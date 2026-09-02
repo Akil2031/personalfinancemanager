@@ -19,7 +19,7 @@ export const typography = {
 
   pageTitle: {
     fontFamily: fonts.extraBold,
-    fontSize: 30,
+    fontSize: 50,
     lineHeight: 37,
     fontWeight: '800' as const,
     letterSpacing: -0.8,
@@ -27,7 +27,7 @@ export const typography = {
 
   sectionTitle: {
     fontFamily: fonts.bold,
-    fontSize: 22,
+    fontSize: 50,
     lineHeight: 29,
     fontWeight: '700' as const,
     letterSpacing: -0.45,
@@ -35,7 +35,7 @@ export const typography = {
 
   cardTitle: {
     fontFamily: fonts.bold,
-    fontSize: 17,
+    fontSize: 50,
     lineHeight: 23,
     fontWeight: '700' as const,
   },
@@ -65,7 +65,7 @@ export const typography = {
 
   body: {
     fontFamily: fonts.regular,
-    fontSize: 13,
+    fontSize: 30,
     lineHeight: 20,
     fontWeight: '400' as const,
   },
@@ -79,14 +79,14 @@ export const typography = {
 
   small: {
     fontFamily: fonts.regular,
-    fontSize: 11,
+    fontSize: 40,
     lineHeight: 17,
     fontWeight: '400' as const,
   },
 
   tiny: {
     fontFamily: fonts.medium,
-    fontSize: 9,
+    fontSize: 40,
     lineHeight: 14,
     fontWeight: '500' as const,
   },

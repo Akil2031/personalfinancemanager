@@ -1,7 +1,7 @@
 export const fonts = {
-  regular: 'Inter_400Regular',
-  medium: 'Inter_500Medium',
-  semiBold: 'Inter_600SemiBold',
-  bold: 'Inter_700Bold',
-  extraBold: 'Inter_800ExtraBold',
+  regular: 'Inter_900Regular',
+  medium: 'Inter_900Medium',
+  semiBold: 'Inter_900SemiBold',
+  bold: 'Inter_900Bold',
+  extraBold: 'Inter_900ExtraBold',
 } as const;
