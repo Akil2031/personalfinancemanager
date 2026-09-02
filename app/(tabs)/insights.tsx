@@ -113,12 +113,8 @@ function formatDate(
  * This avoids the UTC date-shift problem.
  */
 function parseDateString(
-  value: string | Date
+  value: string
 ): Date {
-  if (value instanceof Date) {
-    return new Date(value);
-  }
-
   const normalized =
     String(value)
       .substring(0, 10);
@@ -142,7 +138,7 @@ function parseDateString(
 }
 
 function getDaysUntil(
-  value?: string | Date | null
+  value?: string | null
 ): number | null {
   if (!value) {
     return null;
@@ -450,16 +446,9 @@ export default function InsightsRoute() {
             item
           ) =>
             total +
-            Math.max(
-              0,
-              safeNumber(
-                item.loan
-                  .originalPrincipal
-              ) -
-                safeNumber(
-                  item.position
-                    .currentOutstanding
-                )
+            safeNumber(
+              item.position
+                .principalPaid
             ),
           0
         ),
@@ -483,37 +472,9 @@ export default function InsightsRoute() {
             item
           ) =>
             total +
-            Math.max(
-              0,
-              safeNumber(
-                item.loan.emi
-              ) *
-                Math.max(
-                  0,
-                  safeNumber(
-                    (
-                      item.loan as unknown as Record<
-                        string,
-                        unknown
-                      >
-                    ).tenureMonths
-                  ) -
-                    safeNumber(
-                      item.position
-                        .remainingMonths
-                    )
-                ) -
-                Math.max(
-                  0,
-                  safeNumber(
-                    item.loan
-                      .originalPrincipal
-                  ) -
-                    safeNumber(
-                      item.position
-                        .currentOutstanding
-                    )
-                )
+            safeNumber(
+              item.position
+                .interestPaid
             ),
           0
         ),
@@ -1129,7 +1090,7 @@ export default function InsightsRoute() {
       >
         <ActivityIndicator
           size="large"
-          color="#16803A"
+          color="#356DFF"
         />
 
         <Text
@@ -1173,7 +1134,7 @@ export default function InsightsRoute() {
             onRefresh={
               handleRefresh
             }
-            tintColor="#16803A"
+            tintColor="#356DFF"
           />
         }
       >
@@ -1214,6 +1175,7 @@ export default function InsightsRoute() {
         >
           <MetricCard
             label="Total Outstanding"
+            tone="blue"
             value={formatCurrency(
               totalOutstanding
             )}
@@ -1223,6 +1185,7 @@ export default function InsightsRoute() {
 
           <MetricCard
             label="Monthly EMI"
+            tone="green"
             value={formatCurrency(
               totalMonthlyEMI
             )}
@@ -1231,6 +1194,7 @@ export default function InsightsRoute() {
 
           <MetricCard
             label="Active Loans"
+            tone="purple"
             value={String(
               activeLoans.length
             )}
@@ -1239,6 +1203,7 @@ export default function InsightsRoute() {
 
           <MetricCard
             label="Principal Paid"
+            tone="orange"
             value={formatCurrency(
               totalPrincipalPaid
             )}
@@ -1249,6 +1214,7 @@ export default function InsightsRoute() {
 
           <MetricCard
             label="Interest Paid"
+            tone="indigo"
             value={formatCurrency(
               totalInterestPaid
             )}
@@ -1815,25 +1781,32 @@ function MetricCard({
   label,
   value,
   caption,
+  tone = 'neutral',
   highlight = false,
 }: {
   label: string;
   value: string;
   caption: string;
+  tone?: 'blue' | 'purple' | 'green' | 'orange' | 'indigo' | 'neutral';
   highlight?: boolean;
 }) {
   return (
     <View
       style={[
         styles.metricCard,
-        highlight &&
-          styles.metricCardHighlight,
+        tone === 'blue' && styles.metricBlue,
+        tone === 'purple' && styles.metricPurple,
+        tone === 'green' && styles.metricGreen,
+        tone === 'orange' && styles.metricOrange,
+        tone === 'indigo' && styles.metricIndigo,
+        highlight && styles.metricCardHighlight,
       ]}
     >
       <Text
-        style={
-          styles.metricLabel
-        }
+        style={[
+          styles.metricLabel,
+          tone !== 'neutral' && styles.metricLabelColored,
+        ]}
       >
         {label}
       </Text>
@@ -1841,18 +1814,18 @@ function MetricCard({
       <Text
         style={[
           styles.metricValue,
-          highlight &&
-            styles.metricValueHighlight,
+          tone === 'blue' && styles.metricValueBlue,
+          tone === 'purple' && styles.metricValuePurple,
+          tone === 'green' && styles.metricValueGreen,
+          tone === 'orange' && styles.metricValueOrange,
+          tone === 'indigo' && styles.metricValueIndigo,
+          highlight && styles.metricValueHighlight,
         ]}
       >
         {value}
       </Text>
 
-      <Text
-        style={
-          styles.metricCaption
-        }
-      >
+      <Text style={styles.metricCaption}>
         {caption}
       </Text>
     </View>
@@ -2207,536 +2180,528 @@ const styles =
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor:
-        '#F4F8F5',
+      backgroundColor: '#F5F7FB',
     },
 
-    scroll: {
-      flex: 1,
-    },
+    scroll: { flex: 1 },
 
     content: {
       width: '100%',
-      maxWidth: 1400,
+      maxWidth: 1280,
       alignSelf: 'center',
-      padding: 28,
-      paddingBottom: 60,
+      paddingHorizontal: 28,
+      paddingTop: 30,
+      paddingBottom: 70,
     },
 
     loading: {
       flex: 1,
       alignItems: 'center',
-      justifyContent:
-        'center',
-      backgroundColor:
-        '#F4F8F5',
+      justifyContent: 'center',
+      backgroundColor: '#F5F7FB',
     },
 
     loadingText: {
       marginTop: 12,
-      color: '#6B7280',
+      color: '#667085',
       fontSize: 13,
+      fontFamily: 'Inter_500Medium',
     },
 
     pageHeader: {
-      marginBottom: 20,
+      marginBottom: 24,
     },
 
     title: {
       fontSize: 30,
-      fontWeight: '700',
-      color: '#111827',
+      lineHeight: 38,
+      fontFamily: 'Inter_800ExtraBold',
+      color: '#172033',
+      letterSpacing: -0.6,
     },
 
     subtitle: {
       marginTop: 6,
       maxWidth: 850,
-      color: '#6B7280',
+      color: '#667085',
       fontSize: 13,
       lineHeight: 20,
+      fontFamily: 'Inter_400Regular',
     },
 
     metricsGrid: {
-      flexDirection:
-        'row',
-      flexWrap:
-        'wrap',
+      flexDirection: 'row',
+      flexWrap: 'wrap',
       gap: 14,
     },
 
     metricCard: {
       flexGrow: 1,
-      flexBasis: 210,
-      minHeight: 118,
-      backgroundColor:
-        '#FFFFFF',
-      borderRadius: 14,
-      padding: 19,
+      flexBasis: 225,
+      minHeight: 150,
+      padding: 20,
+      borderRadius: 20,
       borderWidth: 1,
-      borderColor:
-        '#E1EAE4',
+      justifyContent: 'center',
+      shadowOpacity: 0.18,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 5,
+    },
+
+    metricBlue: {
+      backgroundColor: '#356DFF',
+      borderColor: '#356DFF',
+      shadowColor: '#2454D8',
+    },
+    metricPurple: {
+      backgroundColor: '#7857D8',
+      borderColor: '#7857D8',
+      shadowColor: '#5B3FB7',
+    },
+    metricGreen: {
+      backgroundColor: '#18A673',
+      borderColor: '#18A673',
+      shadowColor: '#087A55',
+    },
+    metricOrange: {
+      backgroundColor: '#E99A32',
+      borderColor: '#E99A32',
+      shadowColor: '#C87818',
+    },
+
+    metricIndigo: {
+      backgroundColor: '#5B4CC4',
+      borderColor: '#5B4CC4',
+      shadowColor: '#43359A',
     },
 
     metricCardHighlight: {
-      borderColor:
-        '#B9D9C2',
+      borderColor: '#356DFF',
     },
 
     metricLabel: {
-      color: '#6B7280',
-      fontSize: 11,
-      fontWeight: '600',
+      color: '#FFFFFF',
+      fontSize: 10,
+      fontFamily: 'Inter_700Bold',
+      textTransform: 'uppercase',
+      letterSpacing: 0.65,
     },
+
+    metricLabelColored: { color: 'rgba(255,255,255,0.82)' },
 
     metricValue: {
-      marginTop: 9,
-      color: '#17221B',
-      fontSize: 23,
-      fontWeight: '800',
+      marginTop: 11,
+      color: '#FFFFFF',
+      fontSize: 25,
+      lineHeight: 31,
+      fontFamily: 'Inter_800ExtraBold',
+      letterSpacing: -0.7,
     },
 
-    metricValueHighlight: {
-      color: '#16803A',
-    },
+    metricValueBlue: { color: '#FFFFFF' },
+    metricValuePurple: { color: '#FFFFFF' },
+    metricValueGreen: { color: '#FFFFFF' },
+    metricValueOrange: { color: '#FFFFFF' },
+    metricValueIndigo: { color: '#FFFFFF' },
+    metricValueHighlight: { color: '#FFFFFF' },
 
     metricCaption: {
       marginTop: 7,
-      color: '#8A958E',
-      fontSize: 9,
+      color: 'rgba(255,255,255,0.72)',
+      fontSize: 10,
       lineHeight: 14,
+      fontFamily: 'Inter_400Regular',
     },
 
     card: {
       marginTop: 18,
-      padding: 21,
-      backgroundColor:
-        '#FFFFFF',
-      borderRadius: 14,
+      padding: 22,
+      backgroundColor: '#FFFFFF',
+      borderRadius: 20,
       borderWidth: 1,
-      borderColor:
-        '#E1EAE4',
+      borderColor: '#E7EBF3',
+      shadowColor: '#172033',
+      shadowOpacity: 0.035,
+      shadowRadius: 14,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 1,
     },
 
     cardTitle: {
-      color: '#17221B',
-      fontSize: 18,
-      fontWeight: '800',
+      color: '#172033',
+      fontSize: 17,
+      lineHeight: 23,
+      fontFamily: 'Inter_700Bold',
+      letterSpacing: -0.15,
     },
 
     sectionHeader: {
-      flexDirection:
-        'row',
-      justifyContent:
-        'space-between',
-      alignItems:
-        'flex-start',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      gap: 14,
     },
 
     sectionSubtitle: {
-      marginTop: 4,
-      color: '#87928B',
+      marginTop: 5,
+      color: '#7B8496',
       fontSize: 10,
+      lineHeight: 15,
+      fontFamily: 'Inter_400Regular',
     },
 
     muted: {
-      color: '#7B8780',
+      color: '#7B8496',
       fontSize: 10,
       lineHeight: 17,
+      fontFamily: 'Inter_400Regular',
     },
 
     progressHeader: {
-      marginTop: 17,
-      flexDirection:
-        'row',
-      justifyContent:
-        'space-between',
-      alignItems:
-        'flex-end',
+      marginTop: 18,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-end',
     },
 
     progressLabel: {
-      color: '#7B8780',
+      color: '#667085',
       fontSize: 10,
+      fontFamily: 'Inter_500Medium',
     },
 
     progressValue: {
       marginTop: 4,
-      color: '#16803A',
-      fontSize: 19,
-      fontWeight: '800',
+      color: '#172033',
+      fontSize: 22,
+      fontFamily: 'Inter_800ExtraBold',
     },
 
     progressPercent: {
-      color: '#16803A',
-      fontSize: 22,
-      fontWeight: '800',
+      color: '#3156D3',
+      fontSize: 20,
+      fontFamily: 'Inter_800ExtraBold',
     },
 
     progressTrack: {
       height: 10,
-      marginTop: 12,
+      marginTop: 14,
+      backgroundColor: '#EDF1F7',
+      borderRadius: 99,
       overflow: 'hidden',
-      borderRadius: 999,
-      backgroundColor:
-        '#E8EFEA',
     },
 
     progressFill: {
       height: '100%',
-      borderRadius: 999,
-      backgroundColor:
-        '#16803A',
+      backgroundColor: '#356DFF',
+      borderRadius: 99,
     },
 
     progressFooter: {
-      marginTop: 9,
-      flexDirection:
-        'row',
-      justifyContent:
-        'space-between',
-      alignItems:
-        'center',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 10,
     },
 
     progressFooterValue: {
-      color: '#34423A',
+      color: '#344054',
       fontSize: 10,
-      fontWeight: '700',
+      fontFamily: 'Inter_600SemiBold',
     },
 
     nextEMIRow: {
       marginTop: 16,
-      padding: 16,
-      borderRadius: 12,
-      backgroundColor:
-        '#F5F9F6',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 18,
+      borderRadius: 16,
+      backgroundColor: '#F2F5FF',
       borderWidth: 1,
-      borderColor:
-        '#DCE9E0',
-      flexDirection:
-        'row',
-      justifyContent:
-        'space-between',
-      alignItems:
-        'center',
+      borderColor: '#DCE5FF',
     },
 
-    nextEMILeft: {
-      flex: 1,
-    },
+    nextEMILeft: { flex: 1, paddingRight: 16 },
 
     nextEMILoan: {
-      color: '#26342C',
+      color: '#172033',
       fontSize: 15,
-      fontWeight: '800',
+      fontFamily: 'Inter_700Bold',
     },
 
     nextEMILender: {
       marginTop: 3,
-      color: '#7B8780',
+      color: '#667085',
       fontSize: 10,
+      fontFamily: 'Inter_500Medium',
     },
 
     nextEMIType: {
-      marginTop: 5,
-      color: '#16803A',
+      marginTop: 7,
+      color: '#3156D3',
       fontSize: 9,
-      fontWeight: '700',
+      fontFamily: 'Inter_600SemiBold',
     },
 
-    nextEMIRight: {
-      alignItems:
-        'flex-end',
-    },
+    nextEMIRight: { alignItems: 'flex-end' },
 
     nextEMIAmount: {
-      color: '#16803A',
-      fontSize: 21,
-      fontWeight: '800',
+      color: '#3156D3',
+      fontSize: 22,
+      fontFamily: 'Inter_800ExtraBold',
     },
 
     nextEMIDate: {
       marginTop: 4,
-      color: '#5F6C64',
-      fontSize: 10,
+      color: '#667085',
+      fontSize: 9,
+      fontFamily: 'Inter_500Medium',
     },
 
     nextEMIDays: {
-      marginTop: 4,
-      color: '#16803A',
+      marginTop: 5,
+      color: '#C47718',
       fontSize: 9,
-      fontWeight: '700',
+      fontFamily: 'Inter_700Bold',
     },
 
     insightCount: {
       minWidth: 30,
       height: 30,
       borderRadius: 15,
-      backgroundColor:
-        '#EAF4ED',
+      backgroundColor: '#F2F5FF',
       alignItems: 'center',
-      justifyContent:
-        'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: '#DCE5FF',
     },
 
     insightCountText: {
-      color: '#16803A',
+      color: '#3156D3',
       fontSize: 11,
-      fontWeight: '800',
+      fontFamily: 'Inter_700Bold',
     },
 
     insightList: {
-      marginTop: 15,
+      marginTop: 16,
       gap: 10,
     },
 
     insightCard: {
-      padding: 15,
-      borderRadius: 11,
+      padding: 16,
+      borderRadius: 16,
+      backgroundColor: '#F8FAFC',
       borderWidth: 1,
+      borderColor: '#E7EBF3',
     },
 
-    insightHigh: {
-      backgroundColor:
-        '#FFF4F2',
-      borderColor:
-        '#F1C9C3',
-    },
-
-    insightMedium: {
-      backgroundColor:
-        '#FFF9EA',
-      borderColor:
-        '#EADCA9',
-    },
-
-    insightPositive: {
-      backgroundColor:
-        '#F1F9F3',
-      borderColor:
-        '#CBE2D0',
-    },
+    insightHigh: { backgroundColor: '#FFF4F2', borderColor: '#F6D7D1' },
+    insightMedium: { backgroundColor: '#FFF8EC', borderColor: '#F4E0BA' },
+    insightPositive: { backgroundColor: '#F2F5FF', borderColor: '#DCE5FF' },
 
     insightTitleRow: {
-      flexDirection:
-        'row',
-      alignItems:
-        'center',
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 9,
     },
 
     insightIcon: {
-      width: 22,
-      height: 22,
-      borderRadius: 11,
-      backgroundColor:
-        '#FFFFFF',
+      width: 27,
+      height: 27,
+      borderRadius: 9,
+      backgroundColor: '#FFFFFF',
       textAlign: 'center',
-      textAlignVertical:
-        'center',
+      textAlignVertical: 'center',
+      paddingTop: 5,
+      color: '#3156D3',
       fontSize: 12,
-      fontWeight: '800',
-      color: '#16803A',
-      marginRight: 8,
-      paddingTop: 3,
+      fontFamily: 'Inter_800ExtraBold',
+      overflow: 'hidden',
     },
 
     insightTitle: {
       flex: 1,
-      color: '#26342C',
-      fontSize: 13,
-      fontWeight: '800',
+      color: '#172033',
+      fontSize: 12,
+      fontFamily: 'Inter_700Bold',
     },
 
     insightMessage: {
-      marginTop: 8,
-      color: '#526058',
+      marginTop: 9,
+      color: '#596579',
       fontSize: 10,
-      lineHeight: 17,
+      lineHeight: 16,
+      fontFamily: 'Inter_400Regular',
     },
 
     insightRecommendation: {
-      marginTop: 8,
-      color: '#34423A',
-      fontSize: 10,
-      lineHeight: 17,
-      fontWeight: '600',
+      marginTop: 9,
+      color: '#344054',
+      fontSize: 9,
+      lineHeight: 15,
+      fontFamily: 'Inter_600SemiBold',
     },
 
-    loanList: {
-      marginTop: 15,
-      gap: 10,
-    },
+    loanList: { marginTop: 15, gap: 10 },
 
     loanRow: {
-      padding: 15,
-      borderRadius: 11,
+      padding: 17,
+      borderRadius: 16,
+      backgroundColor: '#FBFCFE',
       borderWidth: 1,
-      borderColor:
-        '#E2EAE5',
-      backgroundColor:
-        '#FAFCFA',
+      borderColor: '#E7EBF3',
     },
 
     loanRowTop: {
-      flexDirection:
-        'row',
-      justifyContent:
-        'space-between',
-      alignItems:
-        'center',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
     },
 
-    loanIdentity: {
-      flex: 1,
-      paddingRight: 15,
-    },
+    loanIdentity: { flex: 1, paddingRight: 14 },
 
     loanName: {
-      color: '#26342C',
+      color: '#172033',
       fontSize: 13,
-      fontWeight: '800',
+      fontFamily: 'Inter_700Bold',
     },
 
     loanLender: {
-      marginTop: 3,
-      color: '#87928B',
+      marginTop: 4,
+      color: '#7B8496',
       fontSize: 9,
+      fontFamily: 'Inter_400Regular',
     },
 
-    loanOutstandingBox: {
-      alignItems:
-        'flex-end',
-    },
+    loanOutstandingBox: { alignItems: 'flex-end' },
 
     loanOutstanding: {
-      color: '#16803A',
+      color: '#3156D3',
       fontSize: 16,
-      fontWeight: '800',
+      fontFamily: 'Inter_800ExtraBold',
     },
 
     loanOutstandingLabel: {
-      marginTop: 2,
-      color: '#87928B',
+      marginTop: 3,
+      color: '#98A2B3',
       fontSize: 8,
+      textTransform: 'uppercase',
+      letterSpacing: 0.4,
+      fontFamily: 'Inter_600SemiBold',
     },
 
     loanMetrics: {
-      marginTop: 14,
-      paddingTop: 12,
-      borderTopWidth: 1,
-      borderTopColor:
-        '#E7EEE9',
-      flexDirection:
-        'row',
-      flexWrap:
-        'wrap',
-      gap: 10,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+      marginTop: 15,
     },
 
     loanMetric: {
       minWidth: 105,
       flexGrow: 1,
+      padding: 10,
+      borderRadius: 11,
+      backgroundColor: '#FFFFFF',
+      borderWidth: 1,
+      borderColor: '#EDF0F5',
     },
 
     loanMetricLabel: {
-      color: '#8A958E',
+      color: '#98A2B3',
       fontSize: 8,
+      textTransform: 'uppercase',
+      letterSpacing: 0.35,
+      fontFamily: 'Inter_600SemiBold',
     },
 
     loanMetricValue: {
-      marginTop: 3,
-      color: '#34423A',
+      marginTop: 4,
+      color: '#344054',
       fontSize: 10,
-      fontWeight: '700',
+      fontFamily: 'Inter_700Bold',
     },
 
     loanProgressHeader: {
       marginTop: 14,
-      flexDirection:
-        'row',
-      justifyContent:
-        'space-between',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
     },
 
     loanProgressLabel: {
-      color: '#7B8780',
+      color: '#667085',
       fontSize: 9,
+      fontFamily: 'Inter_500Medium',
     },
 
     loanProgressPercent: {
-      color: '#16803A',
+      color: '#168A61',
       fontSize: 9,
-      fontWeight: '800',
+      fontFamily: 'Inter_700Bold',
     },
 
     loanProgressTrack: {
       height: 7,
-      marginTop: 6,
+      marginTop: 7,
+      borderRadius: 99,
+      backgroundColor: '#EDF1F7',
       overflow: 'hidden',
-      borderRadius: 999,
-      backgroundColor:
-        '#E8EFEA',
     },
 
     loanProgressFill: {
       height: '100%',
-      borderRadius: 999,
-      backgroundColor:
-        '#16803A',
+      borderRadius: 99,
+      backgroundColor: '#18A673',
     },
 
     summaryRow: {
-      paddingVertical: 11,
-      flexDirection:
-        'row',
-      justifyContent:
-        'space-between',
-      alignItems:
-        'center',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 13,
       borderBottomWidth: 1,
-      borderBottomColor:
-        '#EDF1EE',
+      borderBottomColor: '#EEF1F5',
     },
 
     summaryRowLabel: {
-      color: '#6D7972',
+      color: '#667085',
       fontSize: 10,
+      fontFamily: 'Inter_400Regular',
     },
 
     summaryRowValue: {
-      color: '#34423A',
+      color: '#344054',
       fontSize: 11,
-      fontWeight: '700',
+      fontFamily: 'Inter_600SemiBold',
     },
 
     summaryRowLabelStrong: {
-      color: '#26342C',
-      fontWeight: '800',
+      color: '#172033',
+      fontFamily: 'Inter_700Bold',
     },
 
     summaryRowValueStrong: {
-      color: '#16803A',
-      fontSize: 13,
-      fontWeight: '800',
+      color: '#3156D3',
+      fontFamily: 'Inter_800ExtraBold',
     },
 
     emptyBlock: {
-      paddingVertical: 25,
-      alignItems:
-        'center',
-      justifyContent:
-        'center',
+      marginTop: 14,
+      padding: 22,
+      borderRadius: 15,
+      backgroundColor: '#F8FAFC',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#E7EBF3',
     },
 
     emptyTitle: {
-      color: '#34423A',
-      fontSize: 13,
-      fontWeight: '800',
-      textAlign: 'center',
-      marginBottom: 5,
+      color: '#344054',
+      fontSize: 12,
+      fontFamily: 'Inter_700Bold',
     },
 
-    bottomSpace: {
-      height: 30,
-    },
+    bottomSpace: { height: 20 },
   });
+

@@ -28,6 +28,7 @@ import {
 } from 'react-native';
 
 
+
 import {
   Loan,
 } from '../../src/models/loan';
@@ -890,7 +891,7 @@ export default function PaymentsRoute() {
   }
 
   return (
-    
+   
       <View
         style={
           styles.container
@@ -1592,7 +1593,7 @@ export default function PaymentsRoute() {
           />
         </ScrollView>
       </View>
-    
+   
   );
 }
 
@@ -1938,50 +1939,58 @@ const styles =
     },
 
     summaryCard: {
-      flex: 1,
-      minWidth: 190,
-      minHeight: 104,
-      borderRadius: 18,
-      paddingHorizontal: 18,
-      paddingVertical: 16,
-      justifyContent: 'center',
+      flexGrow: 1,
+      flexBasis: 225,
+      minHeight: 150,
+      padding: 20,
+      borderRadius: 20,
       borderWidth: 1,
+      justifyContent: 'center',
+      shadowOpacity: 0.18,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 5,
     },
 
     summaryBlue: {
-      backgroundColor: '#F1F5FF',
-      borderColor: '#DCE6FF',
+      backgroundColor: '#356DFF',
+      borderColor: '#356DFF',
+      shadowColor: '#2454D8',
     },
 
     summaryGreen: {
-      backgroundColor: '#EFFAF5',
-      borderColor: '#D6F0E4',
+      backgroundColor: '#18A673',
+      borderColor: '#18A673',
+      shadowColor: '#087A55',
     },
 
     summaryPurple: {
-      backgroundColor: '#F6F2FF',
-      borderColor: '#E7DFFF',
+      backgroundColor: '#7857D8',
+      borderColor: '#7857D8',
+      shadowColor: '#5B3FB7',
     },
 
     summaryOrange: {
-      backgroundColor: '#FFF8EC',
-      borderColor: '#F7E5C2',
+      backgroundColor: '#E99A32',
+      borderColor: '#E99A32',
+      shadowColor: '#C87818',
     },
 
     summaryLabel: {
-      fontFamily: 'Inter_500Medium',
+      fontFamily: 'Inter_700Bold',
       fontSize: 10,
-      color: '#718096',
-      letterSpacing: 0.1,
+      color: 'rgba(255,255,255,0.82)',
+      letterSpacing: 0.65,
+      textTransform: 'uppercase',
     },
 
     summaryValue: {
-      marginTop: 8,
+      marginTop: 11,
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 21,
-      lineHeight: 27,
-      color: '#172033',
-      letterSpacing: -0.3,
+      fontSize: 25,
+      lineHeight: 31,
+      color: '#FFFFFF',
+      letterSpacing: -0.7,
     },
 
     formCard: {
