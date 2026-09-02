@@ -988,6 +988,9 @@ export default function AddLoanScreen({
           styles.formCard
         }
       >
+        <Text style={styles.formEyebrow}>
+          LOAN PROFILE
+        </Text>
         <Text
           style={
             styles.sectionTitle
@@ -1972,152 +1975,157 @@ const styles =
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor:
-        '#F4F8F5',
+      backgroundColor: '#F5F7FB',
     },
 
     content: {
       width: '100%',
-      maxWidth: 1200,
+      maxWidth: 1180,
       alignSelf: 'center',
-      paddingHorizontal: 32,
-      paddingTop: 28,
-      paddingBottom: 50,
+      paddingHorizontal: 28,
+      paddingTop: 24,
+      paddingBottom: 56,
     },
 
     header: {
-      flexDirection:
-        'row',
-      justifyContent:
-        'space-between',
-      alignItems:
-        'flex-start',
-      marginBottom: 22,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: 20,
     },
 
     title: {
+      fontFamily: 'Inter_800ExtraBold',
       fontSize: 30,
-      fontWeight: '800',
-      color: '#17221B',
+      color: '#172033',
+      letterSpacing: -0.6,
     },
 
     subtitle: {
-      marginTop: 5,
+      marginTop: 6,
+      maxWidth: 650,
+      fontFamily: 'Inter_400Regular',
       fontSize: 13,
-      color: '#728078',
+      lineHeight: 19,
+      color: '#6B7890',
     },
 
     cancelButton: {
-      paddingHorizontal: 14,
-      paddingVertical: 9,
-      borderRadius: 8,
-      backgroundColor:
-        '#E9F0EB',
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderRadius: 11,
+      backgroundColor: '#FFFFFF',
+      borderWidth: 1,
+      borderColor: '#E0E6F0',
     },
 
     cancelText: {
+      fontFamily: 'Inter_600SemiBold',
       fontSize: 12,
-      fontWeight: '700',
-      color: '#536159',
+      color: '#4F5D73',
     },
 
     formCard: {
-      backgroundColor:
-        '#FFFFFF',
+      backgroundColor: '#FFFFFF',
       borderWidth: 1,
-      borderColor:
-        '#DFE8E2',
-      borderRadius: 16,
+      borderColor: '#E3E8F1',
+      borderRadius: 18,
       padding: 24,
+      shadowColor: '#1D2A44',
+      shadowOpacity: 0.05,
+      shadowRadius: 18,
+      shadowOffset: { width: 0, height: 7 },
+      elevation: 2,
+    },
+
+    formEyebrow: {
+      marginBottom: 6,
+      fontFamily: 'Inter_700Bold',
+      fontSize: 9,
+      letterSpacing: 1.1,
+      color: '#356DFF',
     },
 
     sectionTitle: {
-      fontSize: 18,
-      fontWeight: '800',
-      color: '#17221B',
-      marginBottom: 6,
+      fontFamily: 'Inter_700Bold',
+      fontSize: 17,
+      color: '#172033',
+      marginBottom: 4,
+      letterSpacing: -0.2,
     },
 
     fieldContainer: {
-      marginTop: 15,
+      marginTop: 16,
       flex: 1,
     },
 
     label: {
       marginBottom: 7,
-      fontSize: 12,
-      fontWeight: '700',
-      color: '#435149',
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 11,
+      color: '#46546B',
     },
 
     input: {
-      height: 45,
+      height: 46,
       borderWidth: 1,
-      borderColor:
-        '#D5E0D9',
-      borderRadius: 9,
-      paddingHorizontal: 13,
-      backgroundColor:
-        '#FBFCFB',
-      fontSize: 14,
-      color: '#1D2922',
+      borderColor: '#DCE3EE',
+      borderRadius: 11,
+      paddingHorizontal: 14,
+      backgroundColor: '#FBFCFE',
+      fontFamily: 'Inter_500Medium',
+      fontSize: 13,
+      color: '#172033',
     },
 
     helper: {
-      marginTop: 5,
+      marginTop: 6,
+      fontFamily: 'Inter_400Regular',
       fontSize: 10,
-      color: '#89958E',
+      lineHeight: 15,
+      color: '#8793A6',
     },
 
     optionGrid: {
-      flexDirection:
-        'row',
-      flexWrap:
-        'wrap',
-      gap: 8,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 9,
       marginBottom: 4,
     },
 
     inlineOptions: {
-      flexDirection:
-        'row',
-      flexWrap:
-        'wrap',
-      gap: 8,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 9,
     },
 
     optionButton: {
       paddingHorizontal: 14,
-      paddingVertical: 9,
-      borderRadius: 8,
+      paddingVertical: 10,
+      borderRadius: 11,
       borderWidth: 1,
-      borderColor:
-        '#D5E0D9',
-      backgroundColor:
-        '#F8FAF9',
+      borderColor: '#DCE3EE',
+      backgroundColor: '#FAFBFD',
     },
 
     optionButtonSelected: {
-      backgroundColor:
-        '#E0F5E7',
-      borderColor:
-        '#75C58D',
+      backgroundColor: '#EAF0FF',
+      borderColor: '#AFC3FF',
     },
 
     optionText: {
+      fontFamily: 'Inter_600SemiBold',
       fontSize: 11,
-      fontWeight: '700',
-      color: '#65736B',
+      color: '#68758A',
     },
 
     optionTextSelected: {
-      color: '#16803A',
+      color: '#356DFF',
     },
 
     twoColumn: {
-      flexDirection:
-        'row',
-      gap: 16,
+      flexDirection: 'row',
+      gap: 18,
     },
 
     column: {
@@ -2126,33 +2134,32 @@ const styles =
 
     calculatedCard: {
       marginTop: 18,
-      backgroundColor:
-        '#EFFAF2',
+      backgroundColor: '#F3F6FF',
       borderWidth: 1,
-      borderColor:
-        '#B9E6C8',
-      borderRadius: 16,
+      borderColor: '#CFDAFF',
+      borderRadius: 18,
       padding: 22,
     },
 
     calculatedTitle: {
+      fontFamily: 'Inter_700Bold',
       fontSize: 17,
-      fontWeight: '800',
-      color: '#176A35',
+      color: '#274DBB',
+      letterSpacing: -0.2,
     },
 
     calculatedSubtitle: {
-      marginTop: 3,
+      marginTop: 4,
+      fontFamily: 'Inter_400Regular',
       fontSize: 11,
-      color: '#6B8272',
+      lineHeight: 16,
+      color: '#6F7D96',
     },
 
     calculatedGrid: {
-      flexDirection:
-        'row',
-      flexWrap:
-        'wrap',
-      marginTop: 20,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      marginTop: 18,
       gap: 1,
     },
 
@@ -2164,117 +2171,115 @@ const styles =
     },
 
     calculatedLabel: {
+      fontFamily: 'Inter_500Medium',
       fontSize: 10,
-      color: '#718078',
+      color: '#7A879C',
     },
 
     calculatedValue: {
       marginTop: 5,
+      fontFamily: 'Inter_700Bold',
       fontSize: 17,
-      fontWeight: '800',
-      color: '#26342C',
+      color: '#1D2940',
     },
 
     calculatedValueAccent: {
-      color: '#16803A',
+      color: '#356DFF',
     },
 
     assumption: {
-      flexDirection:
-        'row',
-      alignItems:
-        'center',
+      flexDirection: 'row',
+      alignItems: 'center',
       marginTop: 14,
       padding: 11,
-      borderRadius: 9,
-      backgroundColor:
-        '#DDF5E4',
+      borderRadius: 11,
+      backgroundColor: '#EAF0FF',
     },
 
     assumptionIcon: {
-      width: 20,
-      height: 20,
-      borderRadius: 10,
-      backgroundColor:
-        '#16803A',
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      backgroundColor: '#356DFF',
       color: '#FFFFFF',
-      textAlign:
-        'center',
-      lineHeight: 20,
-      fontWeight: '800',
+      textAlign: 'center',
+      lineHeight: 22,
+      fontFamily: 'Inter_700Bold',
+      fontSize: 11,
       marginRight: 9,
     },
 
     assumptionText: {
       flex: 1,
+      fontFamily: 'Inter_400Regular',
       fontSize: 10,
-      color: '#42604B',
+      lineHeight: 15,
+      color: '#536585',
     },
 
     calculationEmpty: {
       marginTop: 18,
       padding: 16,
-      borderRadius: 9,
-      backgroundColor:
-        '#E7F2EA',
+      borderRadius: 11,
+      backgroundColor: '#F5F7FB',
+      borderWidth: 1,
+      borderColor: '#E6EAF1',
     },
 
     calculationEmptyText: {
+      fontFamily: 'Inter_400Regular',
       fontSize: 11,
-      color: '#6D7D73',
       lineHeight: 17,
+      color: '#748198',
     },
 
     calculateButton: {
       marginTop: 16,
       paddingVertical: 13,
-      borderRadius: 9,
-      alignItems:
-        'center',
-      backgroundColor:
-        '#E2EEE5',
+      borderRadius: 11,
+      alignItems: 'center',
+      backgroundColor: '#EAF0FF',
       borderWidth: 1,
-      borderColor:
-        '#C7DCCE',
+      borderColor: '#C9D7FF',
     },
 
     calculateButtonText: {
+      fontFamily: 'Inter_700Bold',
       fontSize: 12,
-      fontWeight: '800',
-      color: '#267040',
+      color: '#356DFF',
     },
 
     statusCard: {
       marginTop: 16,
       padding: 20,
-      backgroundColor:
-        '#FFFFFF',
-      borderRadius: 14,
+      backgroundColor: '#FFFFFF',
+      borderRadius: 16,
       borderWidth: 1,
-      borderColor:
-        '#DFE8E2',
+      borderColor: '#E3E8F1',
     },
 
     saveButton: {
       marginTop: 18,
-      minHeight: 50,
-      borderRadius: 10,
-      alignItems:
-        'center',
-      justifyContent:
-        'center',
-      backgroundColor:
-        '#16803A',
+      minHeight: 52,
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#356DFF',
+      shadowColor: '#356DFF',
+      shadowOpacity: 0.18,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 3,
     },
 
     saveButtonDisabled: {
-      opacity: 0.65,
+      opacity: 0.62,
     },
 
     saveButtonText: {
       color: '#FFFFFF',
-      fontSize: 14,
-      fontWeight: '800',
+      fontFamily: 'Inter_700Bold',
+      fontSize: 13,
     },
 
     bottomSpace: {
