@@ -17,9 +17,7 @@ import {
 
 import AddLoanScreen from '../src/screens/AddLoanScreen';
 
-import {
-  getLoanById,
-} from '../src/services/loanService';
+import * as loanService from '../src/services/loanService';
 
 import {
   Loan,
@@ -69,8 +67,23 @@ export default function EditLoanRoute() {
       setLoading(true);
       setError('');
 
+      const getLoan =
+        (loanService as typeof loanService & {
+          getLoan?: (id: string) => Promise<Loan | null>;
+          getLoanById?: (id: string) => Promise<Loan | null>;
+        }).getLoan ??
+        (loanService as typeof loanService & {
+          getLoanById?: (id: string) => Promise<Loan | null>;
+        }).getLoanById;
+
+      if (!getLoan) {
+        throw new Error(
+          'Loan lookup service is unavailable.'
+        );
+      }
+
       const result =
-        await getLoanById(
+        await getLoan(
           loanId
         );
 

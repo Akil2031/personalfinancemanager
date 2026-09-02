@@ -23,17 +23,9 @@ import {
 } from '../../src/services/loanService';
 
 import {
-  getAllPayments,
-} from '../../src/services/paymentService';
-
-import {
-  Payment,
-} from '../../src/models/payment';
-
-import {
-  generateAdjustedLoanSchedule,
-} from '../../src/engine/loanSchedule';
-
+  calculateLoanPosition,
+  LoanPosition,
+} from '../../src/engine/loanPosition';
 
 /*
  * =========================================================
@@ -43,7 +35,7 @@ import {
 
 interface LoanWithPosition {
   loan: Loan;
-  position: ReturnType<typeof generateAdjustedLoanSchedule>;
+  position: LoanPosition;
 }
 
 /*
@@ -121,8 +113,12 @@ function formatDate(
  * This avoids the UTC date-shift problem.
  */
 function parseDateString(
-  value: string
+  value: string | Date
 ): Date {
+  if (value instanceof Date) {
+    return new Date(value);
+  }
+
   const normalized =
     String(value)
       .substring(0, 10);
@@ -146,7 +142,7 @@ function parseDateString(
 }
 
 function getDaysUntil(
-  value?: string | null
+  value?: string | Date | null
 ): number | null {
   if (!value) {
     return null;
@@ -263,11 +259,6 @@ export default function InsightsRoute() {
   ] = useState<Loan[]>([]);
 
   const [
-    paymentData,
-    setPaymentData,
-  ] = useState<Payment[]>([]);
-
-  const [
     loading,
     setLoading,
   ] = useState(true);
@@ -287,23 +278,12 @@ export default function InsightsRoute() {
     useCallback(
       async () => {
         try {
-          const [
-            data,
-            paymentData,
-          ] = await Promise.all([
-            getLoans(),
-            getAllPayments(),
-          ]);
+          const data =
+            await getLoans();
 
-          setLoans(data);
-
-          /*
-           * Store actual payment records locally so every
-           * calculation below uses the same payment-aware
-           * schedule engine as the Loans screen.
-           */
-          setPaymentData(paymentData);
-
+          setLoans(
+            data
+          );
         } catch (
           error
         ) {
@@ -313,7 +293,6 @@ export default function InsightsRoute() {
           );
 
           setLoans([]);
-          setPaymentData([]);
         } finally {
           setLoading(false);
           setRefreshing(false);
@@ -365,28 +344,18 @@ export default function InsightsRoute() {
             'CLOSED'
         )
         .map(
-          loan => {
-            const loanPayments =
-              paymentData.filter(
-                payment =>
-                  payment.loanId ===
-                  loan.id
-              );
+          loan => ({
+            loan,
 
-            return {
-              loan,
-              position:
-                generateAdjustedLoanSchedule(
-                  loan,
-                  loanPayments,
-                  new Date()
-                ),
-            };
-          }
+            position:
+              calculateLoanPosition(
+                loan,
+                new Date()
+              ),
+          })
         );
     }, [
       loans,
-      paymentData,
     ]);
 
   /*
@@ -481,9 +450,16 @@ export default function InsightsRoute() {
             item
           ) =>
             total +
-            safeNumber(
-              item.position
-                .principalPaid
+            Math.max(
+              0,
+              safeNumber(
+                item.loan
+                  .originalPrincipal
+              ) -
+                safeNumber(
+                  item.position
+                    .currentOutstanding
+                )
             ),
           0
         ),
@@ -507,9 +483,37 @@ export default function InsightsRoute() {
             item
           ) =>
             total +
-            safeNumber(
-              item.position
-                .interestPaid
+            Math.max(
+              0,
+              safeNumber(
+                item.loan.emi
+              ) *
+                Math.max(
+                  0,
+                  safeNumber(
+                    (
+                      item.loan as unknown as Record<
+                        string,
+                        unknown
+                      >
+                    ).tenureMonths
+                  ) -
+                    safeNumber(
+                      item.position
+                        .remainingMonths
+                    )
+                ) -
+                Math.max(
+                  0,
+                  safeNumber(
+                    item.loan
+                      .originalPrincipal
+                  ) -
+                    safeNumber(
+                      item.position
+                        .currentOutstanding
+                    )
+                )
             ),
           0
         ),
