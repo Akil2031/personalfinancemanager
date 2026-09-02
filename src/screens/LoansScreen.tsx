@@ -1395,10 +1395,14 @@ export default function LoansScreen({
         {/* TOTAL OUTSTANDING */}
 
         <View
-          style={
-            styles.summaryCard
-          }
+          style={[
+            styles.summaryCard,
+            styles.summaryCardBlue,
+          ]}
         >
+
+          <View pointerEvents="none" style={styles.summaryCircleLarge} />
+          <View pointerEvents="none" style={styles.summaryCircleSmall} />
 
           <Text
             style={
@@ -1435,10 +1439,14 @@ export default function LoansScreen({
         {/* TOTAL LOAN AMOUNT */}
 
         <View
-          style={
-            styles.summaryCard
-          }
+          style={[
+            styles.summaryCard,
+            styles.summaryCardPurple,
+          ]}
         >
+
+          <View pointerEvents="none" style={styles.summaryCircleLarge} />
+          <View pointerEvents="none" style={styles.summaryCircleSmall} />
 
           <Text
             style={
@@ -1475,10 +1483,14 @@ export default function LoansScreen({
         {/* MONTHLY EMI */}
 
         <View
-          style={
-            styles.summaryCard
-          }
+          style={[
+            styles.summaryCard,
+            styles.summaryCardGreen,
+          ]}
         >
+
+          <View pointerEvents="none" style={styles.summaryCircleLarge} />
+          <View pointerEvents="none" style={styles.summaryCircleSmall} />
 
           <Text
             style={
@@ -1515,10 +1527,14 @@ export default function LoansScreen({
         {/* ACTIVE LOANS */}
 
         <View
-          style={
-            styles.summaryCard
-          }
+          style={[
+            styles.summaryCard,
+            styles.summaryCardOrange,
+          ]}
         >
+
+          <View pointerEvents="none" style={styles.summaryCircleLarge} />
+          <View pointerEvents="none" style={styles.summaryCircleSmall} />
 
           <Text
             style={
@@ -1856,7 +1872,9 @@ export default function LoansScreen({
                             styles.loanIconText
                           }
                         >
-                          ₹
+                          {String(loan.loanType || 'OTHER')
+                            .replace('_LOAN', '')
+                            .slice(0, 2)}
                         </Text>
 
                       </View>
@@ -2397,826 +2415,571 @@ const styles =
 
     container: {
       flex: 1,
-      backgroundColor:
-        '#F4F8F5',
+      backgroundColor: '#F3F7F6',
     },
-
 
     content: {
-      paddingBottom: 40,
+      paddingBottom: 44,
     },
-
 
     loading: {
       flex: 1,
-
-      justifyContent:
-        'center',
-
-      alignItems:
-        'center',
-
-      backgroundColor:
-        '#F4F8F5',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#F3F7F6',
     },
-
 
     loadingText: {
-      marginTop: 10,
-
-      color:
-        '#637068',
+      marginTop: 12,
+      fontFamily: 'Inter_500Medium',
+      fontSize: 13,
+      color: '#667085',
     },
-
 
     header: {
-      paddingHorizontal: 28,
-
-      paddingTop: 26,
-
-      paddingBottom: 20,
-
-      flexDirection:
-        'row',
-
-      alignItems:
-        'center',
-
-      justifyContent:
-        'space-between',
+      paddingHorizontal: 30,
+      paddingTop: 30,
+      paddingBottom: 24,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 18,
     },
-
 
     title: {
-      fontSize: 28,
-
-      fontWeight:
-        '800',
-
-      color:
-        '#17221B',
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 30,
+      letterSpacing: -0.7,
+      color: '#101828',
     },
-
 
     subtitle: {
-      marginTop: 5,
-
+      marginTop: 7,
+      fontFamily: 'Inter_400Regular',
       fontSize: 13,
-
-      color:
-        '#748078',
+      color: '#667085',
     },
-
 
     addButton: {
-      paddingHorizontal: 16,
-
-      paddingVertical: 10,
-
-      borderRadius: 9,
-
-      backgroundColor:
-        '#16803A',
+      minHeight: 46,
+      paddingHorizontal: 19,
+      paddingVertical: 12,
+      borderRadius: 13,
+      backgroundColor: '#356DFF',
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: '#2454D8',
+      shadowOpacity: 0.22,
+      shadowRadius: 13,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 4,
     },
-
 
     addButtonText: {
-      color:
-        '#FFFFFF',
-
+      fontFamily: 'Inter_700Bold',
+      color: '#FFFFFF',
       fontSize: 12,
-
-      fontWeight:
-        '800',
+      letterSpacing: 0.1,
     },
 
-
     summaryContainer: {
-      flexDirection:
-        'row',
-
-      flexWrap:
-        'wrap',
-
-      gap: 12,
-
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 14,
       paddingHorizontal: 24,
     },
 
-
     summaryCard: {
       flexGrow: 1,
-
-      flexBasis: 220,
-
-      minHeight: 115,
-
-      backgroundColor:
-        '#FFFFFF',
-
-      borderRadius: 14,
-
+      flexBasis: 225,
+      minHeight: 150,
+      padding: 20,
+      borderRadius: 20,
+      backgroundColor: '#356DFF',
       borderWidth: 1,
-
-      borderColor:
-        '#E1EAE4',
-
-      padding: 17,
+      borderColor: '#356DFF',
+      shadowColor: '#2454D8',
+      shadowOpacity: 0.18,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 5,
+      overflow: 'hidden',
+      position: 'relative',
     },
 
+    summaryCardBlue: {
+      backgroundColor: '#356DFF',
+      borderColor: '#356DFF',
+      shadowColor: '#2454D8',
+    },
+
+    summaryCardPurple: {
+      backgroundColor: '#7857D8',
+      borderColor: '#7857D8',
+      shadowColor: '#5B3FB7',
+    },
+
+    summaryCardGreen: {
+      backgroundColor: '#18A673',
+      borderColor: '#18A673',
+      shadowColor: '#087A55',
+    },
+
+    summaryCardOrange: {
+      backgroundColor: '#E99A32',
+      borderColor: '#E99A32',
+      shadowColor: '#C87818',
+    },
 
     summaryLabel: {
-      fontSize: 11,
-
-      fontWeight:
-        '600',
-
-      color:
-        '#718078',
+      fontFamily: 'Inter_700Bold',
+      fontSize: 10,
+      color: 'rgba(255,255,255,0.82)',
+      letterSpacing: 0.65,
+      textTransform: 'uppercase',
     },
-
 
     summaryValue: {
-      marginTop: 7,
-
-      fontSize: 21,
-
-      fontWeight:
-        '800',
-
-      color:
-        '#16803A',
+      marginTop: 11,
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 25,
+      letterSpacing: -0.7,
+      color: '#FFFFFF',
     },
-
 
     summaryHint: {
-      marginTop: 4,
-
+      marginTop: 7,
+      fontFamily: 'Inter_400Regular',
       fontSize: 10,
-
-      color:
-        '#98A39D',
+      color: 'rgba(255,255,255,0.72)',
     },
 
+    summaryCircleLarge: {
+      position: 'absolute',
+      width: 145,
+      height: 145,
+      borderRadius: 73,
+      right: -52,
+      top: -72,
+      backgroundColor: 'rgba(255,255,255,0.11)',
+    },
+
+    summaryCircleSmall: {
+      position: 'absolute',
+      width: 105,
+      height: 105,
+      borderRadius: 53,
+      left: -58,
+      bottom: -66,
+      backgroundColor: 'rgba(255,255,255,0.07)',
+    },
 
     searchContainer: {
       marginHorizontal: 24,
-
       marginTop: 22,
     },
 
-
     searchInput: {
-      height: 43,
-
-      backgroundColor:
-        '#FFFFFF',
-
+      height: 48,
+      paddingHorizontal: 16,
+      borderRadius: 13,
+      backgroundColor: '#FFFFFF',
       borderWidth: 1,
-
-      borderColor:
-        '#DDE6E0',
-
-      borderRadius: 9,
-
-      paddingHorizontal: 14,
-
-      fontSize: 12,
-
-      color:
-        '#1B2921',
+      borderColor: '#E4E8F0',
+      fontFamily: 'Inter_400Regular',
+      fontSize: 13,
+      color: '#101828',
+      shadowColor: '#101828',
+      shadowOpacity: 0.035,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 1,
     },
 
-
     filterRow: {
-      flexDirection:
-        'row',
-
-      flexWrap:
-        'wrap',
-
+      flexDirection: 'row',
+      flexWrap: 'wrap',
       gap: 8,
-
       marginHorizontal: 24,
-
       marginTop: 12,
     },
 
-
     filterButton: {
-      paddingHorizontal: 13,
-
-      paddingVertical: 8,
-
-      borderRadius: 8,
-
-      backgroundColor:
-        '#FFFFFF',
-
+      paddingHorizontal: 15,
+      paddingVertical: 9,
+      borderRadius: 22,
+      backgroundColor: '#FFFFFF',
       borderWidth: 1,
-
-      borderColor:
-        '#DDE6E0',
+      borderColor: '#E1E6EF',
     },
-
 
     filterButtonActive: {
-      backgroundColor:
-        '#16803A',
-
-      borderColor:
-        '#16803A',
+      backgroundColor: '#EAF0FF',
+      borderColor: '#C9D7FF',
     },
-
 
     filterText: {
+      fontFamily: 'Inter_600SemiBold',
       fontSize: 10,
-
-      fontWeight:
-        '700',
-
-      color:
-        '#65736B',
+      color: '#667085',
     },
-
 
     filterTextActive: {
-      color:
-        '#FFFFFF',
+      color: '#356DFF',
     },
-
 
     sectionHeader: {
       paddingHorizontal: 28,
-
-      paddingTop: 27,
-
-      paddingBottom: 13,
+      paddingTop: 30,
+      paddingBottom: 14,
     },
-
 
     sectionTitle: {
-      fontSize: 20,
-
-      fontWeight:
-        '800',
-
-      color:
-        '#17221B',
+      fontFamily: 'Inter_700Bold',
+      fontSize: 19,
+      letterSpacing: -0.25,
+      color: '#101828',
     },
-
 
     sectionSubtitle: {
-      marginTop: 3,
-
+      marginTop: 4,
+      fontFamily: 'Inter_400Regular',
       fontSize: 11,
-
-      color:
-        '#7B8780',
+      color: '#98A2B3',
     },
-
 
     loanCard: {
       marginHorizontal: 24,
-
-      marginBottom: 13,
-
-      padding: 19,
-
-      backgroundColor:
-        '#FFFFFF',
-
-      borderRadius: 16,
-
+      marginBottom: 14,
+      padding: 20,
+      borderRadius: 19,
+      backgroundColor: '#FFFFFF',
       borderWidth: 1,
-
-      borderColor:
-        '#E1EAE4',
+      borderColor: '#E7EBF2',
+      shadowColor: '#101828',
+      shadowOpacity: 0.055,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 7 },
+      elevation: 2,
     },
-
 
     loanHeader: {
-      flexDirection:
-        'row',
-
-      alignItems:
-        'center',
-
-      justifyContent:
-        'space-between',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 14,
     },
-
 
     loanIdentity: {
-      flexDirection:
-        'row',
-
-      alignItems:
-        'center',
-    },
-
-
-    loanIcon: {
-      width: 43,
-
-      height: 43,
-
-      borderRadius: 11,
-
-      backgroundColor:
-        '#EAF4ED',
-
-      alignItems:
-        'center',
-
-      justifyContent:
-        'center',
-
-      marginRight: 11,
-    },
-
-
-    loanIconText: {
-      fontSize: 18,
-
-      fontWeight:
-        '800',
-
-      color:
-        '#16803A',
-    },
-
-
-    loanName: {
-      fontSize: 16,
-
-      fontWeight:
-        '800',
-
-      color:
-        '#17221B',
-    },
-
-
-    lender: {
-      marginTop: 3,
-
-      fontSize: 11,
-
-      color:
-        '#78847D',
-    },
-
-
-    statusBadge: {
-      paddingHorizontal: 9,
-
-      paddingVertical: 5,
-
-      borderRadius: 20,
-    },
-
-
-    statusActive: {
-      backgroundColor:
-        '#E8F6EC',
-    },
-
-
-    statusClosed: {
-      backgroundColor:
-        '#EEF0F1',
-    },
-
-
-    statusPaused: {
-      backgroundColor:
-        '#FFF4DD',
-    },
-
-
-    statusText: {
-      fontSize: 9,
-
-      fontWeight:
-        '800',
-    },
-
-
-    statusTextActive: {
-      color:
-        '#16803A',
-    },
-
-
-    statusTextClosed: {
-      color:
-        '#66716B',
-    },
-
-
-    statusTextPaused: {
-      color:
-        '#A66A00',
-    },
-
-
-    divider: {
-      height: 1,
-
-      backgroundColor:
-        '#EDF1EE',
-
-      marginVertical: 16,
-    },
-
-
-    metrics: {
-      flexDirection:
-        'row',
-
-      flexWrap:
-        'wrap',
-
-      gap: 15,
-    },
-
-
-    metric: {
-      flex: 1,
-
-      minWidth: 115,
-    },
-
-
-    metricLabel: {
-      fontSize: 10,
-
-      color:
-        '#7B8780',
-    },
-
-
-    metricValue: {
-      marginTop: 4,
-
-      fontSize: 13,
-
-      fontWeight:
-        '700',
-
-      color:
-        '#27322C',
-    },
-
-
-    metricValuePrimary: {
-      marginTop: 4,
-
-      fontSize: 15,
-
-      fontWeight:
-        '800',
-
-      color:
-        '#16803A',
-    },
-
-
-    progressSection: {
-      marginTop: 17,
-    },
-
-
-    progressHeader: {
-      flexDirection:
-        'row',
-
-      justifyContent:
-        'space-between',
-
-      alignItems:
-        'center',
-    },
-
-
-    progressLabel: {
-      fontSize: 10,
-
-      color:
-        '#7B8780',
-    },
-
-
-    progressPercent: {
-      fontSize: 10,
-
-      fontWeight:
-        '800',
-
-      color:
-        '#16803A',
-    },
-
-
-    progressTrack: {
-      height: 6,
-
-      marginTop: 7,
-
-      borderRadius: 6,
-
-      backgroundColor:
-        '#E8EFEB',
-
-      overflow:
-        'hidden',
-    },
-
-
-    progressFill: {
-      height: 6,
-
-      borderRadius: 6,
-
-      backgroundColor:
-        '#16803A',
-    },
-
-
-    progressText: {
-      marginTop: 5,
-
-      fontSize: 9,
-
-      color:
-        '#8A958F',
-    },
-
-
-    loanFooter: {
-      marginTop: 17,
-
-      paddingTop: 14,
-
-      borderTopWidth: 1,
-
-      borderTopColor:
-        '#EDF1EE',
-
-      flexDirection:
-        'row',
-
-      alignItems:
-        'center',
-
-      justifyContent:
-        'space-between',
-    },
-
-
-    footerInfoGroup: {
-      flexDirection:
-        'row',
-
-      alignItems:
-        'flex-start',
-
-      gap: 22,
-
+      flexDirection: 'row',
+      alignItems: 'center',
       flexShrink: 1,
     },
 
-
-    footerLabel: {
-      fontSize: 9,
-
-      color:
-        '#89948E',
+    loanIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: 15,
+      marginRight: 13,
+      backgroundColor: '#EAF0FF',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: '#C9D7FF',
     },
 
+    loanIconText: {
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 13,
+      letterSpacing: 0.2,
+      color: '#356DFF',
+    },
+
+    loanName: {
+      fontFamily: 'Inter_700Bold',
+      fontSize: 16,
+      letterSpacing: -0.2,
+      color: '#101828',
+    },
+
+    lender: {
+      marginTop: 4,
+      fontFamily: 'Inter_400Regular',
+      fontSize: 11,
+      color: '#667085',
+    },
+
+    statusBadge: {
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 20,
+    },
+
+    statusActive: {
+      backgroundColor: '#ECFDF3',
+    },
+
+    statusClosed: {
+      backgroundColor: '#F2F4F7',
+    },
+
+    statusPaused: {
+      backgroundColor: '#FFFAEB',
+    },
+
+    statusText: {
+      fontFamily: 'Inter_700Bold',
+      fontSize: 9,
+      letterSpacing: 0.25,
+    },
+
+    statusTextActive: {
+      color: '#027A48',
+    },
+
+    statusTextClosed: {
+      color: '#667085',
+    },
+
+    statusTextPaused: {
+      color: '#B54708',
+    },
+
+    divider: {
+      height: 1,
+      marginVertical: 17,
+      backgroundColor: '#EEF1F5',
+    },
+
+    metrics: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 16,
+    },
+
+    metric: {
+      flex: 1,
+      minWidth: 125,
+    },
+
+    metricLabel: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 10,
+      color: '#98A2B3',
+    },
+
+    metricValue: {
+      marginTop: 5,
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 13,
+      color: '#344054',
+    },
+
+    metricValuePrimary: {
+      marginTop: 5,
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 17,
+      letterSpacing: -0.2,
+      color: '#356DFF',
+    },
+
+    progressSection: {
+      marginTop: 19,
+    },
+
+    progressHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+
+    progressLabel: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 10,
+      color: '#667085',
+    },
+
+    progressPercent: {
+      fontFamily: 'Inter_700Bold',
+      fontSize: 10,
+      color: '#356DFF',
+    },
+
+    progressTrack: {
+      height: 7,
+      marginTop: 8,
+      borderRadius: 8,
+      backgroundColor: '#EAF0FF',
+      overflow: 'hidden',
+    },
+
+    progressFill: {
+      height: 7,
+      borderRadius: 8,
+      backgroundColor: '#356DFF',
+    },
+
+    progressText: {
+      marginTop: 6,
+      fontFamily: 'Inter_400Regular',
+      fontSize: 9,
+      color: '#98A2B3',
+    },
+
+    loanFooter: {
+      marginTop: 18,
+      paddingTop: 15,
+      borderTopWidth: 1,
+      borderTopColor: '#EEF1F5',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 16,
+    },
+
+    footerInfoGroup: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: 24,
+      flexShrink: 1,
+    },
+
+    footerLabel: {
+      fontFamily: 'Inter_400Regular',
+      fontSize: 9,
+      color: '#98A2B3',
+    },
 
     footerValue: {
       marginTop: 3,
-
-      fontSize: 12,
-
-      fontWeight:
-        '700',
-
-      color:
-        '#27322C',
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 11,
+      color: '#344054',
     },
 
-
     actions: {
-      flexDirection:
-        'row',
-
-      alignItems:
-        'center',
-
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 7,
     },
 
-
     actionButton: {
-      paddingHorizontal: 11,
-
+      paddingHorizontal: 12,
       paddingVertical: 8,
-
-      borderRadius: 8,
-
-      backgroundColor:
-        '#EAF4ED',
+      borderRadius: 9,
+      backgroundColor: '#EAF0FF',
+      borderWidth: 1,
+      borderColor: '#C9D7FF',
     },
-
 
     actionButtonDanger: {
-      backgroundColor:
-        '#FFF0EE',
+      backgroundColor: '#FFF1F0',
+      borderColor: '#FECACA',
     },
-
 
     actionButtonDisabled: {
       opacity: 0.55,
     },
 
-
     actionButtonText: {
+      fontFamily: 'Inter_700Bold',
       fontSize: 10,
-
-      fontWeight:
-        '800',
-
-      color:
-        '#16803A',
+      color: '#356DFF',
     },
-
 
     actionButtonTextDanger: {
-      color:
-        '#C0392B',
+      color: '#D92D20',
     },
-
 
     emptyCard: {
       marginHorizontal: 24,
-
-      padding: 35,
-
-      borderRadius: 16,
-
-      backgroundColor:
-        '#FFFFFF',
-
-      alignItems:
-        'center',
-
+      padding: 42,
+      borderRadius: 19,
+      backgroundColor: '#FFFFFF',
+      alignItems: 'center',
       borderWidth: 1,
-
-      borderColor:
-        '#E1EAE4',
+      borderColor: '#E7EBF2',
+      shadowColor: '#101828',
+      shadowOpacity: 0.04,
+      shadowRadius: 14,
+      shadowOffset: { width: 0, height: 5 },
+      elevation: 1,
     },
-
 
     emptyIcon: {
-      width: 55,
-
-      height: 55,
-
-      borderRadius: 15,
-
-      backgroundColor:
-        '#EAF4ED',
-
-      alignItems:
-        'center',
-
-      justifyContent:
-        'center',
+      width: 58,
+      height: 58,
+      borderRadius: 17,
+      backgroundColor: '#EAF0FF',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
-
 
     emptyIconText: {
-      fontSize: 23,
-
-      fontWeight:
-        '800',
-
-      color:
-        '#16803A',
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 22,
+      color: '#356DFF',
     },
-
 
     emptyTitle: {
-      marginTop: 13,
-
+      marginTop: 14,
+      fontFamily: 'Inter_700Bold',
       fontSize: 17,
-
-      fontWeight:
-        '800',
-
-      color:
-        '#17221B',
+      color: '#101828',
     },
 
-
     emptyText: {
-      marginTop: 6,
-
-      maxWidth: 400,
-
-      textAlign:
-        'center',
-
+      marginTop: 7,
+      maxWidth: 430,
+      textAlign: 'center',
+      fontFamily: 'Inter_400Regular',
       fontSize: 12,
-
       lineHeight: 19,
-
-      color:
-        '#7B8780',
+      color: '#667085',
     },
 
     bottomSpace: {
-  height: 30,
-},
-
-
-    /*
-     * =====================================================
-     * VIEW HEADER
-     * =====================================================
-     */
+      height: 34,
+    },
 
     viewHeader: {
-      height: 64,
-
+      height: 70,
       paddingHorizontal: 24,
-
-      backgroundColor:
-        '#FFFFFF',
-
+      backgroundColor: '#FFFFFF',
       borderBottomWidth: 1,
-
-      borderBottomColor:
-        '#DFE8E2',
-
-      flexDirection:
-        'row',
-
-      alignItems:
-        'center',
-
-      justifyContent:
-        'space-between',
+      borderBottomColor: '#E7EBF2',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
     },
-
 
     backButton: {
-      minWidth: 110,
-
-      paddingHorizontal: 12,
-
-      paddingVertical: 8,
-
-      borderRadius: 8,
-
-      backgroundColor:
-        '#EAF4ED',
-
-      alignItems:
-        'center',
-
-      justifyContent:
-        'center',
+      minWidth: 96,
+      paddingHorizontal: 13,
+      paddingVertical: 9,
+      borderRadius: 10,
+      backgroundColor: '#EAF0FF',
+      borderWidth: 1,
+      borderColor: '#C9D7FF',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
-
 
     backButtonText: {
+      fontFamily: 'Inter_700Bold',
       fontSize: 11,
-
-      fontWeight:
-        '800',
-
-      color:
-        '#16803A',
+      color: '#356DFF',
     },
-
 
     viewHeaderTitle: {
+      fontFamily: 'Inter_700Bold',
       fontSize: 15,
-
-      fontWeight:
-        '800',
-
-      color:
-        '#17221B',
+      color: '#101828',
     },
 
-
     headerSpacer: {
-      minWidth: 110,
+      minWidth: 96,
     },
 
   });
+
