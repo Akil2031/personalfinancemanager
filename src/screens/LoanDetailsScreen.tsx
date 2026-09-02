@@ -68,6 +68,21 @@ function formatDate(
   );
 }
 
+function commitmentAmount(loan: Loan): number {
+  if (loan.repaymentType === 'INTEREST_ONLY') {
+    const monthlyInterest = Number(loan.monthlyInterest || 0);
+    if (monthlyInterest > 0) return monthlyInterest;
+
+    const outstanding = Number(loan.currentOutstanding || loan.originalPrincipal || 0);
+    const rate = Number(loan.annualInterestRate || 0);
+    return outstanding > 0 && rate > 0
+      ? (outstanding * rate) / 100 / 12
+      : 0;
+  }
+
+  return Number(loan.emi || 0);
+}
+
 export default function LoanDetailsScreen({
   loan,
 }: Props) {
@@ -414,13 +429,16 @@ export default function LoanDetailsScreen({
             loan.originalPrincipal
           )}`}
           tone="purple"
-          primary
         />
 
         <SummaryCard
-          label="Monthly EMI"
+          label={
+            loan.repaymentType === 'INTEREST_ONLY'
+              ? 'Monthly Interest'
+              : 'Monthly EMI'
+          }
           value={`₹${money(
-            loan.emi
+            commitmentAmount(loan)
           )}`}
           tone="green"
         />
@@ -466,7 +484,9 @@ export default function LoanDetailsScreen({
               styles.nextLabel
             }
           >
-            NEXT EMI
+            {loan.repaymentType === 'INTEREST_ONLY'
+              ? 'NEXT INTEREST'
+              : 'NEXT EMI'}
           </Text>
 
           <Text
@@ -516,7 +536,7 @@ export default function LoanDetailsScreen({
           >
             ₹
             {money(
-              loan.emi
+              commitmentAmount(loan)
             )}
           </Text>
 
@@ -525,7 +545,9 @@ export default function LoanDetailsScreen({
               styles.nextAmountLabel
             }
           >
-            Scheduled EMI
+            {loan.repaymentType === 'INTEREST_ONLY'
+              ? 'Monthly interest'
+              : 'Scheduled EMI'}
           </Text>
         </View>
       </View>
@@ -1032,19 +1054,21 @@ function SummaryCard({
       ]}
     >
       <Text
-        style={
-          styles.summaryLabel
-        }
+        style={[
+          styles.summaryLabel,
+          tone !== 'neutral' && styles.summaryBlueLabel,
+        ]}
       >
         {label}
       </Text>
 
       <Text
-        style={
+        style={[
           primary
             ? styles.summaryPrimaryValue
-            : styles.summaryValue
-        }
+            : styles.summaryValue,
+          tone !== 'neutral' && styles.summaryColorValue,
+        ]}
       >
         {value}
       </Text>
@@ -1350,7 +1374,7 @@ const styles =
       flexBasis: 170,
       minHeight: 98,
       padding: 16,
-      borderRadius: 15,
+      borderRadius: 16,
       backgroundColor: '#FFFFFF',
       borderWidth: 1,
       borderColor: '#E3E8F1',
@@ -1364,45 +1388,69 @@ const styles =
     summaryBlue: {
       backgroundColor: '#356DFF',
       borderColor: '#356DFF',
+      shadowColor: '#2454D8',
+      shadowOpacity: 0.18,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 5,
     },
 
     summaryPurple: {
       backgroundColor: '#7857D8',
       borderColor: '#7857D8',
+      shadowColor: '#5B3FB7',
+      shadowOpacity: 0.18,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 5,
     },
 
     summaryGreen: {
       backgroundColor: '#18A673',
       borderColor: '#18A673',
+      shadowColor: '#087A55',
+      shadowOpacity: 0.18,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 5,
     },
 
     summaryOrange: {
       backgroundColor: '#E99A32',
       borderColor: '#E99A32',
+      shadowColor: '#C87818',
+      shadowOpacity: 0.18,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 5,
     },
 
     summaryLabel: {
-      fontFamily: 'Inter_500Medium',
+      fontFamily: 'Inter_700Bold',
       fontSize: 10,
       color: '#7A879C',
+      letterSpacing: 0.55,
+      textTransform: 'uppercase',
     },
 
     summaryValue: {
-      marginTop: 8,
+      marginTop: 9,
       fontFamily: 'Inter_700Bold',
       fontSize: 17,
+      lineHeight: 22,
       color: '#1D2940',
     },
 
     summaryPrimaryValue: {
-      marginTop: 8,
+      marginTop: 9,
       fontFamily: 'Inter_800ExtraBold',
       fontSize: 19,
+      lineHeight: 24,
       color: '#FFFFFF',
     },
 
     summaryBlueLabel: {
-      color: 'rgba(255,255,255,0.78)',
+      color: 'rgba(255,255,255,0.88)',
     },
 
     summaryColorValue: {
