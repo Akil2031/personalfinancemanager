@@ -2187,8 +2187,6 @@ const styles =
 
     content: {
       width: '100%',
-      maxWidth: 1280,
-      alignSelf: 'center',
       paddingHorizontal: 28,
       paddingTop: 30,
       paddingBottom: 70,

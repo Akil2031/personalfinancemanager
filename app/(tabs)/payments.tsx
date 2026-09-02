@@ -27,8 +27,6 @@ import {
   View,
 } from 'react-native';
 
-
-
 import {
   Loan,
 } from '../../src/models/loan';
@@ -886,7 +884,7 @@ export default function PaymentsRoute() {
             Loading payments...
           </Text>
         </View>
-     
+      
     );
   }
 
@@ -1593,7 +1591,7 @@ export default function PaymentsRoute() {
           />
         </ScrollView>
       </View>
-   
+    
   );
 }
 
@@ -1867,8 +1865,6 @@ const styles =
 
     content: {
       width: '100%',
-      maxWidth: 1280,
-      alignSelf: 'center',
       paddingHorizontal: 28,
       paddingTop: 28,
       paddingBottom: 52,

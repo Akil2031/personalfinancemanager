@@ -833,8 +833,6 @@ const styles =
       paddingTop: 28,
       paddingBottom: 56,
       width: '100%',
-      maxWidth: 1280,
-      alignSelf: 'center',
     },
 
     header: {

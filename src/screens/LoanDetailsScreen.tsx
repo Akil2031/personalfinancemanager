@@ -1287,8 +1287,6 @@ const styles =
 
     content: {
       width: '100%',
-      maxWidth: 1180,
-      alignSelf: 'center',
       paddingHorizontal: 28,
       paddingTop: 24,
       paddingBottom: 48,

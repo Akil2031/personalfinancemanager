@@ -20,6 +20,10 @@ import {
   generateAdjustedLoanSchedule,
 } from '../../src/engine/loanSchedule';
 
+import {
+  calculateTargetPerformance,
+} from '../../src/services/targetService';
+
 import type {
   Loan,
   LoanType,
@@ -245,60 +249,6 @@ function getLoanTypeLabel(type: LoanType): string {
 
 function getLoanTypeCode(type: LoanType): string {
   return LOAN_TYPE_META[type]?.code || 'OT';
-}
-
-function calculateTargetPerformance(
-  activeLoans: Loan[],
-  baselineOutstanding: number,
-  baselineDate: Date,
-  targetDate: Date,
-  additionalMonthlyPayment: number,
-) {
-  const now = new Date();
-  const monthsToTarget = Math.max(
-    0,
-    (targetDate.getFullYear() - now.getFullYear()) * 12 +
-      targetDate.getMonth() - now.getMonth(),
-  );
-
-  const monthlyCommitment = activeLoans.reduce(
-    (sum, loan) => sum + getCommitment(loan),
-    0,
-  );
-  const monthlyReduction = Math.max(
-    0,
-    monthlyCommitment + additionalMonthlyPayment,
-  );
-  const currentOutstanding = Math.max(
-    0,
-    baselineOutstanding -
-      Math.max(0, monthsToTarget) * monthlyReduction,
-  );
-  const projectedMonths = monthlyReduction > 0
-    ? Math.ceil(baselineOutstanding / monthlyReduction)
-    : Infinity;
-  const projectedDebtFreeDate = Number.isFinite(projectedMonths)
-    ? new Date(
-        baselineDate.getFullYear(),
-        baselineDate.getMonth() + projectedMonths,
-        baselineDate.getDate(),
-      )
-    : null;
-
-  return {
-    currentOutstanding,
-    projectedDebtFreeDate,
-    requiredAdditionalPrincipal: Math.max(
-      0,
-      baselineOutstanding -
-        monthsToTarget * monthlyReduction,
-    ),
-    status: currentOutstanding <= 0
-      ? 'AHEAD'
-      : projectedDebtFreeDate && projectedDebtFreeDate <= targetDate
-        ? 'ON_TRACK'
-        : 'BEHIND',
-  };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -796,41 +746,9 @@ export default function Dashboard() {
     if (!target?.targetDate) return null;
 
     try {
-      const targetDate =
-        target.targetDate instanceof Date
-          ? new Date(target.targetDate)
-          : new Date(String(target.targetDate));
-
-      const baselineDate =
-        target.baselineDate instanceof Date
-          ? new Date(target.baselineDate)
-          : new Date(String(target.baselineDate));
-
-      const baselineOutstanding = Number(
-        target.baselineOutstanding,
-      ) || summary.totalOutstanding || 0;
-
-      const additionalMonthlyPayment = Number(
-        target.additionalMonthlyPayment || 0,
-      ) || 0;
-
-      if (
-        Number.isNaN(targetDate.getTime()) ||
-        Number.isNaN(baselineDate.getTime())
-      ) {
-        console.warn('Invalid debt-free target dates:', {
-          targetDate: target.targetDate,
-          baselineDate: target.baselineDate,
-        });
-        return null;
-      }
-
       return calculateTargetPerformance(
         activeLoans.map((item) => item.loan),
-        baselineOutstanding,
-        baselineDate,
-        targetDate,
-        additionalMonthlyPayment,
+        target.targetDate,
       );
     } catch (err) {
       console.warn(
@@ -1038,15 +956,7 @@ export default function Dashboard() {
         contentContainerStyle={[
           styles.scrollContent,
           {
-            maxWidth: isDesktop
-              ? 1440
-              : undefined,
-            alignSelf: isDesktop
-              ? 'center'
-              : undefined,
-            width: isDesktop
-              ? '100%'
-              : undefined,
+            width: '100%',
           },
         ]}
         refreshControl={
