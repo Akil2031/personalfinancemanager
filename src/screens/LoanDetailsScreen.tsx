@@ -414,6 +414,7 @@ export default function LoanDetailsScreen({
             loan.originalPrincipal
           )}`}
           tone="purple"
+          primary
         />
 
         <SummaryCard

@@ -6,6 +6,14 @@ import React, {
 } from 'react';
 
 import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+} from '@expo-google-fonts/inter';
+
+import {
   ActivityIndicator,
   Alert,
   Platform,
@@ -18,6 +26,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+
 
 import {
   Loan,
@@ -39,31 +48,25 @@ import {
 } from '../../src/services/paymentService';
 
 import {
-  generateLoanSchedule,
-} from '../../src/engine/loanSchedule';
+  calculateRemainingEMI,
+} from '../../src/engine/emiCalculator';
 
 import {
   allocatePayment,
 } from '../../src/engine/paymentCalculator';
 
-type PaymentFormMode =
-  | 'ADD'
-  | 'EDIT';
+import {
+  generateLoanSchedule,
+} from '../../src/engine/loanSchedule';
+
+type PaymentFormMode = 'ADD' | 'EDIT';
 
 type PaymentType =
   | 'PAID'
   | 'PARTIAL'
   | 'PREPAYMENT';
 
-/*
- * =========================================================
- * HELPERS
- * =========================================================
- */
-
-function formatAmount(
-  value: number
-): string {
+function formatAmount(value: number): string {
   return Math.round(
     Number(value) || 0
   ).toLocaleString('en-IN');
@@ -139,16 +142,6 @@ function getLoanName(
   );
 }
 
-/*
- * =========================================================
- * FIND NEXT SCHEDULED EMI
- * =========================================================
- *
- * The central loanScheduler is the only source of truth.
- *
- * We intentionally do NOT create another scheduler here.
- */
-
 function getScheduledInstallment(
   loan: Loan
 ) {
@@ -156,13 +149,6 @@ function getScheduledInstallment(
     generateLoanSchedule(
       loan
     );
-
-  if (
-    !result.schedule ||
-    result.schedule.length === 0
-  ) {
-    return null;
-  }
 
   const today =
     new Date();
@@ -174,12 +160,9 @@ function getScheduledInstallment(
     999
   );
 
-  /*
-   * First try to find the next future EMI.
-   */
   const futureRows =
     result.schedule.filter(
-      row => {
+      (row: any) => {
         const dueDate =
           new Date(
             row.dueDate
@@ -199,28 +182,14 @@ function getScheduledInstallment(
       }
     );
 
-  if (
-    futureRows.length > 0
-  ) {
-    return futureRows[0];
-  }
-
-  /*
-   * If there is no future row, return
-   * the last available schedule row.
-   */
   return (
+    futureRows[0] ||
     result.schedule[
       result.schedule.length - 1
-    ] || null
+    ] ||
+    null
   );
 }
-
-/*
- * =========================================================
- * MAIN SCREEN
- * =========================================================
- */
 
 export default function PaymentsRoute() {
   const [
@@ -256,18 +225,16 @@ export default function PaymentsRoute() {
   const [
     formMode,
     setFormMode,
-  ] =
-    useState<PaymentFormMode>(
-      'ADD'
-    );
+  ] = useState<PaymentFormMode>(
+    'ADD'
+  );
 
   const [
     editingPayment,
     setEditingPayment,
-  ] =
-    useState<Payment | null>(
-      null
-    );
+  ] = useState<Payment | null>(
+    null
+  );
 
   const [
     selectedLoanId,
@@ -296,12 +263,6 @@ export default function PaymentsRoute() {
     setSearch,
   ] = useState('');
 
-  /*
-   * =======================================================
-   * LOAD DATA
-   * =======================================================
-   */
-
   const loadData =
     useCallback(
       async () => {
@@ -309,11 +270,10 @@ export default function PaymentsRoute() {
           const [
             loanData,
             paymentData,
-          ] =
-            await Promise.all([
-              getLoans(),
-              getAllPayments(),
-            ]);
+          ] = await Promise.all([
+            getLoans(),
+            getAllPayments(),
+          ]);
 
           setLoans(
             loanData
@@ -343,20 +303,13 @@ export default function PaymentsRoute() {
     );
 
   useEffect(() => {
-    void loadData();
+    loadData();
   }, [loadData]);
 
   async function handleRefresh() {
     setRefreshing(true);
-
     await loadData();
   }
-
-  /*
-   * =======================================================
-   * SELECTED LOAN
-   * =======================================================
-   */
 
   const selectedLoan =
     useMemo(
@@ -372,12 +325,6 @@ export default function PaymentsRoute() {
       ]
     );
 
-  /*
-   * =======================================================
-   * SCHEDULED EMI
-   * =======================================================
-   */
-
   const scheduledInstallment =
     useMemo(
       () =>
@@ -386,9 +333,7 @@ export default function PaymentsRoute() {
               selectedLoan
             )
           : null,
-      [
-        selectedLoan,
-      ]
+      [selectedLoan]
     );
 
   const numericAmount =
@@ -409,12 +354,6 @@ export default function PaymentsRoute() {
       scheduledEmi
     );
 
-  /*
-   * =======================================================
-   * PAYMENT ALLOCATION
-   * =======================================================
-   */
-
   const allocation =
     useMemo(() => {
       if (
@@ -425,8 +364,8 @@ export default function PaymentsRoute() {
       }
 
       /*
-       * PARTIAL and PREPAYMENT
-       * are principal-only.
+       * PARTIAL and PREPAYMENT are
+       * principal-only.
        */
       if (
         paymentType ===
@@ -439,12 +378,10 @@ export default function PaymentsRoute() {
             Math.round(
               numericAmount
             ),
-
           principal:
             Math.round(
               numericAmount
             ),
-
           interest: 0,
         };
       }
@@ -466,12 +403,6 @@ export default function PaymentsRoute() {
       scheduledInstallment,
     ]);
 
-  /*
-   * =======================================================
-   * SUMMARY
-   * =======================================================
-   */
-
   const totalPaid =
     useMemo(
       () =>
@@ -482,8 +413,7 @@ export default function PaymentsRoute() {
           ) =>
             sum +
             Number(
-              payment.amount ||
-                0
+              payment.amount || 0
             ),
           0
         ),
@@ -526,12 +456,6 @@ export default function PaymentsRoute() {
       [payments]
     );
 
-  /*
-   * =======================================================
-   * SEARCH
-   * =======================================================
-   */
-
   const filteredPayments =
     useMemo(() => {
       const query =
@@ -573,12 +497,6 @@ export default function PaymentsRoute() {
       search,
     ]);
 
-  /*
-   * =======================================================
-   * FORM
-   * =======================================================
-   */
-
   function resetForm() {
     setSelectedLoanId('');
     setPaymentDate(
@@ -604,6 +522,7 @@ export default function PaymentsRoute() {
     );
 
     setPaymentAmount('');
+
     setNotes('');
 
     setShowForm(true);
@@ -617,7 +536,6 @@ export default function PaymentsRoute() {
         'Edit Failed',
         'Payment ID is missing.'
       );
-
       return;
     }
 
@@ -652,12 +570,6 @@ export default function PaymentsRoute() {
     setShowForm(true);
   }
 
-  /*
-   * =======================================================
-   * SAVE PAYMENT
-   * =======================================================
-   */
-
   async function handleSave() {
     try {
       if (
@@ -667,7 +579,6 @@ export default function PaymentsRoute() {
           'Validation',
           'Please select a loan.'
         );
-
         return;
       }
 
@@ -683,7 +594,6 @@ export default function PaymentsRoute() {
           'Validation',
           'Selected loan was not found.'
         );
-
         return;
       }
 
@@ -694,7 +604,6 @@ export default function PaymentsRoute() {
           'Validation',
           'Please enter the payment date.'
         );
-
         return;
       }
 
@@ -712,7 +621,6 @@ export default function PaymentsRoute() {
           'Validation',
           'Please enter a valid payment date.'
         );
-
         return;
       }
 
@@ -723,16 +631,16 @@ export default function PaymentsRoute() {
           'Validation',
           'Payment amount must be greater than zero.'
         );
-
         return;
       }
 
-      if (!allocation) {
+      if (
+        !allocation
+      ) {
         Alert.alert(
           'Payment',
           'Unable to calculate the payment allocation.'
         );
-
         return;
       }
 
@@ -742,11 +650,9 @@ export default function PaymentsRoute() {
         paymentType;
 
       /*
-       * Existing payment:
-       * preserve its installment number.
-       *
-       * New payment:
-       * use the scheduled installment.
+       * When editing a payment, preserve its
+       * installment number if available.
+       * For a new payment use the next scheduled EMI.
        */
       const installmentNo =
         editingPayment?.installmentNo ??
@@ -768,7 +674,7 @@ export default function PaymentsRoute() {
 
         /*
          * PARTIAL/PREPAYMENT are
-         * principal-only.
+         * always principal-only.
          */
         principal:
           Math.round(
@@ -812,6 +718,7 @@ export default function PaymentsRoute() {
       );
 
       resetForm();
+
     } catch (error) {
       console.error(
         'Payment save failed:',
@@ -829,12 +736,6 @@ export default function PaymentsRoute() {
     }
   }
 
-  /*
-   * =======================================================
-   * DELETE
-   * =======================================================
-   */
-
   async function performDelete(
     payment: Payment
   ) {
@@ -843,7 +744,6 @@ export default function PaymentsRoute() {
         'Delete Failed',
         'Payment ID is missing.'
       );
-
       return;
     }
 
@@ -863,6 +763,10 @@ export default function PaymentsRoute() {
           )
       );
 
+      /*
+       * Reload so all totals and loan
+       * relationships are guaranteed current.
+       */
       await loadData();
 
       if (
@@ -877,6 +781,7 @@ export default function PaymentsRoute() {
           'Payment deleted successfully.'
         );
       }
+
     } catch (error) {
       console.error(
         'Payment delete failed:',
@@ -912,7 +817,6 @@ export default function PaymentsRoute() {
         'Delete Failed',
         'Payment ID is missing.'
       );
-
       return;
     }
 
@@ -960,798 +864,762 @@ export default function PaymentsRoute() {
     );
   }
 
-  /*
-   * =======================================================
-   * LOADING
-   * =======================================================
-   */
-
   if (loading) {
     return (
-      <View
-        style={
-          styles.loading
-        }
-      >
-        <ActivityIndicator
-          size="large"
-          color="#16803A"
-        />
-
-        <Text
+      
+        <View
           style={
-            styles.loadingText
+            styles.loading
           }
         >
-          Loading payments...
-        </Text>
-      </View>
+          <ActivityIndicator
+            size="large"
+            color="#16803A"
+          />
+
+          <Text
+            style={
+              styles.loadingText
+            }
+          >
+            Loading payments...
+          </Text>
+        </View>
+     
     );
   }
 
-  /*
-   * =======================================================
-   * SCREEN
-   * =======================================================
-   */
-
   return (
-    <View
-      style={
-        styles.container
-      }
-    >
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={
-              refreshing
-            }
-            onRefresh={
-              handleRefresh
-            }
-            tintColor="#16803A"
-          />
-        }
-        contentContainerStyle={
-          styles.content
-        }
-        showsVerticalScrollIndicator={
-          false
+    
+      <View
+        style={
+          styles.container
         }
       >
-        {/* =================================================
-            HEADER
-        ================================================== */}
-
-        <View
-          style={
-            styles.pageHeader
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={
+                refreshing
+              }
+              onRefresh={
+                handleRefresh
+              }
+              tintColor="#16803A"
+            />
+          }
+          contentContainerStyle={
+            styles.content
+          }
+          showsVerticalScrollIndicator={
+            false
           }
         >
-          <View>
-            <Text
-              style={
-                styles.title
-              }
-            >
-              Payments
-            </Text>
+          {/* HEADER */}
 
-            <Text
-              style={
-                styles.subtitle
-              }
-            >
-              Record and manage all loan payments
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            style={
-              styles.addButton
-            }
-            onPress={
-              openAddPayment
-            }
-            activeOpacity={0.85}
-          >
-            <Text
-              style={
-                styles.addButtonText
-              }
-            >
-              + Add Payment
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* =================================================
-            SUMMARY
-        ================================================== */}
-
-        <View
-          style={
-            styles.summaryRow
-          }
-        >
-          <SummaryCard
-            label="Total Paid"
-            value={`₹${formatAmount(
-              totalPaid
-            )}`}
-          />
-
-          <SummaryCard
-            label="Principal"
-            value={`₹${formatAmount(
-              totalPrincipal
-            )}`}
-          />
-
-          <SummaryCard
-            label="Interest"
-            value={`₹${formatAmount(
-              totalInterest
-            )}`}
-          />
-
-          <SummaryCard
-            label="Payments"
-            value={String(
-              payments.length
-            )}
-          />
-        </View>
-
-        {/* =================================================
-            FORM
-        ================================================== */}
-
-        {showForm && (
           <View
             style={
-              styles.formCard
-            }
-          >
-            <View
-              style={
-                styles.formHeader
-              }
-            >
-              <View>
-                <Text
-                  style={
-                    styles.formTitle
-                  }
-                >
-                  {formMode ===
-                  'EDIT'
-                    ? 'Edit Payment'
-                    : 'Record Payment'}
-                </Text>
-
-                <Text
-                  style={
-                    styles.formSubtitle
-                  }
-                >
-                  Select the loan and enter the amount actually paid
-                </Text>
-              </View>
-
-              <TouchableOpacity
-                onPress={
-                  resetForm
-                }
-                style={
-                  styles.closeButton
-                }
-              >
-                <Text
-                  style={
-                    styles.closeButtonText
-                  }
-                >
-                  ✕
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* LOAN */}
-
-            <Text
-              style={
-                styles.label
-              }
-            >
-              Select Loan
-            </Text>
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={
-                false
-              }
-              contentContainerStyle={
-                styles.loanSelector
-              }
-            >
-              {loans.map(
-                loan => {
-                  const active =
-                    selectedLoanId ===
-                    loan.id;
-
-                  return (
-                    <Pressable
-                      key={
-                        loan.id
-                      }
-                      style={[
-                        styles.loanOption,
-                        active &&
-                          styles.loanOptionActive,
-                      ]}
-                      onPress={() =>
-                        setSelectedLoanId(
-                          loan.id ||
-                            ''
-                        )
-                      }
-                    >
-                      <Text
-                        style={[
-                          styles.loanOptionName,
-                          active &&
-                            styles.loanOptionNameActive,
-                        ]}
-                        numberOfLines={
-                          1
-                        }
-                      >
-                        {
-                          loan.loanName
-                        }
-                      </Text>
-
-                      <Text
-                        style={[
-                          styles.loanOptionLender,
-                          active &&
-                            styles.loanOptionLenderActive,
-                        ]}
-                        numberOfLines={
-                          1
-                        }
-                      >
-                        {
-                          loan.lender
-                        }
-                      </Text>
-                    </Pressable>
-                  );
-                }
-              )}
-            </ScrollView>
-
-            {/* DATE */}
-
-            <Text
-              style={
-                styles.label
-              }
-            >
-              Payment Date
-            </Text>
-
-            <TextInput
-              style={
-                styles.input
-              }
-              value={
-                paymentDate
-              }
-              onChangeText={
-                setPaymentDate
-              }
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor="#9AA59E"
-            />
-
-            {/* AMOUNT */}
-
-            <Text
-              style={
-                styles.label
-              }
-            >
-              Payment Amount
-            </Text>
-
-            <View
-              style={
-                styles.amountContainer
-              }
-            >
-              <Text
-                style={
-                  styles.currency
-                }
-              >
-                ₹
-              </Text>
-
-              <TextInput
-                style={
-                  styles.amountInput
-                }
-                value={
-                  paymentAmount
-                }
-                onChangeText={
-                  setPaymentAmount
-                }
-                keyboardType="decimal-pad"
-                placeholder="Enter amount"
-                placeholderTextColor="#9AA59E"
-              />
-            </View>
-
-            {/* SCHEDULED EMI */}
-
-            {scheduledEmi >
-              0 && (
-              <View
-                style={
-                  styles.scheduledRow
-                }
-              >
-                <View>
-                  <Text
-                    style={
-                      styles.scheduledLabel
-                    }
-                  >
-                    Scheduled EMI
-                  </Text>
-
-                  <Text
-                    style={
-                      styles.scheduledValue
-                    }
-                  >
-                    ₹
-                    {formatAmount(
-                      scheduledEmi
-                    )}
-                  </Text>
-                </View>
-
-                <TouchableOpacity
-                  style={
-                    styles.useEmiButton
-                  }
-                  onPress={() =>
-                    setPaymentAmount(
-                      String(
-                        Math.round(
-                          scheduledEmi
-                        )
-                      )
-                    )
-                  }
-                >
-                  <Text
-                    style={
-                      styles.useEmiText
-                    }
-                  >
-                    Use EMI
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
-
-            {/* TYPE */}
-
-            {numericAmount >
-              0 && (
-              <View
-                style={
-                  styles.typeCard
-                }
-              >
-                <View>
-                  <Text
-                    style={
-                      styles.typeLabel
-                    }
-                  >
-                    Payment Type
-                  </Text>
-
-                  <Text
-                    style={
-                      styles.typeDescription
-                    }
-                  >
-                    {paymentType ===
-                    'PAID'
-                      ? 'Full scheduled EMI'
-                      : paymentType ===
-                        'PARTIAL'
-                      ? 'Principal-only part payment'
-                      : 'Principal-only prepayment'}
-                  </Text>
-                </View>
-
-                <View
-                  style={[
-                    styles.typeBadge,
-                    paymentType ===
-                    'PARTIAL'
-                      ? styles.partialBadge
-                      : paymentType ===
-                        'PREPAYMENT'
-                      ? styles.prepaymentBadge
-                      : styles.paidBadge,
-                  ]}
-                >
-                  <Text
-                    style={
-                      styles.typeBadgeText
-                    }
-                  >
-                    {
-                      paymentType
-                    }
-                  </Text>
-                </View>
-              </View>
-            )}
-
-            {/* ALLOCATION */}
-
-            {allocation && (
-              <View
-                style={
-                  styles.allocationCard
-                }
-              >
-                <Text
-                  style={
-                    styles.allocationTitle
-                  }
-                >
-                  Payment Allocation
-                </Text>
-
-                <AllocationRow
-                  label="Payment"
-                  value={
-                    allocation.amount
-                  }
-                  strong
-                />
-
-                <AllocationRow
-                  label="Interest"
-                  value={
-                    allocation.interest
-                  }
-                />
-
-                <AllocationRow
-                  label="Principal"
-                  value={
-                    allocation.principal
-                  }
-                  strong
-                />
-
-                {(
-                  paymentType ===
-                    'PARTIAL' ||
-                  paymentType ===
-                    'PREPAYMENT'
-                ) && (
-                  <Text
-                    style={
-                      styles.principalOnlyNote
-                    }
-                  >
-                    This payment is applied 100% to principal.
-                  </Text>
-                )}
-              </View>
-            )}
-
-            {/* NOTES */}
-
-            <Text
-              style={
-                styles.label
-              }
-            >
-              Notes
-            </Text>
-
-            <TextInput
-              style={[
-                styles.input,
-                styles.notes,
-              ]}
-              value={
-                notes
-              }
-              onChangeText={
-                setNotes
-              }
-              placeholder="Optional notes"
-              placeholderTextColor="#9AA59E"
-              multiline
-            />
-
-            {/* ACTIONS */}
-
-            <View
-              style={
-                styles.formActions
-              }
-            >
-              <TouchableOpacity
-                style={
-                  styles.cancelButton
-                }
-                onPress={
-                  resetForm
-                }
-                disabled={
-                  saving
-                }
-              >
-                <Text
-                  style={
-                    styles.cancelButtonText
-                  }
-                >
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.saveButton,
-                  saving &&
-                    styles.disabledButton,
-                ]}
-                onPress={
-                  handleSave
-                }
-                disabled={
-                  saving
-                }
-              >
-                <Text
-                  style={
-                    styles.saveButtonText
-                  }
-                >
-                  {saving
-                    ? 'Saving...'
-                    : formMode ===
-                      'EDIT'
-                    ? 'Update Payment'
-                    : 'Save Payment'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-
-        {/* =================================================
-            HISTORY
-        ================================================== */}
-
-        <View
-          style={
-            styles.historyCard
-          }
-        >
-          <View
-            style={
-              styles.historyHeader
+              styles.pageHeader
             }
           >
             <View>
               <Text
                 style={
-                  styles.historyTitle
+                  styles.title
                 }
               >
-                Payment History
+                Payments
               </Text>
 
               <Text
                 style={
-                  styles.historySubtitle
+                  styles.subtitle
                 }
               >
-                All payments across your loans
+                Record and manage all loan payments
               </Text>
             </View>
 
-            <Text
+            <TouchableOpacity
               style={
-                styles.historyCount
+                styles.addButton
               }
+              onPress={
+                openAddPayment
+              }
+              activeOpacity={0.85}
             >
-              {
-                filteredPayments.length
-              }
-            </Text>
+              <Text
+                style={
+                  styles.addButtonText
+                }
+              >
+                + Add Payment
+              </Text>
+            </TouchableOpacity>
           </View>
 
-          {/* SEARCH */}
+          {/* SUMMARY */}
 
-          <TextInput
+          <View
             style={
-              styles.searchInput
+              styles.summaryRow
             }
-            value={
-              search
-            }
-            onChangeText={
-              setSearch
-            }
-            placeholder="Search loan, status, date or amount..."
-            placeholderTextColor="#9AA59E"
-          />
+          >
+            <SummaryCard
+              label="Total Paid"
+              value={`₹${formatAmount(
+                totalPaid
+              )}`}
+              tone="blue"
+            />
 
-          {filteredPayments.length ===
-          0 ? (
+            <SummaryCard
+              label="Principal"
+              value={`₹${formatAmount(
+                totalPrincipal
+              )}`}
+              tone="green"
+            />
+
+            <SummaryCard
+              label="Interest"
+              value={`₹${formatAmount(
+                totalInterest
+              )}`}
+              tone="purple"
+            />
+
+            <SummaryCard
+              label="Payments"
+              value={String(
+                payments.length
+              )}
+              tone="orange"
+            />
+          </View>
+
+          {/* FORM */}
+
+          {showForm && (
             <View
               style={
-                styles.empty
+                styles.formCard
               }
             >
               <View
                 style={
-                  styles.emptyIcon
+                  styles.formHeader
+                }
+              >
+                <View>
+                  <Text
+                    style={
+                      styles.formTitle
+                    }
+                  >
+                    {formMode ===
+                    'EDIT'
+                      ? 'Edit Payment'
+                      : 'Record Payment'}
+                  </Text>
+
+                  <Text
+                    style={
+                      styles.formSubtitle
+                    }
+                  >
+                    Select the loan and enter the amount actually paid
+                  </Text>
+                </View>
+
+                <TouchableOpacity
+                  onPress={
+                    resetForm
+                  }
+                  style={
+                    styles.closeButton
+                  }
+                >
+                  <Text
+                    style={
+                      styles.closeButtonText
+                    }
+                  >
+                    ✕
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* LOAN */}
+
+              <Text
+                style={
+                  styles.label
+                }
+              >
+                Select Loan
+              </Text>
+
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={
+                  false
+                }
+                contentContainerStyle={
+                  styles.loanSelector
+                }
+              >
+                {loans.map(
+                  loan => {
+                    const active =
+                      selectedLoanId ===
+                      loan.id;
+
+                    return (
+                      <Pressable
+                        key={
+                          loan.id
+                        }
+                        style={[
+                          styles.loanOption,
+                          active &&
+                            styles.loanOptionActive,
+                        ]}
+                        onPress={() =>
+                          setSelectedLoanId(
+                            loan.id || ''
+                          )
+                        }
+                      >
+                        <Text
+                          style={[
+                            styles.loanOptionName,
+                            active &&
+                              styles.loanOptionNameActive,
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {
+                            loan.loanName
+                          }
+                        </Text>
+
+                        <Text
+                          style={[
+                            styles.loanOptionLender,
+                            active &&
+                              styles.loanOptionLenderActive,
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {
+                            loan.lender
+                          }
+                        </Text>
+                      </Pressable>
+                    );
+                  }
+                )}
+              </ScrollView>
+
+              {/* DATE */}
+
+              <Text
+                style={
+                  styles.label
+                }
+              >
+                Payment Date
+              </Text>
+
+              <TextInput
+                style={
+                  styles.input
+                }
+                value={
+                  paymentDate
+                }
+                onChangeText={
+                  setPaymentDate
+                }
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor="#9AA59E"
+              />
+
+              {/* AMOUNT */}
+
+              <Text
+                style={
+                  styles.label
+                }
+              >
+                Payment Amount
+              </Text>
+
+              <View
+                style={
+                  styles.amountContainer
                 }
               >
                 <Text
                   style={
-                    styles.emptyIconText
+                    styles.currency
                   }
                 >
                   ₹
+                </Text>
+
+                <TextInput
+                  style={
+                    styles.amountInput
+                  }
+                  value={
+                    paymentAmount
+                  }
+                  onChangeText={
+                    setPaymentAmount
+                  }
+                  keyboardType="decimal-pad"
+                  placeholder="Enter amount"
+                  placeholderTextColor="#9AA59E"
+                />
+              </View>
+
+              {/* SCHEDULED EMI */}
+
+              {scheduledEmi >
+                0 && (
+                <View
+                  style={
+                    styles.scheduledRow
+                  }
+                >
+                  <View>
+                    <Text
+                      style={
+                        styles.scheduledLabel
+                      }
+                    >
+                      Scheduled EMI
+                    </Text>
+
+                    <Text
+                      style={
+                        styles.scheduledValue
+                      }
+                    >
+                      ₹
+                      {formatAmount(
+                        scheduledEmi
+                      )}
+                    </Text>
+                  </View>
+
+                  <TouchableOpacity
+                    style={
+                      styles.useEmiButton
+                    }
+                    onPress={() =>
+                      setPaymentAmount(
+                        String(
+                          Math.round(
+                            scheduledEmi
+                          )
+                        )
+                      )
+                    }
+                  >
+                    <Text
+                      style={
+                        styles.useEmiText
+                      }
+                    >
+                      Use EMI
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {/* TYPE */}
+
+              {numericAmount >
+                0 && (
+                <View
+                  style={
+                    styles.typeCard
+                  }
+                >
+                  <View>
+                    <Text
+                      style={
+                        styles.typeLabel
+                      }
+                    >
+                      Payment Type
+                    </Text>
+
+                    <Text
+                      style={
+                        styles.typeDescription
+                      }
+                    >
+                      {paymentType ===
+                      'PAID'
+                        ? 'Full scheduled EMI'
+                        : paymentType ===
+                          'PARTIAL'
+                        ? 'Principal-only part payment'
+                        : 'Principal-only prepayment'}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.typeBadge,
+                      paymentType ===
+                      'PARTIAL'
+                        ? styles.partialBadge
+                        : paymentType ===
+                          'PREPAYMENT'
+                        ? styles.prepaymentBadge
+                        : styles.paidBadge,
+                    ]}
+                  >
+                    <Text
+                      style={
+                        styles.typeBadgeText
+                      }
+                    >
+                      {
+                        paymentType
+                      }
+                    </Text>
+                  </View>
+                </View>
+              )}
+
+              {/* ALLOCATION */}
+
+              {allocation && (
+                <View
+                  style={
+                    styles.allocationCard
+                  }
+                >
+                  <Text
+                    style={
+                      styles.allocationTitle
+                    }
+                  >
+                    Payment Allocation
+                  </Text>
+
+                  <AllocationRow
+                    label="Payment"
+                    value={
+                      allocation.amount
+                    }
+                    strong
+                  />
+
+                  <AllocationRow
+                    label="Interest"
+                    value={
+                      allocation.interest
+                    }
+                  />
+
+                  <AllocationRow
+                    label="Principal"
+                    value={
+                      allocation.principal
+                    }
+                    strong
+                  />
+
+                  {(
+                    paymentType ===
+                      'PARTIAL' ||
+                    paymentType ===
+                      'PREPAYMENT'
+                  ) && (
+                    <Text
+                      style={
+                        styles.principalOnlyNote
+                      }
+                    >
+                      This payment is applied 100% to principal.
+                    </Text>
+                  )}
+                </View>
+              )}
+
+              {/* NOTES */}
+
+              <Text
+                style={
+                  styles.label
+                }
+              >
+                Notes
+              </Text>
+
+              <TextInput
+                style={[
+                  styles.input,
+                  styles.notes,
+                ]}
+                value={
+                  notes
+                }
+                onChangeText={
+                  setNotes
+                }
+                placeholder="Optional notes"
+                placeholderTextColor="#9AA59E"
+                multiline
+              />
+
+              {/* ACTIONS */}
+
+              <View
+                style={
+                  styles.formActions
+                }
+              >
+                <TouchableOpacity
+                  style={
+                    styles.cancelButton
+                  }
+                  onPress={
+                    resetForm
+                  }
+                  disabled={
+                    saving
+                  }
+                >
+                  <Text
+                    style={
+                      styles.cancelButtonText
+                    }
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.saveButton,
+                    saving &&
+                      styles.disabledButton,
+                  ]}
+                  onPress={
+                    handleSave
+                  }
+                  disabled={
+                    saving
+                  }
+                >
+                  <Text
+                    style={
+                      styles.saveButtonText
+                    }
+                  >
+                    {saving
+                      ? 'Saving...'
+                      : formMode ===
+                        'EDIT'
+                      ? 'Update Payment'
+                      : 'Save Payment'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {/* HISTORY */}
+
+          <View
+            style={
+              styles.historyCard
+            }
+          >
+            <View
+              style={
+                styles.historyHeader
+              }
+            >
+              <View>
+                <Text
+                  style={
+                    styles.historyTitle
+                  }
+                >
+                  Payment History
+                </Text>
+
+                <Text
+                  style={
+                    styles.historySubtitle
+                  }
+                >
+                  All payments across your loans
                 </Text>
               </View>
 
               <Text
                 style={
-                  styles.emptyTitle
+                  styles.historyCount
                 }
               >
-                No payments recorded yet
+                {
+                  filteredPayments.length
+                }
               </Text>
+            </View>
 
-              <Text
+            {/* SEARCH */}
+
+            <TextInput
+              style={
+                styles.searchInput
+              }
+              value={
+                search
+              }
+              onChangeText={
+                setSearch
+              }
+              placeholder="Search loan, status, date or amount..."
+              placeholderTextColor="#9AA59E"
+            />
+
+            {filteredPayments.length ===
+            0 ? (
+              <View
                 style={
-                  styles.emptyText
+                  styles.empty
                 }
               >
-                Click “+ Add Payment” to record your first payment.
-              </Text>
-
-              <TouchableOpacity
-                style={
-                  styles.emptyAddButton
-                }
-                onPress={
-                  openAddPayment
-                }
-              >
-                <Text
+                <View
                   style={
-                    styles.emptyAddButtonText
+                    styles.emptyIcon
                   }
                 >
-                  + Add Payment
-                </Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View
-              style={
-                styles.historyList
-              }
-            >
-              {filteredPayments.map(
-                payment => (
-                  <PaymentHistoryItem
-                    key={
-                      payment.id
+                  <Text
+                    style={
+                      styles.emptyIconText
                     }
-                    payment={
-                      payment
-                    }
-                    loanName={getLoanName(
-                      loans,
-                      payment.loanId
-                    )}
-                    onEdit={() =>
-                      openEditPayment(
-                        payment
-                      )
-                    }
-                    onDelete={() =>
-                      confirmDelete(
-                        payment
-                      )
-                    }
-                  />
-                )
-              )}
-            </View>
-          )}
-        </View>
+                  >
+                    ₹
+                  </Text>
+                </View>
 
-        <View
-          style={
-            styles.bottomSpace
-          }
-        />
-      </ScrollView>
-    </View>
+                <Text
+                  style={
+                    styles.emptyTitle
+                  }
+                >
+                  No payments recorded yet
+                </Text>
+
+                <Text
+                  style={
+                    styles.emptyText
+                  }
+                >
+                  Click “+ Add Payment” to record your first payment.
+                </Text>
+
+                <TouchableOpacity
+                  style={
+                    styles.emptyAddButton
+                  }
+                  onPress={
+                    openAddPayment
+                  }
+                >
+                  <Text
+                    style={
+                      styles.emptyAddButtonText
+                    }
+                  >
+                    + Add Payment
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View
+                style={
+                  styles.historyList
+                }
+              >
+                {filteredPayments.map(
+                  payment => (
+                    <PaymentHistoryItem
+                      key={
+                        payment.id
+                      }
+                      payment={
+                        payment
+                      }
+                      loanName={getLoanName(
+                        loans,
+                        payment.loanId
+                      )}
+                      onEdit={() =>
+                        openEditPayment(
+                          payment
+                        )
+                      }
+                      onDelete={() =>
+                        confirmDelete(
+                          payment
+                        )
+                      }
+                    />
+                  )
+                )}
+              </View>
+            )}
+          </View>
+
+          <View
+            style={
+              styles.bottomSpace
+            }
+          />
+        </ScrollView>
+      </View>
+    
   );
 }
-
-/*
- * =========================================================
- * SUMMARY CARD
- * =========================================================
- */
 
 function SummaryCard({
   label,
   value,
+  tone,
 }: {
   label: string;
   value: string;
+  tone: 'blue' | 'green' | 'purple' | 'orange';
 }) {
   return (
     <View
-      style={
-        styles.summaryCard
-      }
+      style={[
+        styles.summaryCard,
+        tone === 'blue' && styles.summaryBlue,
+        tone === 'green' && styles.summaryGreen,
+        tone === 'purple' && styles.summaryPurple,
+        tone === 'orange' && styles.summaryOrange,
+      ]}
     >
-      <Text
-        style={
-          styles.summaryLabel
-        }
-      >
-        {label}
-      </Text>
-
-      <Text
-        style={
-          styles.summaryValue
-        }
-      >
-        {value}
-      </Text>
+      <Text style={styles.summaryLabel}>{label}</Text>
+      <Text style={styles.summaryValue}>{value}</Text>
     </View>
   );
 }
-
-/*
- * =========================================================
- * ALLOCATION ROW
- * =========================================================
- */
 
 function AllocationRow({
   label,
@@ -1793,12 +1661,6 @@ function AllocationRow({
     </View>
   );
 }
-
-/*
- * =========================================================
- * PAYMENT HISTORY ITEM
- * =========================================================
- */
 
 function PaymentHistoryItem({
   payment,
@@ -1860,7 +1722,7 @@ function PaymentHistoryItem({
               style={[
                 styles.statusBadge,
                 payment.status ===
-                'PARTIAL'
+                  'PARTIAL'
                   ? styles.partialBadge
                   : payment.status ===
                     'PREPAYMENT'
@@ -1995,442 +1857,463 @@ function PaymentHistoryItem({
   );
 }
 
-/*
- * =========================================================
- * STYLES
- * =========================================================
- */
-
 const styles =
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor:
-        '#F4F8F5',
+      backgroundColor: '#F5F7FB',
     },
 
     content: {
-      paddingHorizontal: 24,
-      paddingTop: 24,
-      paddingBottom: 40,
       width: '100%',
-      maxWidth: 1200,
+      maxWidth: 1280,
       alignSelf: 'center',
+      paddingHorizontal: 28,
+      paddingTop: 28,
+      paddingBottom: 52,
     },
 
     loading: {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor:
-        '#F4F8F5',
+      backgroundColor: '#F5F7FB',
     },
 
     loadingText: {
       marginTop: 12,
-      color: '#6F7B74',
+      color: '#718096',
+      fontFamily: 'Inter_500Medium',
       fontSize: 13,
     },
 
     pageHeader: {
       flexDirection: 'row',
-      justifyContent:
-        'space-between',
-      alignItems: 'center',
-      marginBottom: 18,
+      justifyContent: 'space-between',
+      alignItems: 'flex-end',
+      marginBottom: 22,
       gap: 20,
     },
 
     title: {
-      fontSize: 28,
-      fontWeight: '800',
-      color: '#17221B',
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 30,
+      lineHeight: 37,
+      color: '#172033',
+      letterSpacing: -0.6,
     },
 
     subtitle: {
-      marginTop: 4,
+      marginTop: 5,
+      fontFamily: 'Inter_400Regular',
       fontSize: 12,
-      color: '#7B8780',
+      color: '#7B879A',
     },
 
     addButton: {
-      backgroundColor:
-        '#16803A',
+      minHeight: 44,
       paddingHorizontal: 18,
-      paddingVertical: 12,
-      borderRadius: 10,
+      borderRadius: 12,
+      backgroundColor: '#356DFF',
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: '#356DFF',
+      shadowOpacity: 0.16,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 5 },
+      elevation: 3,
     },
 
     addButtonText: {
       color: '#FFFFFF',
+      fontFamily: 'Inter_700Bold',
       fontSize: 12,
-      fontWeight: '800',
     },
 
     summaryRow: {
       flexDirection: 'row',
       gap: 12,
-      marginBottom: 14,
+      marginBottom: 18,
       flexWrap: 'wrap',
     },
 
     summaryCard: {
       flex: 1,
-      minWidth: 180,
-      minHeight: 88,
-      backgroundColor:
-        '#FFFFFF',
+      minWidth: 190,
+      minHeight: 104,
+      borderRadius: 18,
+      paddingHorizontal: 18,
+      paddingVertical: 16,
+      justifyContent: 'center',
       borderWidth: 1,
-      borderColor:
-        '#E1EAE4',
-      borderRadius: 13,
-      padding: 15,
-      justifyContent:
-        'center',
+    },
+
+    summaryBlue: {
+      backgroundColor: '#F1F5FF',
+      borderColor: '#DCE6FF',
+    },
+
+    summaryGreen: {
+      backgroundColor: '#EFFAF5',
+      borderColor: '#D6F0E4',
+    },
+
+    summaryPurple: {
+      backgroundColor: '#F6F2FF',
+      borderColor: '#E7DFFF',
+    },
+
+    summaryOrange: {
+      backgroundColor: '#FFF8EC',
+      borderColor: '#F7E5C2',
     },
 
     summaryLabel: {
+      fontFamily: 'Inter_500Medium',
       fontSize: 10,
-      color: '#7B8780',
-      fontWeight: '600',
+      color: '#718096',
+      letterSpacing: 0.1,
     },
 
     summaryValue: {
-      marginTop: 6,
-      fontSize: 19,
-      color: '#16803A',
-      fontWeight: '800',
+      marginTop: 8,
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 21,
+      lineHeight: 27,
+      color: '#172033',
+      letterSpacing: -0.3,
     },
 
     formCard: {
-      backgroundColor:
-        '#FFFFFF',
+      backgroundColor: '#FFFFFF',
       borderWidth: 1,
-      borderColor:
-        '#DDE9E0',
-      borderRadius: 14,
-      padding: 20,
-      marginBottom: 14,
+      borderColor: '#E4E9F2',
+      borderRadius: 20,
+      padding: 22,
+      marginBottom: 18,
+      shadowColor: '#172033',
+      shadowOpacity: 0.045,
+      shadowRadius: 18,
+      shadowOffset: { width: 0, height: 7 },
+      elevation: 2,
     },
 
     formHeader: {
       flexDirection: 'row',
-      justifyContent:
-        'space-between',
-      alignItems:
-        'flex-start',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: 4,
     },
 
     formTitle: {
-      fontSize: 18,
-      fontWeight: '800',
-      color: '#17221B',
+      fontFamily: 'Inter_700Bold',
+      fontSize: 19,
+      color: '#172033',
+      letterSpacing: -0.2,
     },
 
     formSubtitle: {
-      marginTop: 4,
-      color: '#7B8780',
+      marginTop: 5,
+      fontFamily: 'Inter_400Regular',
+      color: '#8290A3',
       fontSize: 11,
     },
 
     closeButton: {
-      width: 32,
-      height: 32,
-      borderRadius: 8,
-      backgroundColor:
-        '#F1F5F2',
+      width: 34,
+      height: 34,
+      borderRadius: 10,
+      backgroundColor: '#F4F6FA',
       alignItems: 'center',
-      justifyContent:
-        'center',
+      justifyContent: 'center',
     },
 
     closeButtonText: {
-      color: '#64716A',
-      fontSize: 14,
-      fontWeight: '800',
+      color: '#66758A',
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 15,
     },
 
     label: {
-      marginTop: 17,
-      marginBottom: 7,
+      marginTop: 18,
+      marginBottom: 8,
+      fontFamily: 'Inter_600SemiBold',
       fontSize: 10,
-      color: '#5F6C64',
-      fontWeight: '700',
+      color: '#526174',
     },
 
     loanSelector: {
-      gap: 9,
+      gap: 10,
       paddingVertical: 2,
     },
 
     loanOption: {
-      width: 180,
-      padding: 12,
-      borderRadius: 10,
+      width: 190,
+      minHeight: 62,
+      paddingHorizontal: 14,
+      paddingVertical: 11,
+      borderRadius: 13,
+      backgroundColor: '#FAFBFD',
       borderWidth: 1,
-      borderColor:
-        '#DDE6E0',
-      backgroundColor:
-        '#FAFCFA',
+      borderColor: '#E1E7F0',
+      justifyContent: 'center',
     },
 
     loanOptionActive: {
-      borderColor:
-        '#16803A',
-      backgroundColor:
-        '#EAF4ED',
+      backgroundColor: '#F1F5FF',
+      borderColor: '#356DFF',
+      borderWidth: 1.5,
     },
 
     loanOptionName: {
-      fontSize: 12,
-      fontWeight: '800',
-      color: '#26342C',
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 11,
+      color: '#273449',
     },
 
     loanOptionNameActive: {
-      color: '#16803A',
+      color: '#3156D3',
     },
 
     loanOptionLender: {
-      marginTop: 3,
+      marginTop: 4,
+      fontFamily: 'Inter_400Regular',
       fontSize: 9,
-      color: '#87928B',
+      color: '#8793A5',
     },
 
     loanOptionLenderActive: {
-      color: '#16803A',
+      color: '#6680C7',
     },
 
     input: {
-      height: 44,
+      minHeight: 48,
+      backgroundColor: '#FBFCFE',
       borderWidth: 1,
-      borderColor:
-        '#DDE6E0',
-      backgroundColor:
-        '#FAFCFA',
-      borderRadius: 9,
-      paddingHorizontal: 13,
-      fontSize: 14,
-      color: '#17221B',
+      borderColor: '#DDE4EE',
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 11,
+      fontFamily: 'Inter_400Regular',
+      fontSize: 12,
+      color: '#1D2939',
     },
 
     amountContainer: {
-      height: 50,
+      minHeight: 58,
       flexDirection: 'row',
       alignItems: 'center',
+      backgroundColor: '#FBFCFE',
       borderWidth: 1,
-      borderColor:
-        '#CFE0D4',
-      backgroundColor:
-        '#FFFFFF',
-      borderRadius: 10,
-      paddingHorizontal: 13,
+      borderColor: '#C9D7F7',
+      borderRadius: 14,
+      paddingHorizontal: 14,
     },
 
     currency: {
-      fontSize: 19,
-      fontWeight: '800',
-      color: '#16803A',
-      marginRight: 8,
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 20,
+      color: '#356DFF',
+      marginRight: 7,
     },
 
     amountInput: {
       flex: 1,
-      fontSize: 18,
-      fontWeight: '700',
-      color: '#17221B',
+      padding: 0,
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 22,
+      color: '#172033',
     },
 
     scheduledRow: {
-      marginTop: 10,
-      padding: 12,
-      borderRadius: 10,
-      backgroundColor:
-        '#F5F9F6',
+      marginTop: 9,
+      minHeight: 58,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+      borderRadius: 13,
+      backgroundColor: '#F4F7FC',
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent:
-        'space-between',
+      justifyContent: 'space-between',
     },
 
     scheduledLabel: {
+      fontFamily: 'Inter_400Regular',
       fontSize: 9,
-      color: '#7B8780',
+      color: '#7A8799',
     },
 
     scheduledValue: {
       marginTop: 3,
-      fontSize: 14,
-      fontWeight: '800',
-      color: '#26342C',
+      fontFamily: 'Inter_700Bold',
+      fontSize: 13,
+      color: '#25324A',
     },
 
     useEmiButton: {
       paddingHorizontal: 12,
       paddingVertical: 8,
-      borderRadius: 8,
-      backgroundColor:
-        '#EAF4ED',
+      borderRadius: 9,
+      backgroundColor: '#E9F0FF',
     },
 
     useEmiText: {
-      color: '#16803A',
-      fontSize: 10,
-      fontWeight: '800',
+      fontFamily: 'Inter_700Bold',
+      fontSize: 9,
+      color: '#356DFF',
     },
 
     typeCard: {
-      marginTop: 12,
-      padding: 13,
-      borderRadius: 10,
-      backgroundColor:
-        '#F7FAF8',
+      marginTop: 10,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      borderRadius: 13,
+      backgroundColor: '#F8F9FC',
       borderWidth: 1,
-      borderColor:
-        '#E1EAE4',
+      borderColor: '#E6EAF1',
       flexDirection: 'row',
+      justifyContent: 'space-between',
       alignItems: 'center',
-      justifyContent:
-        'space-between',
     },
 
     typeLabel: {
-      fontSize: 9,
-      color: '#7B8780',
-      fontWeight: '700',
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 10,
+      color: '#344054',
     },
 
     typeDescription: {
       marginTop: 3,
-      fontSize: 11,
-      color: '#34423A',
+      fontFamily: 'Inter_400Regular',
+      fontSize: 9,
+      color: '#8793A5',
     },
 
     typeBadge: {
-      paddingHorizontal: 10,
-      paddingVertical: 6,
-      borderRadius: 999,
+      paddingHorizontal: 9,
+      paddingVertical: 5,
+      borderRadius: 20,
     },
 
     paidBadge: {
-      backgroundColor:
-        '#E8F5EC',
+      backgroundColor: '#EAF8F1',
     },
 
     partialBadge: {
-      backgroundColor:
-        '#FFF4D9',
+      backgroundColor: '#FFF4DD',
     },
 
     prepaymentBadge: {
-      backgroundColor:
-        '#E8F0FF',
+      backgroundColor: '#EEE9FF',
     },
 
     missedBadge: {
-      backgroundColor:
-        '#FDECEC',
+      backgroundColor: '#FDECEC',
     },
 
     typeBadgeText: {
-      fontSize: 9,
-      fontWeight: '800',
-      color: '#34423A',
+      fontFamily: 'Inter_700Bold',
+      fontSize: 8,
+      color: '#168A61',
     },
 
     allocationCard: {
       marginTop: 12,
-      padding: 15,
-      borderRadius: 11,
-      backgroundColor:
-        '#F8FBF9',
+      backgroundColor: '#F5F7FF',
       borderWidth: 1,
-      borderColor:
-        '#DDE9E0',
+      borderColor: '#DCE5FF',
+      borderRadius: 15,
+      padding: 16,
     },
 
     allocationTitle: {
+      fontFamily: 'Inter_700Bold',
       fontSize: 13,
-      fontWeight: '800',
-      color: '#17221B',
+      color: '#243252',
       marginBottom: 8,
     },
 
     allocationRow: {
       flexDirection: 'row',
-      justifyContent:
-        'space-between',
-      paddingVertical: 5,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 7,
     },
 
     allocationLabel: {
-      fontSize: 11,
-      color: '#6D7972',
+      fontFamily: 'Inter_400Regular',
+      fontSize: 10,
+      color: '#718096',
     },
 
     allocationLabelStrong: {
-      color: '#26342C',
-      fontWeight: '700',
+      fontFamily: 'Inter_600SemiBold',
+      color: '#344054',
     },
 
     allocationValue: {
-      fontSize: 11,
-      color: '#34423A',
+      fontFamily: 'Inter_500Medium',
+      fontSize: 10,
+      color: '#475467',
     },
 
     allocationValueStrong: {
-      fontWeight: '800',
-      color: '#16803A',
+      fontFamily: 'Inter_700Bold',
+      color: '#3156D3',
     },
 
     principalOnlyNote: {
-      marginTop: 8,
-      fontSize: 10,
-      color: '#16803A',
-      fontWeight: '700',
+      marginTop: 7,
+      fontFamily: 'Inter_500Medium',
+      fontSize: 9,
+      color: '#6941C6',
     },
 
     notes: {
-      minHeight: 75,
-      paddingTop: 12,
-      textAlignVertical:
-        'top',
+      minHeight: 88,
+      textAlignVertical: 'top',
     },
 
     formActions: {
       flexDirection: 'row',
-      justifyContent:
-        'flex-end',
+      justifyContent: 'flex-end',
       gap: 10,
       marginTop: 18,
     },
 
     cancelButton: {
+      minHeight: 44,
       paddingHorizontal: 18,
-      paddingVertical: 12,
-      borderRadius: 9,
-      backgroundColor:
-        '#EEF2EF',
+      borderRadius: 11,
+      backgroundColor: '#F1F3F7',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
 
     cancelButtonText: {
-      color: '#536158',
+      fontFamily: 'Inter_600SemiBold',
       fontSize: 11,
-      fontWeight: '800',
+      color: '#59677A',
     },
 
     saveButton: {
-      paddingHorizontal: 20,
-      paddingVertical: 12,
-      borderRadius: 9,
-      backgroundColor:
-        '#16803A',
+      minHeight: 44,
+      paddingHorizontal: 22,
+      borderRadius: 11,
+      backgroundColor: '#356DFF',
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: '#356DFF',
+      shadowOpacity: 0.14,
+      shadowRadius: 9,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 2,
     },
 
     saveButtonText: {
-      color: '#FFFFFF',
+      fontFamily: 'Inter_700Bold',
       fontSize: 11,
-      fontWeight: '800',
+      color: '#FFFFFF',
     },
 
     disabledButton: {
@@ -2438,99 +2321,96 @@ const styles =
     },
 
     historyCard: {
-      backgroundColor:
-        '#FFFFFF',
+      backgroundColor: '#FFFFFF',
       borderWidth: 1,
-      borderColor:
-        '#E1EAE4',
-      borderRadius: 14,
-      padding: 19,
+      borderColor: '#E4E9F2',
+      borderRadius: 20,
+      padding: 22,
+      shadowColor: '#172033',
+      shadowOpacity: 0.04,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 2,
     },
 
     historyHeader: {
       flexDirection: 'row',
-      justifyContent:
-        'space-between',
+      justifyContent: 'space-between',
       alignItems: 'center',
+      marginBottom: 14,
     },
 
     historyTitle: {
+      fontFamily: 'Inter_700Bold',
       fontSize: 18,
-      fontWeight: '800',
-      color: '#17221B',
+      color: '#172033',
+      letterSpacing: -0.2,
     },
 
     historySubtitle: {
-      marginTop: 3,
+      marginTop: 4,
+      fontFamily: 'Inter_400Regular',
       fontSize: 10,
-      color: '#87928B',
+      color: '#8793A5',
     },
 
     historyCount: {
-      minWidth: 30,
-      height: 30,
-      borderRadius: 15,
-      backgroundColor:
-        '#EAF4ED',
-      color: '#16803A',
+      minWidth: 34,
+      height: 34,
+      borderRadius: 17,
+      backgroundColor: '#EEF3FF',
       textAlign: 'center',
-      textAlignVertical:
-        'center',
-      fontSize: 11,
-      fontWeight: '800',
+      textAlignVertical: 'center',
       paddingTop: 8,
+      fontFamily: 'Inter_700Bold',
+      fontSize: 11,
+      color: '#356DFF',
     },
 
     searchInput: {
-      height: 42,
-      marginTop: 15,
-      marginBottom: 12,
+      minHeight: 46,
+      backgroundColor: '#F8FAFD',
       borderWidth: 1,
-      borderColor:
-        '#DDE6E0',
-      backgroundColor:
-        '#FAFCFA',
-      borderRadius: 9,
-      paddingHorizontal: 13,
-      fontSize: 12,
-      color: '#17221B',
+      borderColor: '#DFE5EE',
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      fontFamily: 'Inter_400Regular',
+      fontSize: 11,
+      color: '#25324A',
+      marginBottom: 14,
     },
 
     historyList: {
-      gap: 9,
+      gap: 10,
     },
 
     historyItem: {
+      backgroundColor: '#FBFCFE',
       borderWidth: 1,
-      borderColor:
-        '#E4EBE6',
-      borderRadius: 11,
-      padding: 13,
-      backgroundColor:
-        '#FFFFFF',
+      borderColor: '#E6EAF1',
+      borderRadius: 15,
+      padding: 15,
     },
 
     historyMain: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'flex-start',
     },
 
     historyIcon: {
       width: 40,
       height: 40,
-      borderRadius: 10,
-      backgroundColor:
-        '#EAF4ED',
+      borderRadius: 12,
+      backgroundColor: '#EEF3FF',
       alignItems: 'center',
-      justifyContent:
-        'center',
-      marginRight: 11,
+      justifyContent: 'center',
+      marginRight: 12,
     },
 
     historyIconText: {
-      color: '#16803A',
-      fontWeight: '800',
-      fontSize: 17,
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 16,
+      color: '#356DFF',
     },
 
     historyInfo: {
@@ -2542,146 +2422,149 @@ const styles =
       flexDirection: 'row',
       alignItems: 'center',
       gap: 8,
+      flexWrap: 'wrap',
     },
 
     historyLoanName: {
-      flexShrink: 1,
-      fontSize: 13,
-      fontWeight: '800',
-      color: '#26342C',
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 12,
+      color: '#273449',
     },
 
     statusBadge: {
-      paddingHorizontal: 7,
+      paddingHorizontal: 8,
       paddingVertical: 4,
-      borderRadius: 999,
+      borderRadius: 20,
     },
 
     statusBadgeText: {
+      fontFamily: 'Inter_700Bold',
       fontSize: 8,
-      fontWeight: '800',
-      color: '#34423A',
     },
 
     historyDate: {
-      marginTop: 4,
-      fontSize: 10,
-      color: '#7B8780',
+      marginTop: 5,
+      fontFamily: 'Inter_400Regular',
+      fontSize: 9,
+      color: '#8793A5',
     },
 
     breakdown: {
-      marginTop: 5,
-      fontSize: 10,
-      color: '#5F6C64',
+      marginTop: 7,
+      fontFamily: 'Inter_400Regular',
+      fontSize: 9,
+      color: '#69778A',
     },
 
     notesText: {
-      marginTop: 5,
-      fontSize: 10,
-      color: '#7B8780',
+      marginTop: 7,
+      fontFamily: 'Inter_400Regular',
+      fontSize: 9,
+      color: '#66758A',
       fontStyle: 'italic',
     },
 
     historyRight: {
       alignItems: 'flex-end',
       marginLeft: 12,
+      minWidth: 125,
     },
 
     historyAmount: {
+      fontFamily: 'Inter_800ExtraBold',
       fontSize: 16,
-      fontWeight: '800',
-      color: '#16803A',
+      color: '#172033',
     },
 
     actionRow: {
       flexDirection: 'row',
       gap: 7,
-      marginTop: 8,
+      marginTop: 9,
     },
 
     editButton: {
-      paddingHorizontal: 9,
+      paddingHorizontal: 10,
       paddingVertical: 6,
-      borderRadius: 7,
-      backgroundColor:
-        '#EEF5F0',
+      borderRadius: 8,
+      backgroundColor: '#EEF3FF',
     },
 
     editButtonText: {
+      fontFamily: 'Inter_600SemiBold',
       fontSize: 9,
-      fontWeight: '800',
-      color: '#16803A',
+      color: '#356DFF',
     },
 
     deleteButton: {
-      paddingHorizontal: 9,
+      paddingHorizontal: 10,
       paddingVertical: 6,
-      borderRadius: 7,
-      backgroundColor:
-        '#FDECEC',
+      borderRadius: 8,
+      backgroundColor: '#FDEEEE',
     },
 
     deleteButtonText: {
+      fontFamily: 'Inter_600SemiBold',
       fontSize: 9,
-      fontWeight: '800',
-      color: '#C0392B',
+      color: '#C2413A',
     },
 
     empty: {
       alignItems: 'center',
-      justifyContent:
-        'center',
-      paddingVertical: 55,
+      justifyContent: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 44,
+      borderRadius: 15,
+      backgroundColor: '#F8FAFD',
+      borderWidth: 1,
+      borderColor: '#E6EAF1',
     },
 
     emptyIcon: {
-      width: 54,
-      height: 54,
-      borderRadius: 16,
-      backgroundColor:
-        '#EAF4ED',
+      width: 50,
+      height: 50,
+      borderRadius: 15,
+      backgroundColor: '#EEF3FF',
       alignItems: 'center',
-      justifyContent:
-        'center',
+      justifyContent: 'center',
     },
 
     emptyIconText: {
-      color: '#16803A',
-      fontSize: 22,
-      fontWeight: '800',
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 19,
+      color: '#356DFF',
     },
 
     emptyTitle: {
-      marginTop: 13,
-      fontSize: 15,
-      fontWeight: '800',
-      color: '#26342C',
+      marginTop: 12,
+      fontFamily: 'Inter_700Bold',
+      fontSize: 14,
+      color: '#273449',
     },
 
     emptyText: {
       marginTop: 5,
-      fontSize: 11,
-      color: '#87928B',
+      fontFamily: 'Inter_400Regular',
+      fontSize: 10,
+      color: '#8793A5',
       textAlign: 'center',
-      maxWidth: 380,
     },
 
     emptyAddButton: {
-      marginTop: 15,
+      marginTop: 16,
       paddingHorizontal: 15,
-      paddingVertical: 10,
-      borderRadius: 9,
-      backgroundColor:
-        '#16803A',
+      paddingVertical: 9,
+      borderRadius: 10,
+      backgroundColor: '#356DFF',
     },
 
     emptyAddButtonText: {
-      color: '#FFFFFF',
+      fontFamily: 'Inter_700Bold',
       fontSize: 10,
-      fontWeight: '800',
+      color: '#FFFFFF',
     },
 
     bottomSpace: {
       height: 30,
     },
   });
+

@@ -4,6 +4,14 @@ import React, {
 } from 'react';
 
 import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+} from '@expo-google-fonts/inter';
+
+import {
   ScrollView,
   StyleSheet,
   Text,
@@ -490,6 +498,7 @@ export default function CalculatorRoute() {
                   value={formatCurrency(
                     calculation.totalPrincipal
                   )}
+                  tone="green"
                 />
 
                 <SummaryItem
@@ -497,6 +506,7 @@ export default function CalculatorRoute() {
                   value={formatCurrency(
                     calculation.totalInterest
                   )}
+                  tone="purple"
                 />
 
                 <SummaryItem
@@ -504,6 +514,7 @@ export default function CalculatorRoute() {
                   value={formatCurrency(
                     calculation.totalPayment
                   )}
+                  tone="blue"
                 />
 
                 <SummaryItem
@@ -511,6 +522,7 @@ export default function CalculatorRoute() {
                   value={formatDate(
                     calculation.maturityDate
                   )}
+                  tone="orange"
                 />
               </View>
             </View>
@@ -705,28 +717,34 @@ export default function CalculatorRoute() {
 function SummaryItem({
   label,
   value,
+  tone = 'blue',
 }: {
   label: string;
   value: string;
+  tone?: 'blue' | 'purple' | 'green' | 'orange';
 }) {
   return (
     <View
-      style={
-        styles.summaryItem
-      }
+      style={[
+        styles.summaryItem,
+        tone === 'blue' && styles.summaryBlue,
+        tone === 'purple' && styles.summaryPurple,
+        tone === 'green' && styles.summaryGreen,
+        tone === 'orange' && styles.summaryOrange,
+      ]}
     >
-      <Text
-        style={
-          styles.summaryLabel
-        }
-      >
+      <Text style={styles.summaryLabel}>
         {label}
       </Text>
 
       <Text
-        style={
-          styles.summaryValue
-        }
+        style={[
+          styles.summaryValue,
+          tone === 'blue' && styles.summaryBlueValue,
+          tone === 'purple' && styles.summaryPurpleValue,
+          tone === 'green' && styles.summaryGreenValue,
+          tone === 'orange' && styles.summaryOrangeValue,
+        ]}
       >
         {value}
       </Text>
@@ -807,95 +825,109 @@ const styles =
   StyleSheet.create({
     screen: {
       flex: 1,
-      backgroundColor:
-        '#F6F9F7',
+      backgroundColor: '#F5F7FB',
     },
 
     content: {
-      padding: 24,
-      paddingBottom: 50,
+      paddingHorizontal: 28,
+      paddingTop: 28,
+      paddingBottom: 56,
+      width: '100%',
+      maxWidth: 1280,
+      alignSelf: 'center',
     },
 
     header: {
-      marginBottom: 22,
+      marginBottom: 24,
+      paddingHorizontal: 2,
     },
 
     title: {
-      fontSize: 28,
-      fontWeight: '700',
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 30,
       color: '#111827',
+      letterSpacing: -0.7,
     },
 
     subtitle: {
-      marginTop: 6,
+      marginTop: 7,
+      fontFamily: 'Inter_400Regular',
       fontSize: 14,
-      color: '#6B7280',
+      color: '#667085',
       lineHeight: 21,
+      maxWidth: 720,
     },
 
     card: {
-      backgroundColor:
-        '#FFFFFF',
-      borderRadius: 12,
+      backgroundColor: '#FFFFFF',
+      borderRadius: 20,
       borderWidth: 1,
-      borderColor: '#E5E7EB',
-      padding: 20,
+      borderColor: '#E7EBF3',
+      padding: 22,
       marginBottom: 18,
+      shadowColor: '#101828',
+      shadowOpacity: 0.055,
+      shadowRadius: 18,
+      shadowOffset: { width: 0, height: 7 },
+      elevation: 2,
     },
 
     sectionTitle: {
-      fontSize: 18,
-      fontWeight: '700',
-      color: '#111827',
+      fontFamily: 'Inter_700Bold',
+      fontSize: 17,
+      color: '#182230',
+      letterSpacing: -0.2,
       marginBottom: 18,
     },
 
     field: {
-      marginBottom: 18,
+      marginBottom: 17,
     },
 
     label: {
-      fontSize: 13,
-      fontWeight: '600',
-      color: '#374151',
-      marginBottom: 7,
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 12,
+      color: '#344054',
+      marginBottom: 8,
+      letterSpacing: 0.1,
     },
 
     input: {
-      height: 46,
+      height: 50,
       borderWidth: 1,
-      borderColor: '#D1D5DB',
-      borderRadius: 8,
-      paddingHorizontal: 13,
+      borderColor: '#D9E0EA',
+      borderRadius: 13,
+      paddingHorizontal: 15,
+      fontFamily: 'Inter_500Medium',
       fontSize: 15,
-      color: '#111827',
-      backgroundColor:
-        '#FFFFFF',
+      color: '#101828',
+      backgroundColor: '#FBFCFE',
     },
 
     inputWithSuffix: {
-      height: 46,
+      height: 50,
       borderWidth: 1,
-      borderColor: '#D1D5DB',
-      borderRadius: 8,
+      borderColor: '#D9E0EA',
+      borderRadius: 13,
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor:
-        '#FFFFFF',
+      backgroundColor: '#FBFCFE',
     },
 
     inputFlex: {
       flex: 1,
-      height: 44,
-      paddingHorizontal: 13,
+      height: 48,
+      paddingHorizontal: 15,
+      fontFamily: 'Inter_500Medium',
       fontSize: 15,
-      color: '#111827',
+      color: '#101828',
     },
 
     inputSuffix: {
-      fontSize: 15,
-      color: '#6B7280',
-      paddingRight: 14,
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 14,
+      color: '#667085',
+      paddingRight: 15,
     },
 
     tenureRow: {
@@ -906,185 +938,243 @@ const styles =
 
     tenureInput: {
       flex: 1,
-      height: 46,
+      height: 50,
       borderWidth: 1,
-      borderColor: '#D1D5DB',
-      borderRadius: 8,
-      paddingHorizontal: 13,
+      borderColor: '#D9E0EA',
+      borderRadius: 13,
+      paddingHorizontal: 15,
+      fontFamily: 'Inter_500Medium',
       fontSize: 15,
-      color: '#111827',
-      backgroundColor:
-        '#FFFFFF',
+      color: '#101828',
+      backgroundColor: '#FBFCFE',
     },
 
     toggleContainer: {
       flexDirection: 'row',
       borderWidth: 1,
-      borderColor: '#D1D5DB',
-      borderRadius: 8,
+      borderColor: '#D9E0EA',
+      borderRadius: 13,
       overflow: 'hidden',
+      backgroundColor: '#F8FAFC',
     },
 
     toggleButton: {
-      paddingHorizontal: 14,
-      height: 44,
-      justifyContent:
-        'center',
-      backgroundColor:
-        '#FFFFFF',
+      paddingHorizontal: 15,
+      height: 48,
+      justifyContent: 'center',
+      backgroundColor: '#F8FAFC',
     },
 
     toggleButtonActive: {
-      backgroundColor:
-        '#EAF7EF',
+      backgroundColor: '#356DFF',
     },
 
     toggleText: {
-      fontSize: 13,
-      fontWeight: '600',
-      color: '#6B7280',
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 12,
+      color: '#667085',
     },
 
     toggleTextActive: {
-      color: '#00843D',
+      color: '#FFFFFF',
     },
 
     helperText: {
-      marginTop: 5,
-      fontSize: 12,
-      color: '#6B7280',
+      marginTop: 7,
+      fontFamily: 'Inter_400Regular',
+      fontSize: 11,
+      color: '#98A2B3',
     },
 
     resultCard: {
-      backgroundColor:
-        '#EAF7EF',
+      backgroundColor: '#356DFF',
       borderWidth: 1,
-      borderColor: '#BFE5CD',
-      borderRadius: 12,
-      padding: 24,
+      borderColor: '#356DFF',
+      borderRadius: 20,
+      paddingHorizontal: 28,
+      paddingVertical: 28,
       marginBottom: 18,
       alignItems: 'center',
+      shadowColor: '#356DFF',
+      shadowOpacity: 0.18,
+      shadowRadius: 22,
+      shadowOffset: { width: 0, height: 10 },
+      elevation: 4,
     },
 
     resultLabel: {
-      fontSize: 13,
-      fontWeight: '600',
-      color: '#166534',
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 12,
+      color: '#DCE7FF',
+      letterSpacing: 0.5,
+      textTransform: 'uppercase',
     },
 
     emiValue: {
-      marginTop: 6,
-      fontSize: 32,
-      fontWeight: '700',
-      color: '#00843D',
+      marginTop: 8,
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 38,
+      color: '#FFFFFF',
+      letterSpacing: -1,
     },
 
     resultSubtext: {
-      marginTop: 4,
+      marginTop: 5,
+      fontFamily: 'Inter_400Regular',
       fontSize: 12,
-      color: '#4B5563',
+      color: '#DCE7FF',
     },
 
     summaryGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
+      gap: 12,
     },
 
     summaryItem: {
-      width: '50%',
-      paddingBottom: 20,
+      width: '48%',
+      minHeight: 88,
+      borderRadius: 15,
+      paddingHorizontal: 15,
+      paddingVertical: 14,
+      justifyContent: 'center',
+      borderWidth: 1,
     },
 
     summaryLabel: {
-      fontSize: 12,
-      color: '#6B7280',
-      marginBottom: 5,
+      fontFamily: 'Inter_500Medium',
+      fontSize: 11,
+      color: '#667085',
+      marginBottom: 7,
     },
 
     summaryValue: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: '#111827',
+      fontFamily: 'Inter_700Bold',
+      fontSize: 17,
+      color: '#182230',
+      letterSpacing: -0.2,
+    },
+
+    summaryBlue: {
+      backgroundColor: '#F2F5FF',
+      borderColor: '#DCE5FF',
+    },
+
+    summaryPurple: {
+      backgroundColor: '#F6F2FF',
+      borderColor: '#E7DDFF',
+    },
+
+    summaryGreen: {
+      backgroundColor: '#EFFAF5',
+      borderColor: '#D4F0E3',
+    },
+
+    summaryOrange: {
+      backgroundColor: '#FFF8EC',
+      borderColor: '#F5E2BE',
+    },
+
+    summaryBlueValue: {
+      color: '#3156D3',
+    },
+
+    summaryPurpleValue: {
+      color: '#6941C6',
+    },
+
+    summaryGreenValue: {
+      color: '#168A61',
+    },
+
+    summaryOrangeValue: {
+      color: '#C47718',
     },
 
     scheduleHeader: {
       flexDirection: 'row',
-      justifyContent:
-        'space-between',
+      justifyContent: 'space-between',
       marginBottom: 4,
     },
 
     scheduleSubtext: {
       marginTop: -10,
       marginBottom: 14,
-      fontSize: 12,
-      color: '#6B7280',
+      fontFamily: 'Inter_400Regular',
+      fontSize: 11,
+      color: '#98A2B3',
     },
 
     tableHeader: {
       height: 42,
       flexDirection: 'row',
-      backgroundColor:
-        '#F3F4F6',
+      backgroundColor: '#F8FAFC',
       borderTopWidth: 1,
       borderBottomWidth: 1,
-      borderColor: '#E5E7EB',
+      borderColor: '#E7EBF3',
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
     },
 
     tableHeaderCell: {
-      justifyContent:
-        'center',
+      justifyContent: 'center',
       paddingHorizontal: 10,
     },
 
     tableHeaderText: {
-      fontSize: 12,
-      fontWeight: '700',
-      color: '#374151',
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 11,
+      color: '#475467',
     },
 
     tableRow: {
-      height: 48,
+      minHeight: 50,
       flexDirection: 'row',
       borderBottomWidth: 1,
-      borderColor: '#E5E7EB',
+      borderColor: '#EEF1F5',
       alignItems: 'center',
+      backgroundColor: '#FFFFFF',
     },
 
     tableCell: {
       paddingHorizontal: 10,
-      justifyContent:
-        'center',
+      justifyContent: 'center',
     },
 
     tableCellText: {
-      fontSize: 12,
-      color: '#374151',
+      fontFamily: 'Inter_400Regular',
+      fontSize: 11,
+      color: '#475467',
     },
 
     emptyCard: {
-      backgroundColor:
-        '#FFFFFF',
+      backgroundColor: '#FFFFFF',
       borderWidth: 1,
-      borderColor: '#E5E7EB',
-      borderRadius: 12,
-      padding: 30,
+      borderColor: '#E7EBF3',
+      borderRadius: 20,
+      padding: 34,
       alignItems: 'center',
-      marginTop: 5,
+      marginTop: 3,
+      shadowColor: '#101828',
+      shadowOpacity: 0.04,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 1,
     },
 
     emptyTitle: {
+      fontFamily: 'Inter_700Bold',
       fontSize: 16,
-      fontWeight: '700',
-      color: '#111827',
+      color: '#182230',
     },
 
     emptyText: {
       marginTop: 8,
+      fontFamily: 'Inter_400Regular',
       fontSize: 13,
       lineHeight: 20,
       textAlign: 'center',
-      color: '#6B7280',
+      color: '#667085',
       maxWidth: 500,
     },
   });
