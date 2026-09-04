@@ -201,7 +201,7 @@ const styles =
 
     loadingText: {
       marginTop: 12,
-      fontSize: 13,
+      fontSize: 15,
       color: '#68766E',
     },
 
@@ -216,7 +216,7 @@ const styles =
     },
 
     errorTitle: {
-      fontSize: 20,
+      fontSize: 24,
       fontWeight: '800',
       color: '#18231B',
     },
@@ -224,13 +224,13 @@ const styles =
     errorText: {
       marginTop: 8,
       textAlign: 'center',
-      fontSize: 13,
+      fontSize: 15,
       color: '#6F7B74',
     },
 
     backText: {
       marginTop: 20,
-      fontSize: 13,
+      fontSize: 15,
       fontWeight: '700',
       color: '#16803A',
     },

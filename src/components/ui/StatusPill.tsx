@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   icon: {
     ...theme.typography.tiny,
 
-    fontSize: 9,
+    fontSize: 11,
 
     lineHeight: 13,
   },
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   text: {
     ...theme.typography.tiny,
 
-    fontSize: 9,
+    fontSize: 11,
 
     lineHeight: 13,
 

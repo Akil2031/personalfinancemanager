@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
   brandMarkText: {
     color: theme.colors.white,
     fontFamily: 'Inter_700Bold',
-    fontSize: 17,
+    fontSize: 20,
     zIndex: 1,
   },
 
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   brandName: {
     color: theme.colors.text,
     fontFamily: 'Inter_700Bold',
-    fontSize: 16,
+    fontSize: 19,
     lineHeight: 19,
     letterSpacing: -0.25,
   },
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     marginTop: 1,
     color: theme.colors.textMuted,
     fontFamily: 'Inter_700Bold',
-    fontSize: 7,
+    fontSize: 8,
     lineHeight: 9,
     letterSpacing: 1.05,
   },
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
   navLabel: {
     color: theme.colors.textSecondary,
     fontFamily: 'Inter_500Medium',
-    fontSize: 12,
+    fontSize: 14,
     lineHeight: 16,
   },
 
@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     color: theme.colors.text,
     fontFamily: 'Inter_400Regular',
-    fontSize: 11,
+    fontSize: 13,
   } as any,
 
   searchShortcut: {
@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
   searchShortcutText: {
     color: theme.colors.textMuted,
     fontFamily: 'Inter_500Medium',
-    fontSize: 8,
+    fontSize: 9,
   },
 
   iconButton: {
@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center',
     fontFamily: 'Inter_700Bold',
-    fontSize: 10,
+    fontSize: 12,
     overflow: 'hidden',
   },
 
@@ -664,7 +664,7 @@ const styles = StyleSheet.create({
   menuAvatarText: {
     color: theme.colors.primary,
     fontFamily: 'Inter_700Bold',
-    fontSize: 13,
+    fontSize: 15,
   },
 
   menuIdentity: {
@@ -675,14 +675,14 @@ const styles = StyleSheet.create({
   menuName: {
     color: theme.colors.text,
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 12,
+    fontSize: 14,
   },
 
   menuEmail: {
     marginTop: 3,
     color: theme.colors.textMuted,
     fontFamily: 'Inter_400Regular',
-    fontSize: 10,
+    fontSize: 12,
   },
 
   menuDivider: {
@@ -712,7 +712,7 @@ const styles = StyleSheet.create({
   logoutText: {
     color: '#D14B5B',
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 11,
+    fontSize: 13,
   },
 
 
@@ -911,3 +911,4 @@ const styles = StyleSheet.create({
     opacity: 0.72,
   },
 });
+

@@ -842,7 +842,7 @@ const styles =
 
     title: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 30,
+      fontSize: 35,
       color: '#111827',
       letterSpacing: -0.7,
     },
@@ -850,7 +850,7 @@ const styles =
     subtitle: {
       marginTop: 7,
       fontFamily: 'Inter_400Regular',
-      fontSize: 14,
+      fontSize: 17,
       color: '#667085',
       lineHeight: 21,
       maxWidth: 720,
@@ -872,7 +872,7 @@ const styles =
 
     sectionTitle: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 17,
+      fontSize: 20,
       color: '#182230',
       letterSpacing: -0.2,
       marginBottom: 18,
@@ -884,7 +884,7 @@ const styles =
 
     label: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 12,
+      fontSize: 14,
       color: '#344054',
       marginBottom: 8,
       letterSpacing: 0.1,
@@ -897,7 +897,7 @@ const styles =
       borderRadius: 13,
       paddingHorizontal: 15,
       fontFamily: 'Inter_500Medium',
-      fontSize: 15,
+      fontSize: 18,
       color: '#101828',
       backgroundColor: '#FBFCFE',
     },
@@ -917,13 +917,13 @@ const styles =
       height: 48,
       paddingHorizontal: 15,
       fontFamily: 'Inter_500Medium',
-      fontSize: 15,
+      fontSize: 18,
       color: '#101828',
     },
 
     inputSuffix: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 14,
+      fontSize: 17,
       color: '#667085',
       paddingRight: 15,
     },
@@ -942,7 +942,7 @@ const styles =
       borderRadius: 13,
       paddingHorizontal: 15,
       fontFamily: 'Inter_500Medium',
-      fontSize: 15,
+      fontSize: 18,
       color: '#101828',
       backgroundColor: '#FBFCFE',
     },
@@ -969,7 +969,7 @@ const styles =
 
     toggleText: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 12,
+      fontSize: 14,
       color: '#667085',
     },
 
@@ -980,7 +980,7 @@ const styles =
     helperText: {
       marginTop: 7,
       fontFamily: 'Inter_400Regular',
-      fontSize: 11,
+      fontSize: 13,
       color: '#98A2B3',
     },
 
@@ -1002,7 +1002,7 @@ const styles =
 
     resultLabel: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 12,
+      fontSize: 14,
       color: '#DCE7FF',
       letterSpacing: 0.5,
       textTransform: 'uppercase',
@@ -1011,7 +1011,7 @@ const styles =
     emiValue: {
       marginTop: 8,
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 38,
+      fontSize: 45,
       color: '#FFFFFF',
       letterSpacing: -1,
     },
@@ -1019,7 +1019,7 @@ const styles =
     resultSubtext: {
       marginTop: 5,
       fontFamily: 'Inter_400Regular',
-      fontSize: 12,
+      fontSize: 14,
       color: '#DCE7FF',
     },
 
@@ -1041,14 +1041,14 @@ const styles =
 
     summaryLabel: {
       fontFamily: 'Inter_500Medium',
-      fontSize: 11,
+      fontSize: 13,
       color: '#667085',
       marginBottom: 7,
     },
 
     summaryValue: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 17,
+      fontSize: 20,
       color: '#182230',
       letterSpacing: -0.2,
     },
@@ -1099,7 +1099,7 @@ const styles =
       marginTop: -10,
       marginBottom: 14,
       fontFamily: 'Inter_400Regular',
-      fontSize: 11,
+      fontSize: 13,
       color: '#98A2B3',
     },
 
@@ -1121,7 +1121,7 @@ const styles =
 
     tableHeaderText: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 11,
+      fontSize: 13,
       color: '#475467',
     },
 
@@ -1141,7 +1141,7 @@ const styles =
 
     tableCellText: {
       fontFamily: 'Inter_400Regular',
-      fontSize: 11,
+      fontSize: 13,
       color: '#475467',
     },
 
@@ -1162,17 +1162,18 @@ const styles =
 
     emptyTitle: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 16,
+      fontSize: 19,
       color: '#182230',
     },
 
     emptyText: {
       marginTop: 8,
       fontFamily: 'Inter_400Regular',
-      fontSize: 13,
+      fontSize: 15,
       lineHeight: 20,
       textAlign: 'center',
       color: '#667085',
       maxWidth: 500,
     },
   });
+

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 import {
   Platform,
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   mobileNavLabel: {
     color: theme.colors.textMuted,
     fontFamily: 'Inter_500Medium',
-    fontSize: 8,
+    fontSize: 9,
     lineHeight: 12,
   },
 
@@ -222,3 +222,4 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.97 }],
   },
 });
+

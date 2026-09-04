@@ -1881,7 +1881,7 @@ const styles =
       marginTop: 12,
       color: '#718096',
       fontFamily: 'Inter_500Medium',
-      fontSize: 13,
+      fontSize: 15,
     },
 
     pageHeader: {
@@ -1894,7 +1894,7 @@ const styles =
 
     title: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 30,
+      fontSize: 35,
       lineHeight: 37,
       color: '#172033',
       letterSpacing: -0.6,
@@ -1903,7 +1903,7 @@ const styles =
     subtitle: {
       marginTop: 5,
       fontFamily: 'Inter_400Regular',
-      fontSize: 12,
+      fontSize: 14,
       color: '#7B879A',
     },
 
@@ -1924,7 +1924,7 @@ const styles =
     addButtonText: {
       color: '#FFFFFF',
       fontFamily: 'Inter_700Bold',
-      fontSize: 12,
+      fontSize: 14,
     },
 
     summaryRow: {
@@ -1974,7 +1974,7 @@ const styles =
 
     summaryLabel: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 10,
+      fontSize: 12,
       color: 'rgba(255,255,255,0.82)',
       letterSpacing: 0.65,
       textTransform: 'uppercase',
@@ -1983,7 +1983,7 @@ const styles =
     summaryValue: {
       marginTop: 11,
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 25,
+      fontSize: 30,
       lineHeight: 31,
       color: '#FFFFFF',
       letterSpacing: -0.7,
@@ -2012,7 +2012,7 @@ const styles =
 
     formTitle: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 19,
+      fontSize: 22,
       color: '#172033',
       letterSpacing: -0.2,
     },
@@ -2021,7 +2021,7 @@ const styles =
       marginTop: 5,
       fontFamily: 'Inter_400Regular',
       color: '#8290A3',
-      fontSize: 11,
+      fontSize: 13,
     },
 
     closeButton: {
@@ -2036,14 +2036,14 @@ const styles =
     closeButtonText: {
       color: '#66758A',
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 15,
+      fontSize: 18,
     },
 
     label: {
       marginTop: 18,
       marginBottom: 8,
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 10,
+      fontSize: 12,
       color: '#526174',
     },
 
@@ -2072,7 +2072,7 @@ const styles =
 
     loanOptionName: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 11,
+      fontSize: 13,
       color: '#273449',
     },
 
@@ -2083,7 +2083,7 @@ const styles =
     loanOptionLender: {
       marginTop: 4,
       fontFamily: 'Inter_400Regular',
-      fontSize: 9,
+      fontSize: 11,
       color: '#8793A5',
     },
 
@@ -2100,7 +2100,7 @@ const styles =
       paddingHorizontal: 14,
       paddingVertical: 11,
       fontFamily: 'Inter_400Regular',
-      fontSize: 12,
+      fontSize: 14,
       color: '#1D2939',
     },
 
@@ -2117,7 +2117,7 @@ const styles =
 
     currency: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 20,
+      fontSize: 24,
       color: '#356DFF',
       marginRight: 7,
     },
@@ -2126,7 +2126,7 @@ const styles =
       flex: 1,
       padding: 0,
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 22,
+      fontSize: 26,
       color: '#172033',
     },
 
@@ -2144,14 +2144,14 @@ const styles =
 
     scheduledLabel: {
       fontFamily: 'Inter_400Regular',
-      fontSize: 9,
+      fontSize: 11,
       color: '#7A8799',
     },
 
     scheduledValue: {
       marginTop: 3,
       fontFamily: 'Inter_700Bold',
-      fontSize: 13,
+      fontSize: 15,
       color: '#25324A',
     },
 
@@ -2164,7 +2164,7 @@ const styles =
 
     useEmiText: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 9,
+      fontSize: 11,
       color: '#356DFF',
     },
 
@@ -2183,14 +2183,14 @@ const styles =
 
     typeLabel: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 10,
+      fontSize: 12,
       color: '#344054',
     },
 
     typeDescription: {
       marginTop: 3,
       fontFamily: 'Inter_400Regular',
-      fontSize: 9,
+      fontSize: 11,
       color: '#8793A5',
     },
 
@@ -2218,7 +2218,7 @@ const styles =
 
     typeBadgeText: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 8,
+      fontSize: 9,
       color: '#168A61',
     },
 
@@ -2233,7 +2233,7 @@ const styles =
 
     allocationTitle: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 13,
+      fontSize: 15,
       color: '#243252',
       marginBottom: 8,
     },
@@ -2247,7 +2247,7 @@ const styles =
 
     allocationLabel: {
       fontFamily: 'Inter_400Regular',
-      fontSize: 10,
+      fontSize: 12,
       color: '#718096',
     },
 
@@ -2258,7 +2258,7 @@ const styles =
 
     allocationValue: {
       fontFamily: 'Inter_500Medium',
-      fontSize: 10,
+      fontSize: 12,
       color: '#475467',
     },
 
@@ -2270,7 +2270,7 @@ const styles =
     principalOnlyNote: {
       marginTop: 7,
       fontFamily: 'Inter_500Medium',
-      fontSize: 9,
+      fontSize: 11,
       color: '#6941C6',
     },
 
@@ -2297,7 +2297,7 @@ const styles =
 
     cancelButtonText: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 11,
+      fontSize: 13,
       color: '#59677A',
     },
 
@@ -2317,7 +2317,7 @@ const styles =
 
     saveButtonText: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 11,
+      fontSize: 13,
       color: '#FFFFFF',
     },
 
@@ -2347,7 +2347,7 @@ const styles =
 
     historyTitle: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 18,
+      fontSize: 21,
       color: '#172033',
       letterSpacing: -0.2,
     },
@@ -2355,7 +2355,7 @@ const styles =
     historySubtitle: {
       marginTop: 4,
       fontFamily: 'Inter_400Regular',
-      fontSize: 10,
+      fontSize: 12,
       color: '#8793A5',
     },
 
@@ -2368,7 +2368,7 @@ const styles =
       textAlignVertical: 'center',
       paddingTop: 8,
       fontFamily: 'Inter_700Bold',
-      fontSize: 11,
+      fontSize: 13,
       color: '#356DFF',
     },
 
@@ -2380,7 +2380,7 @@ const styles =
       borderRadius: 12,
       paddingHorizontal: 14,
       fontFamily: 'Inter_400Regular',
-      fontSize: 11,
+      fontSize: 13,
       color: '#25324A',
       marginBottom: 14,
     },
@@ -2414,7 +2414,7 @@ const styles =
 
     historyIconText: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 16,
+      fontSize: 19,
       color: '#356DFF',
     },
 
@@ -2432,7 +2432,7 @@ const styles =
 
     historyLoanName: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 12,
+      fontSize: 14,
       color: '#273449',
     },
 
@@ -2444,27 +2444,27 @@ const styles =
 
     statusBadgeText: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 8,
+      fontSize: 9,
     },
 
     historyDate: {
       marginTop: 5,
       fontFamily: 'Inter_400Regular',
-      fontSize: 9,
+      fontSize: 11,
       color: '#8793A5',
     },
 
     breakdown: {
       marginTop: 7,
       fontFamily: 'Inter_400Regular',
-      fontSize: 9,
+      fontSize: 11,
       color: '#69778A',
     },
 
     notesText: {
       marginTop: 7,
       fontFamily: 'Inter_400Regular',
-      fontSize: 9,
+      fontSize: 11,
       color: '#66758A',
       fontStyle: 'italic',
     },
@@ -2477,7 +2477,7 @@ const styles =
 
     historyAmount: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 16,
+      fontSize: 19,
       color: '#172033',
     },
 
@@ -2496,7 +2496,7 @@ const styles =
 
     editButtonText: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 9,
+      fontSize: 11,
       color: '#356DFF',
     },
 
@@ -2509,7 +2509,7 @@ const styles =
 
     deleteButtonText: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 9,
+      fontSize: 11,
       color: '#C2413A',
     },
 
@@ -2535,21 +2535,21 @@ const styles =
 
     emptyIconText: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 19,
+      fontSize: 22,
       color: '#356DFF',
     },
 
     emptyTitle: {
       marginTop: 12,
       fontFamily: 'Inter_700Bold',
-      fontSize: 14,
+      fontSize: 17,
       color: '#273449',
     },
 
     emptyText: {
       marginTop: 5,
       fontFamily: 'Inter_400Regular',
-      fontSize: 10,
+      fontSize: 12,
       color: '#8793A5',
       textAlign: 'center',
     },
@@ -2564,7 +2564,7 @@ const styles =
 
     emptyAddButtonText: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 10,
+      fontSize: 12,
       color: '#FFFFFF',
     },
 
@@ -2572,4 +2572,5 @@ const styles =
       height: 30,
     },
   });
+
 

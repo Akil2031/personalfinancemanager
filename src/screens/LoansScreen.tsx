@@ -2468,7 +2468,7 @@ const styles =
     loadingText: {
       marginTop: 12,
       fontFamily: 'Inter_500Medium',
-      fontSize: 13,
+      fontSize: 15,
       color: '#667085',
     },
 
@@ -2484,7 +2484,7 @@ const styles =
 
     title: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 30,
+      fontSize: 35,
       letterSpacing: -0.7,
       color: '#101828',
     },
@@ -2492,7 +2492,7 @@ const styles =
     subtitle: {
       marginTop: 7,
       fontFamily: 'Inter_400Regular',
-      fontSize: 13,
+      fontSize: 15,
       color: '#667085',
     },
 
@@ -2514,7 +2514,7 @@ const styles =
     addButtonText: {
       fontFamily: 'Inter_700Bold',
       color: '#FFFFFF',
-      fontSize: 12,
+      fontSize: 14,
       letterSpacing: 0.1,
     },
 
@@ -2569,7 +2569,7 @@ const styles =
 
     summaryLabel: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 10,
+      fontSize: 12,
       color: 'rgba(255,255,255,0.82)',
       letterSpacing: 0.65,
       textTransform: 'uppercase',
@@ -2578,7 +2578,7 @@ const styles =
     summaryValue: {
       marginTop: 11,
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 25,
+      fontSize: 30,
       letterSpacing: -0.7,
       color: '#FFFFFF',
     },
@@ -2586,7 +2586,7 @@ const styles =
     summaryHint: {
       marginTop: 7,
       fontFamily: 'Inter_400Regular',
-      fontSize: 10,
+      fontSize: 12,
       color: 'rgba(255,255,255,0.72)',
     },
 
@@ -2623,7 +2623,7 @@ const styles =
       borderWidth: 1,
       borderColor: '#E4E8F0',
       fontFamily: 'Inter_400Regular',
-      fontSize: 13,
+      fontSize: 15,
       color: '#101828',
       shadowColor: '#101828',
       shadowOpacity: 0.035,
@@ -2656,7 +2656,7 @@ const styles =
 
     filterText: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 10,
+      fontSize: 12,
       color: '#667085',
     },
 
@@ -2672,7 +2672,7 @@ const styles =
 
     sectionTitle: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 19,
+      fontSize: 22,
       letterSpacing: -0.25,
       color: '#101828',
     },
@@ -2680,7 +2680,7 @@ const styles =
     sectionSubtitle: {
       marginTop: 4,
       fontFamily: 'Inter_400Regular',
-      fontSize: 11,
+      fontSize: 13,
       color: '#98A2B3',
     },
 
@@ -2726,14 +2726,14 @@ const styles =
 
     loanIconText: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 13,
+      fontSize: 15,
       letterSpacing: 0.2,
       color: '#356DFF',
     },
 
     loanName: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 16,
+      fontSize: 19,
       letterSpacing: -0.2,
       color: '#101828',
     },
@@ -2741,7 +2741,7 @@ const styles =
     lender: {
       marginTop: 4,
       fontFamily: 'Inter_400Regular',
-      fontSize: 11,
+      fontSize: 13,
       color: '#667085',
     },
 
@@ -2765,7 +2765,7 @@ const styles =
 
     statusText: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 9,
+      fontSize: 11,
       letterSpacing: 0.25,
     },
 
@@ -2800,21 +2800,21 @@ const styles =
 
     metricLabel: {
       fontFamily: 'Inter_500Medium',
-      fontSize: 10,
+      fontSize: 12,
       color: '#98A2B3',
     },
 
     metricValue: {
       marginTop: 5,
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 13,
+      fontSize: 15,
       color: '#344054',
     },
 
     metricValuePrimary: {
       marginTop: 5,
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 17,
+      fontSize: 20,
       letterSpacing: -0.2,
       color: '#356DFF',
     },
@@ -2831,13 +2831,13 @@ const styles =
 
     progressLabel: {
       fontFamily: 'Inter_500Medium',
-      fontSize: 10,
+      fontSize: 12,
       color: '#667085',
     },
 
     progressPercent: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 10,
+      fontSize: 12,
       color: '#356DFF',
     },
 
@@ -2858,7 +2858,7 @@ const styles =
     progressText: {
       marginTop: 6,
       fontFamily: 'Inter_400Regular',
-      fontSize: 9,
+      fontSize: 11,
       color: '#98A2B3',
     },
 
@@ -2882,14 +2882,14 @@ const styles =
 
     footerLabel: {
       fontFamily: 'Inter_400Regular',
-      fontSize: 9,
+      fontSize: 11,
       color: '#98A2B3',
     },
 
     footerValue: {
       marginTop: 3,
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 11,
+      fontSize: 13,
       color: '#344054',
     },
 
@@ -2919,7 +2919,7 @@ const styles =
 
     actionButtonText: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 10,
+      fontSize: 12,
       color: '#356DFF',
     },
 
@@ -2953,14 +2953,14 @@ const styles =
 
     emptyIconText: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 22,
+      fontSize: 26,
       color: '#356DFF',
     },
 
     emptyTitle: {
       marginTop: 14,
       fontFamily: 'Inter_700Bold',
-      fontSize: 17,
+      fontSize: 20,
       color: '#101828',
     },
 
@@ -2969,7 +2969,7 @@ const styles =
       maxWidth: 430,
       textAlign: 'center',
       fontFamily: 'Inter_400Regular',
-      fontSize: 12,
+      fontSize: 14,
       lineHeight: 19,
       color: '#667085',
     },
@@ -3003,13 +3003,13 @@ const styles =
 
     backButtonText: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 11,
+      fontSize: 13,
       color: '#356DFF',
     },
 
     viewHeaderTitle: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 15,
+      fontSize: 18,
       color: '#101828',
     },
 
@@ -3018,4 +3018,5 @@ const styles =
     },
 
   });
+
 

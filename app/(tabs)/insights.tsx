@@ -1583,7 +1583,7 @@ const styles =
     loadingText: {
       marginTop: 12,
       color: '#667085',
-      fontSize: 13,
+      fontSize: 15,
       fontFamily: 'Inter_500Medium',
     },
 
@@ -1592,7 +1592,7 @@ const styles =
     },
 
     title: {
-      fontSize: 30,
+      fontSize: 35,
       lineHeight: 38,
       fontFamily: 'Inter_800ExtraBold',
       color: '#172033',
@@ -1603,7 +1603,7 @@ const styles =
       marginTop: 6,
       maxWidth: 850,
       color: '#667085',
-      fontSize: 13,
+      fontSize: 15,
       lineHeight: 20,
       fontFamily: 'Inter_400Regular',
     },
@@ -1661,7 +1661,7 @@ const styles =
 
     metricLabel: {
       color: '#FFFFFF',
-      fontSize: 10,
+      fontSize: 12,
       fontFamily: 'Inter_700Bold',
       textTransform: 'uppercase',
       letterSpacing: 0.65,
@@ -1672,7 +1672,7 @@ const styles =
     metricValue: {
       marginTop: 11,
       color: '#FFFFFF',
-      fontSize: 25,
+      fontSize: 30,
       lineHeight: 31,
       fontFamily: 'Inter_800ExtraBold',
       letterSpacing: -0.7,
@@ -1688,7 +1688,7 @@ const styles =
     metricCaption: {
       marginTop: 7,
       color: 'rgba(255,255,255,0.72)',
-      fontSize: 10,
+      fontSize: 12,
       lineHeight: 14,
       fontFamily: 'Inter_400Regular',
     },
@@ -1709,7 +1709,7 @@ const styles =
 
     cardTitle: {
       color: '#172033',
-      fontSize: 17,
+      fontSize: 20,
       lineHeight: 23,
       fontFamily: 'Inter_700Bold',
       letterSpacing: -0.15,
@@ -1725,14 +1725,14 @@ const styles =
     sectionSubtitle: {
       marginTop: 5,
       color: '#7B8496',
-      fontSize: 10,
+      fontSize: 12,
       lineHeight: 15,
       fontFamily: 'Inter_400Regular',
     },
 
     muted: {
       color: '#7B8496',
-      fontSize: 10,
+      fontSize: 12,
       lineHeight: 17,
       fontFamily: 'Inter_400Regular',
     },
@@ -1746,20 +1746,20 @@ const styles =
 
     progressLabel: {
       color: '#667085',
-      fontSize: 10,
+      fontSize: 12,
       fontFamily: 'Inter_500Medium',
     },
 
     progressValue: {
       marginTop: 4,
       color: '#172033',
-      fontSize: 22,
+      fontSize: 26,
       fontFamily: 'Inter_800ExtraBold',
     },
 
     progressPercent: {
       color: '#3156D3',
-      fontSize: 20,
+      fontSize: 24,
       fontFamily: 'Inter_800ExtraBold',
     },
 
@@ -1785,7 +1785,7 @@ const styles =
 
     progressFooterValue: {
       color: '#344054',
-      fontSize: 10,
+      fontSize: 12,
       fontFamily: 'Inter_600SemiBold',
     },
 
@@ -1805,21 +1805,21 @@ const styles =
 
     nextEMILoan: {
       color: '#172033',
-      fontSize: 15,
+      fontSize: 18,
       fontFamily: 'Inter_700Bold',
     },
 
     nextEMILender: {
       marginTop: 3,
       color: '#667085',
-      fontSize: 10,
+      fontSize: 12,
       fontFamily: 'Inter_500Medium',
     },
 
     nextEMIType: {
       marginTop: 7,
       color: '#3156D3',
-      fontSize: 9,
+      fontSize: 11,
       fontFamily: 'Inter_600SemiBold',
     },
 
@@ -1827,21 +1827,21 @@ const styles =
 
     nextEMIAmount: {
       color: '#3156D3',
-      fontSize: 22,
+      fontSize: 26,
       fontFamily: 'Inter_800ExtraBold',
     },
 
     nextEMIDate: {
       marginTop: 4,
       color: '#667085',
-      fontSize: 9,
+      fontSize: 11,
       fontFamily: 'Inter_500Medium',
     },
 
     nextEMIDays: {
       marginTop: 5,
       color: '#C47718',
-      fontSize: 9,
+      fontSize: 11,
       fontFamily: 'Inter_700Bold',
     },
 
@@ -1858,7 +1858,7 @@ const styles =
 
     insightCountText: {
       color: '#3156D3',
-      fontSize: 11,
+      fontSize: 13,
       fontFamily: 'Inter_700Bold',
     },
 
@@ -1894,7 +1894,7 @@ const styles =
       textAlignVertical: 'center',
       paddingTop: 5,
       color: '#3156D3',
-      fontSize: 12,
+      fontSize: 14,
       fontFamily: 'Inter_800ExtraBold',
       overflow: 'hidden',
     },
@@ -1902,14 +1902,14 @@ const styles =
     insightTitle: {
       flex: 1,
       color: '#172033',
-      fontSize: 12,
+      fontSize: 14,
       fontFamily: 'Inter_700Bold',
     },
 
     insightMessage: {
       marginTop: 9,
       color: '#596579',
-      fontSize: 10,
+      fontSize: 12,
       lineHeight: 16,
       fontFamily: 'Inter_400Regular',
     },
@@ -1917,7 +1917,7 @@ const styles =
     insightRecommendation: {
       marginTop: 9,
       color: '#344054',
-      fontSize: 9,
+      fontSize: 11,
       lineHeight: 15,
       fontFamily: 'Inter_600SemiBold',
     },
@@ -1942,14 +1942,14 @@ const styles =
 
     loanName: {
       color: '#172033',
-      fontSize: 13,
+      fontSize: 15,
       fontFamily: 'Inter_700Bold',
     },
 
     loanLender: {
       marginTop: 4,
       color: '#7B8496',
-      fontSize: 9,
+      fontSize: 11,
       fontFamily: 'Inter_400Regular',
     },
 
@@ -1957,14 +1957,14 @@ const styles =
 
     loanOutstanding: {
       color: '#3156D3',
-      fontSize: 16,
+      fontSize: 19,
       fontFamily: 'Inter_800ExtraBold',
     },
 
     loanOutstandingLabel: {
       marginTop: 3,
       color: '#98A2B3',
-      fontSize: 8,
+      fontSize: 9,
       textTransform: 'uppercase',
       letterSpacing: 0.4,
       fontFamily: 'Inter_600SemiBold',
@@ -1989,7 +1989,7 @@ const styles =
 
     loanMetricLabel: {
       color: '#98A2B3',
-      fontSize: 8,
+      fontSize: 9,
       textTransform: 'uppercase',
       letterSpacing: 0.35,
       fontFamily: 'Inter_600SemiBold',
@@ -1998,7 +1998,7 @@ const styles =
     loanMetricValue: {
       marginTop: 4,
       color: '#344054',
-      fontSize: 10,
+      fontSize: 12,
       fontFamily: 'Inter_700Bold',
     },
 
@@ -2010,13 +2010,13 @@ const styles =
 
     loanProgressLabel: {
       color: '#667085',
-      fontSize: 9,
+      fontSize: 11,
       fontFamily: 'Inter_500Medium',
     },
 
     loanProgressPercent: {
       color: '#168A61',
-      fontSize: 9,
+      fontSize: 11,
       fontFamily: 'Inter_700Bold',
     },
 
@@ -2045,13 +2045,13 @@ const styles =
 
     summaryRowLabel: {
       color: '#667085',
-      fontSize: 10,
+      fontSize: 12,
       fontFamily: 'Inter_400Regular',
     },
 
     summaryRowValue: {
       color: '#344054',
-      fontSize: 11,
+      fontSize: 13,
       fontFamily: 'Inter_600SemiBold',
     },
 
@@ -2077,7 +2077,7 @@ const styles =
 
     emptyTitle: {
       color: '#344054',
-      fontSize: 12,
+      fontSize: 14,
       fontFamily: 'Inter_700Bold',
     },
 
@@ -2104,7 +2104,7 @@ const styles =
 
     eyebrow: {
       color: '#3156D3',
-      fontSize: 9,
+      fontSize: 11,
       letterSpacing: 1.1,
       fontFamily: 'Inter_800ExtraBold',
     },
@@ -2122,7 +2122,7 @@ const styles =
 
     healthBadgeLabel: {
       color: '#667085',
-      fontSize: 8,
+      fontSize: 9,
       letterSpacing: 0.8,
       fontFamily: 'Inter_700Bold',
     },
@@ -2130,20 +2130,20 @@ const styles =
     healthBadgeScore: {
       marginTop: 4,
       color: '#3156D3',
-      fontSize: 29,
+      fontSize: 34,
       fontFamily: 'Inter_800ExtraBold',
     },
 
     healthBadgeOutOf: {
       color: '#98A2B3',
-      fontSize: 12,
+      fontSize: 14,
       fontFamily: 'Inter_600SemiBold',
     },
 
     healthBadgeStatus: {
       marginTop: 1,
       color: '#168A61',
-      fontSize: 9,
+      fontSize: 11,
       fontFamily: 'Inter_700Bold',
     },
 
@@ -2174,7 +2174,7 @@ const styles =
 
     percentPillText: {
       color: '#3156D3',
-      fontSize: 10,
+      fontSize: 12,
       fontFamily: 'Inter_800ExtraBold',
     },
 
@@ -2188,7 +2188,7 @@ const styles =
 
     progressRemaining: {
       color: '#667085',
-      fontSize: 10,
+      fontSize: 12,
       fontFamily: 'Inter_600SemiBold',
     },
 
@@ -2212,13 +2212,13 @@ const styles =
     healthRowLabel: {
       flex: 1,
       color: '#667085',
-      fontSize: 10,
+      fontSize: 12,
       fontFamily: 'Inter_500Medium',
     },
 
     healthRowValue: {
       color: '#344054',
-      fontSize: 10,
+      fontSize: 12,
       fontFamily: 'Inter_800ExtraBold',
     },
 
@@ -2253,14 +2253,14 @@ const styles =
 
     healthMiniLabel: {
       color: '#98A2B3',
-      fontSize: 8,
+      fontSize: 9,
       fontFamily: 'Inter_600SemiBold',
     },
 
     healthMiniValue: {
       marginTop: 4,
       color: '#172033',
-      fontSize: 11,
+      fontSize: 13,
       fontFamily: 'Inter_800ExtraBold',
     },
 
@@ -2290,7 +2290,7 @@ const styles =
 
     priorityIconText: {
       color: '#3156D3',
-      fontSize: 18,
+      fontSize: 21,
       fontFamily: 'Inter_800ExtraBold',
     },
 
@@ -2298,7 +2298,7 @@ const styles =
 
     priorityEyebrow: {
       color: '#9FB6FF',
-      fontSize: 8,
+      fontSize: 9,
       letterSpacing: 1,
       fontFamily: 'Inter_800ExtraBold',
     },
@@ -2306,14 +2306,14 @@ const styles =
     priorityTitle: {
       marginTop: 4,
       color: '#FFFFFF',
-      fontSize: 16,
+      fontSize: 19,
       fontFamily: 'Inter_800ExtraBold',
     },
 
     priorityMessage: {
       marginTop: 5,
       color: 'rgba(255,255,255,0.78)',
-      fontSize: 10,
+      fontSize: 12,
       lineHeight: 16,
       fontFamily: 'Inter_400Regular',
     },
@@ -2321,7 +2321,7 @@ const styles =
     priorityRecommendation: {
       marginTop: 8,
       color: '#FFFFFF',
-      fontSize: 9,
+      fontSize: 11,
       lineHeight: 15,
       fontFamily: 'Inter_600SemiBold',
     },
@@ -2351,7 +2351,7 @@ const styles =
 
     strategyEyebrow: {
       color: '#98A2B3',
-      fontSize: 8,
+      fontSize: 9,
       letterSpacing: 0.8,
       fontFamily: 'Inter_800ExtraBold',
     },
@@ -2359,24 +2359,25 @@ const styles =
     strategyTitle: {
       marginTop: 9,
       color: '#172033',
-      fontSize: 13,
+      fontSize: 15,
       fontFamily: 'Inter_700Bold',
     },
 
     strategyValue: {
       marginTop: 7,
       color: '#3156D3',
-      fontSize: 21,
+      fontSize: 25,
       fontFamily: 'Inter_800ExtraBold',
     },
 
     strategyHint: {
       marginTop: 7,
       color: '#7B8496',
-      fontSize: 9,
+      fontSize: 11,
       lineHeight: 14,
       fontFamily: 'Inter_400Regular',
     },
 
     bottomSpace: { height: 20 },
   });
+

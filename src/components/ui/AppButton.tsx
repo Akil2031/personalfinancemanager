@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 import {
   ActivityIndicator,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
 
   icon: {
-    fontSize: 16,
+    fontSize: 19,
     fontWeight: '800',
   },
 

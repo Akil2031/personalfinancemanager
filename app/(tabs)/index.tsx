@@ -2927,13 +2927,13 @@ const styles = StyleSheet.create({
 
   logoMarkText: {
     color: '#FFFFFF',
-    fontSize: 21,
+    fontSize: 25,
     fontWeight: '800',
   },
 
   eyebrow: {
     color: COLORS.blue,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '800',
     letterSpacing: 1.7,
     marginBottom: 3,
@@ -2941,7 +2941,7 @@ const styles = StyleSheet.create({
 
   pageTitle: {
     color: COLORS.text,
-    fontSize: 30,
+    fontSize: 35,
     lineHeight: 35,
     fontWeight: '800',
     letterSpacing: -0.8,
@@ -2949,7 +2949,7 @@ const styles = StyleSheet.create({
 
   pageSubtitle: {
     color: COLORS.muted,
-    fontSize: 14,
+    fontSize: 17,
     marginTop: 4,
   },
 
@@ -2967,12 +2967,12 @@ const styles = StyleSheet.create({
   },
 
   refreshIcon: {
-    fontSize: 20,
+    fontSize: 24,
     color: COLORS.text,
   },
 
   refreshText: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '700',
     color: COLORS.text,
   },
@@ -3038,14 +3038,14 @@ const styles = StyleSheet.create({
 
   heroLabel: {
     color: 'rgba(255,255,255,0.76)',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '800',
     letterSpacing: 1.5,
   },
 
   heroHint: {
     color: 'rgba(255,255,255,0.58)',
-    fontSize: 12,
+    fontSize: 14,
     marginTop: 4,
   },
 
@@ -3062,14 +3062,14 @@ const styles = StyleSheet.create({
 
   heroBadgeText: {
     color: '#FFFFFF',
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '800',
     letterSpacing: 1.2,
   },
 
   heroAmount: {
     color: '#FFFFFF',
-    fontSize: 54,
+    fontSize: 64,
     lineHeight: 62,
     fontWeight: '800',
     letterSpacing: -2,
@@ -3086,7 +3086,7 @@ const styles = StyleSheet.create({
 
   heroProgressText: {
     color: 'rgba(255,255,255,0.72)',
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '600',
   },
 
@@ -3113,12 +3113,12 @@ const styles = StyleSheet.create({
 
   heroBottomLabel: {
     color: 'rgba(255,255,255,0.55)',
-    fontSize: 10,
+    fontSize: 12,
   },
 
   heroBottomValue: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '700',
     marginTop: 3,
   },
@@ -3135,7 +3135,7 @@ const styles = StyleSheet.create({
 
   heroArrowText: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: 24,
   },
 
   /* Stats ---------------------------------------------------------------- */
@@ -3182,19 +3182,19 @@ const styles = StyleSheet.create({
   },
 
   metricIconText: {
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: '800',
   },
 
   metricLabel: {
     color: COLORS.muted,
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '600',
   },
 
   metricValue: {
     color: COLORS.text,
-    fontSize: 25,
+    fontSize: 30,
     lineHeight: 30,
     fontWeight: '800',
     marginTop: 3,
@@ -3203,7 +3203,7 @@ const styles = StyleSheet.create({
 
   metricDetail: {
     color: COLORS.subtle,
-    fontSize: 10,
+    fontSize: 12,
     marginTop: 4,
   },
 
@@ -3246,7 +3246,7 @@ const styles = StyleSheet.create({
 
   nextPaymentIconText: {
     color: COLORS.blue,
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '700',
   },
 
@@ -3273,27 +3273,27 @@ const styles = StyleSheet.create({
 
   nextPaymentLoanAmount: {
     color: COLORS.text,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '800',
   },
 
   nextPaymentEyebrow: {
     color: COLORS.blue,
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '800',
     letterSpacing: 1.2,
   },
 
   nextPaymentTitle: {
     color: COLORS.text,
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '700',
     marginTop: 2,
   },
 
   nextPaymentSub: {
     color: COLORS.muted,
-    fontSize: 11,
+    fontSize: 13,
     marginTop: 2,
   },
 
@@ -3304,13 +3304,13 @@ const styles = StyleSheet.create({
 
   nextPaymentAmount: {
     color: COLORS.text,
-    fontSize: 18,
+    fontSize: 21,
     fontWeight: '800',
   },
 
   nextPaymentDate: {
     color: COLORS.muted,
-    fontSize: 11,
+    fontSize: 13,
     marginTop: 3,
   },
 
@@ -3324,13 +3324,13 @@ const styles = StyleSheet.create({
 
   nextPaymentDetailsButtonText: {
     color: COLORS.blue,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '800',
   },
 
   nextPaymentDetailsArrow: {
     color: COLORS.blue,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '800',
   },
 
@@ -3352,13 +3352,13 @@ const styles = StyleSheet.create({
 
   nextCommitmentDetailsTotalLabel: {
     color: COLORS.muted,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
   },
 
   nextCommitmentDetailsTotalValue: {
     color: COLORS.text,
-    fontSize: 18,
+    fontSize: 21,
     fontWeight: '900',
   },
 
@@ -3388,7 +3388,7 @@ const styles = StyleSheet.create({
 
   nextCommitmentDetailIconText: {
     color: COLORS.blue,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '900',
   },
 
@@ -3399,13 +3399,13 @@ const styles = StyleSheet.create({
 
   nextCommitmentDetailLoan: {
     color: COLORS.text,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '800',
   },
 
   nextCommitmentDetailMeta: {
     color: COLORS.muted,
-    fontSize: 10,
+    fontSize: 12,
     marginTop: 3,
   },
 
@@ -3416,13 +3416,13 @@ const styles = StyleSheet.create({
 
   nextCommitmentDetailAmount: {
     color: COLORS.text,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '900',
   },
 
   nextCommitmentDetailDue: {
     color: COLORS.subtle,
-    fontSize: 9,
+    fontSize: 11,
     marginTop: 3,
   },
 
@@ -3435,7 +3435,7 @@ const styles = StyleSheet.create({
 
   sectionEyebrow: {
     color: COLORS.blue,
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '800',
     letterSpacing: 1.5,
     marginBottom: 4,
@@ -3443,14 +3443,14 @@ const styles = StyleSheet.create({
 
   sectionTitle: {
     color: COLORS.text,
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: '800',
     letterSpacing: -0.5,
   },
 
   sectionDescription: {
     color: COLORS.muted,
-    fontSize: 12,
+    fontSize: 14,
     marginTop: 4,
   },
 
@@ -3536,19 +3536,19 @@ const styles = StyleSheet.create({
 
   typeCodeText: {
     color: COLORS.blue,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '900',
   },
 
   typeTitle: {
     color: COLORS.text,
-    fontSize: 14,
+    fontSize: 17,
     fontWeight: '800',
   },
 
   typeDescription: {
     color: COLORS.muted,
-    fontSize: 10,
+    fontSize: 12,
     marginTop: 2,
   },
 
@@ -3563,13 +3563,13 @@ const styles = StyleSheet.create({
 
   typeCount: {
     color: COLORS.text,
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '800',
   },
 
   typeCountLabel: {
     color: COLORS.subtle,
-    fontSize: 8,
+    fontSize: 9,
   },
 
   typeBalance: {
@@ -3578,12 +3578,12 @@ const styles = StyleSheet.create({
 
   typeBalanceLabel: {
     color: COLORS.muted,
-    fontSize: 10,
+    fontSize: 12,
   },
 
   typeBalanceValue: {
     color: COLORS.text,
-    fontSize: 29,
+    fontSize: 34,
     lineHeight: 34,
     fontWeight: '800',
     letterSpacing: -0.8,
@@ -3612,12 +3612,12 @@ const styles = StyleSheet.create({
 
   typeStatLabel: {
     color: COLORS.subtle,
-    fontSize: 9,
+    fontSize: 11,
   },
 
   typeStatValue: {
     color: COLORS.text,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '700',
     marginTop: 3,
   },
@@ -3634,13 +3634,13 @@ const styles = StyleSheet.create({
 
   typeFooterText: {
     color: COLORS.muted,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '600',
   },
 
   typeArrow: {
     color: COLORS.blue,
-    fontSize: 18,
+    fontSize: 21,
   },
 
   /* Analytics ------------------------------------------------------------ */
@@ -3667,13 +3667,13 @@ const styles = StyleSheet.create({
 
   cardTitle: {
     color: COLORS.text,
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: '800',
   },
 
   cardSubtitle: {
     color: COLORS.muted,
-    fontSize: 11,
+    fontSize: 13,
     marginTop: 3,
   },
 
@@ -3708,13 +3708,13 @@ const styles = StyleSheet.create({
 
   distributionLabel: {
     color: COLORS.text,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
   },
 
   distributionValue: {
     color: COLORS.text,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '800',
   },
 
@@ -3732,7 +3732,7 @@ const styles = StyleSheet.create({
 
   distributionShare: {
     color: COLORS.subtle,
-    fontSize: 9,
+    fontSize: 11,
   },
 
   /* Chart ---------------------------------------------------------------- */
@@ -3754,7 +3754,7 @@ const styles = StyleSheet.create({
 
   chartValue: {
     color: COLORS.muted,
-    fontSize: 8,
+    fontSize: 9,
     height: 18,
     textAlign: 'center',
   },
@@ -3778,7 +3778,7 @@ const styles = StyleSheet.create({
 
   chartLabel: {
     color: COLORS.subtle,
-    fontSize: 9,
+    fontSize: 11,
     marginTop: 8,
   },
 
@@ -3793,12 +3793,12 @@ const styles = StyleSheet.create({
 
   chartFooterLabel: {
     color: COLORS.muted,
-    fontSize: 10,
+    fontSize: 12,
   },
 
   chartFooterValue: {
     color: COLORS.text,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '800',
   },
 
@@ -3830,12 +3830,12 @@ const styles = StyleSheet.create({
 
   miniSummaryLabel: {
     color: COLORS.subtle,
-    fontSize: 8,
+    fontSize: 9,
   },
 
   miniSummaryValue: {
     color: COLORS.text,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '800',
     marginTop: 2,
   },
@@ -3866,14 +3866,14 @@ const styles = StyleSheet.create({
 
   upcomingDate: {
     color: COLORS.blue,
-    fontSize: 15,
+    fontSize: 18,
     lineHeight: 17,
     fontWeight: '900',
   },
 
   upcomingMonth: {
     color: COLORS.blue,
-    fontSize: 7,
+    fontSize: 8,
     fontWeight: '800',
   },
 
@@ -3884,19 +3884,19 @@ const styles = StyleSheet.create({
 
   upcomingLoan: {
     color: COLORS.text,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '700',
   },
 
   upcomingMeta: {
     color: COLORS.muted,
-    fontSize: 9,
+    fontSize: 11,
     marginTop: 3,
   },
 
   upcomingAmount: {
     color: COLORS.text,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '800',
     marginLeft: 10,
   },
@@ -3922,13 +3922,13 @@ const styles = StyleSheet.create({
 
   healthScoreValue: {
     color: COLORS.green,
-    fontSize: 27,
+    fontSize: 32,
     fontWeight: '900',
   },
 
   healthScoreLabel: {
     color: COLORS.muted,
-    fontSize: 9,
+    fontSize: 11,
     marginTop: 1,
   },
 
@@ -3957,12 +3957,12 @@ const styles = StyleSheet.create({
 
   healthText: {
     color: COLORS.muted,
-    fontSize: 10,
+    fontSize: 12,
   },
 
   healthValue: {
     color: COLORS.text,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '800',
   },
 
@@ -4001,7 +4001,7 @@ const styles = StyleSheet.create({
   },
 
   insightIconText: {
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: '900',
   },
 
@@ -4011,13 +4011,13 @@ const styles = StyleSheet.create({
 
   insightTitle: {
     color: COLORS.text,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '800',
   },
 
   insightDescription: {
     color: COLORS.muted,
-    fontSize: 10,
+    fontSize: 12,
     lineHeight: 15,
     marginTop: 4,
   },
@@ -4052,21 +4052,21 @@ const styles = StyleSheet.create({
 
   targetProgressLabel: {
     color: COLORS.blue,
-    fontSize: 8,
+    fontSize: 9,
     fontWeight: '800',
     letterSpacing: 1.2,
   },
 
   targetProgressValue: {
     color: COLORS.text,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '800',
     marginTop: 3,
   },
 
   targetProgressAmount: {
     color: COLORS.muted,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
   },
 
@@ -4086,21 +4086,21 @@ const styles = StyleSheet.create({
 
   targetEyebrow: {
     color: COLORS.blue,
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '800',
     letterSpacing: 1.4,
   },
 
   targetTitle: {
     color: COLORS.text,
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: '800',
     marginTop: 5,
   },
 
   targetSubtitle: {
     color: COLORS.muted,
-    fontSize: 11,
+    fontSize: 13,
     marginTop: 5,
     maxWidth: 650,
   },
@@ -4115,12 +4115,12 @@ const styles = StyleSheet.create({
   },
 
   targetStatusIcon: {
-    fontSize: 14,
+    fontSize: 17,
     fontWeight: '900',
   },
 
   targetStatusText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '800',
   },
 
@@ -4141,12 +4141,12 @@ const styles = StyleSheet.create({
 
   targetMetricLabel: {
     color: COLORS.subtle,
-    fontSize: 9,
+    fontSize: 11,
   },
 
   targetMetricValue: {
     color: COLORS.text,
-    fontSize: 16,
+    fontSize: 19,
     fontWeight: '800',
     marginTop: 5,
   },
@@ -4164,7 +4164,7 @@ const styles = StyleSheet.create({
 
   targetBottomText: {
     color: COLORS.muted,
-    fontSize: 10,
+    fontSize: 12,
     flex: 1,
   },
 
@@ -4188,18 +4188,18 @@ const styles = StyleSheet.create({
 
   emptyIconText: {
     color: COLORS.blue,
-    fontSize: 20,
+    fontSize: 24,
   },
 
   emptyTitle: {
     color: COLORS.text,
-    fontSize: 14,
+    fontSize: 17,
     fontWeight: '800',
   },
 
   emptyDescription: {
     color: COLORS.muted,
-    fontSize: 10,
+    fontSize: 12,
     textAlign: 'center',
     maxWidth: 360,
     marginTop: 5,
@@ -4226,7 +4226,7 @@ const styles = StyleSheet.create({
 
   targetEmptyIconText: {
     color: COLORS.blue,
-    fontSize: 23,
+    fontSize: 27,
   },
 
   targetEmptyContent: {
@@ -4235,13 +4235,13 @@ const styles = StyleSheet.create({
 
   targetEmptyTitle: {
     color: COLORS.text,
-    fontSize: 16,
+    fontSize: 19,
     fontWeight: '800',
   },
 
   targetEmptyText: {
     color: COLORS.muted,
-    fontSize: 11,
+    fontSize: 13,
     lineHeight: 16,
     marginTop: 4,
     maxWidth: 600,
@@ -4260,7 +4260,7 @@ const styles = StyleSheet.create({
 
   primaryButtonText: {
     color: '#FFFFFF',
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '800',
   },
 
@@ -4276,13 +4276,13 @@ const styles = StyleSheet.create({
 
   secondaryButtonText: {
     color: COLORS.blue,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '800',
   },
 
   secondaryButtonArrow: {
     color: COLORS.blue,
-    fontSize: 15,
+    fontSize: 18,
   },
 
   /* Loading -------------------------------------------------------------- */
@@ -4307,13 +4307,13 @@ const styles = StyleSheet.create({
 
   loadingTitle: {
     color: COLORS.text,
-    fontSize: 18,
+    fontSize: 21,
     fontWeight: '800',
   },
 
   loadingSubtitle: {
     color: COLORS.muted,
-    fontSize: 12,
+    fontSize: 14,
     textAlign: 'center',
     marginTop: 7,
   },
@@ -4339,20 +4339,20 @@ const styles = StyleSheet.create({
     color: COLORS.red,
     textAlign: 'center',
     lineHeight: 48,
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: '900',
     marginBottom: 15,
   },
 
   errorTitle: {
     color: COLORS.text,
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: '800',
   },
 
   errorText: {
     color: COLORS.muted,
-    fontSize: 11,
+    fontSize: 13,
     textAlign: 'center',
     lineHeight: 16,
     marginTop: 6,
@@ -4368,6 +4368,6 @@ const styles = StyleSheet.create({
 
   footerText: {
     color: COLORS.subtle,
-    fontSize: 9,
+    fontSize: 11,
   },
 });

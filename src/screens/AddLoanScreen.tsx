@@ -1996,7 +1996,7 @@ const styles =
 
     title: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 30,
+      fontSize: 35,
       color: '#172033',
       letterSpacing: -0.6,
     },
@@ -2005,7 +2005,7 @@ const styles =
       marginTop: 6,
       maxWidth: 650,
       fontFamily: 'Inter_400Regular',
-      fontSize: 13,
+      fontSize: 15,
       lineHeight: 19,
       color: '#6B7890',
     },
@@ -2021,7 +2021,7 @@ const styles =
 
     cancelText: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 12,
+      fontSize: 14,
       color: '#4F5D73',
     },
 
@@ -2041,14 +2041,14 @@ const styles =
     formEyebrow: {
       marginBottom: 6,
       fontFamily: 'Inter_700Bold',
-      fontSize: 9,
+      fontSize: 11,
       letterSpacing: 1.1,
       color: '#356DFF',
     },
 
     sectionTitle: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 17,
+      fontSize: 20,
       color: '#172033',
       marginBottom: 4,
       letterSpacing: -0.2,
@@ -2062,7 +2062,7 @@ const styles =
     label: {
       marginBottom: 7,
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 11,
+      fontSize: 13,
       color: '#46546B',
     },
 
@@ -2074,14 +2074,14 @@ const styles =
       paddingHorizontal: 14,
       backgroundColor: '#FBFCFE',
       fontFamily: 'Inter_500Medium',
-      fontSize: 13,
+      fontSize: 15,
       color: '#172033',
     },
 
     helper: {
       marginTop: 6,
       fontFamily: 'Inter_400Regular',
-      fontSize: 10,
+      fontSize: 12,
       lineHeight: 15,
       color: '#8793A6',
     },
@@ -2115,7 +2115,7 @@ const styles =
 
     optionText: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 11,
+      fontSize: 13,
       color: '#68758A',
     },
 
@@ -2143,7 +2143,7 @@ const styles =
 
     calculatedTitle: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 17,
+      fontSize: 20,
       color: '#274DBB',
       letterSpacing: -0.2,
     },
@@ -2151,7 +2151,7 @@ const styles =
     calculatedSubtitle: {
       marginTop: 4,
       fontFamily: 'Inter_400Regular',
-      fontSize: 11,
+      fontSize: 13,
       lineHeight: 16,
       color: '#6F7D96',
     },
@@ -2172,14 +2172,14 @@ const styles =
 
     calculatedLabel: {
       fontFamily: 'Inter_500Medium',
-      fontSize: 10,
+      fontSize: 12,
       color: '#7A879C',
     },
 
     calculatedValue: {
       marginTop: 5,
       fontFamily: 'Inter_700Bold',
-      fontSize: 17,
+      fontSize: 20,
       color: '#1D2940',
     },
 
@@ -2205,14 +2205,14 @@ const styles =
       textAlign: 'center',
       lineHeight: 22,
       fontFamily: 'Inter_700Bold',
-      fontSize: 11,
+      fontSize: 13,
       marginRight: 9,
     },
 
     assumptionText: {
       flex: 1,
       fontFamily: 'Inter_400Regular',
-      fontSize: 10,
+      fontSize: 12,
       lineHeight: 15,
       color: '#536585',
     },
@@ -2228,7 +2228,7 @@ const styles =
 
     calculationEmptyText: {
       fontFamily: 'Inter_400Regular',
-      fontSize: 11,
+      fontSize: 13,
       lineHeight: 17,
       color: '#748198',
     },
@@ -2245,7 +2245,7 @@ const styles =
 
     calculateButtonText: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 12,
+      fontSize: 14,
       color: '#356DFF',
     },
 
@@ -2279,10 +2279,11 @@ const styles =
     saveButtonText: {
       color: '#FFFFFF',
       fontFamily: 'Inter_700Bold',
-      fontSize: 13,
+      fontSize: 15,
     },
 
     bottomSpace: {
       height: 30,
     },
   });
+

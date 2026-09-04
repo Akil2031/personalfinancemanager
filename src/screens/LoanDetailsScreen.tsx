@@ -1192,13 +1192,13 @@ const styles =
 
     loanIconText: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 21,
+      fontSize: 25,
       color: '#356DFF',
     },
 
     title: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 26,
+      fontSize: 31,
       color: '#172033',
       letterSpacing: -0.5,
     },
@@ -1206,7 +1206,7 @@ const styles =
     lender: {
       marginTop: 4,
       fontFamily: 'Inter_400Regular',
-      fontSize: 12,
+      fontSize: 14,
       color: '#738097',
     },
 
@@ -1220,7 +1220,7 @@ const styles =
 
     statusText: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 9,
+      fontSize: 11,
       letterSpacing: 0.4,
       color: '#168B63',
     },
@@ -1289,7 +1289,7 @@ const styles =
 
     summaryLabel: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 10,
+      fontSize: 12,
       color: '#7A879C',
       letterSpacing: 0.55,
       textTransform: 'uppercase',
@@ -1298,7 +1298,7 @@ const styles =
     summaryValue: {
       marginTop: 9,
       fontFamily: 'Inter_700Bold',
-      fontSize: 17,
+      fontSize: 20,
       lineHeight: 22,
       color: '#1D2940',
     },
@@ -1306,7 +1306,7 @@ const styles =
     summaryPrimaryValue: {
       marginTop: 9,
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 19,
+      fontSize: 22,
       lineHeight: 24,
       color: '#FFFFFF',
     },
@@ -1336,7 +1336,7 @@ const styles =
 
     nextLabel: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 9,
+      fontSize: 11,
       letterSpacing: 0.8,
       color: 'rgba(255,255,255,0.72)',
     },
@@ -1344,7 +1344,7 @@ const styles =
     nextDate: {
       marginTop: 5,
       fontFamily: 'Inter_700Bold',
-      fontSize: 18,
+      fontSize: 21,
       color: '#FFFFFF',
     },
 
@@ -1355,14 +1355,14 @@ const styles =
 
     nextAmount: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 19,
+      fontSize: 22,
       color: '#FFFFFF',
     },
 
     nextAmountLabel: {
       marginTop: 3,
       fontFamily: 'Inter_400Regular',
-      fontSize: 9,
+      fontSize: 11,
       color: 'rgba(255,255,255,0.72)',
     },
 
@@ -1382,14 +1382,14 @@ const styles =
 
     sectionTitle: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 17,
+      fontSize: 20,
       color: '#172033',
     },
 
     sectionSubtitle: {
       marginTop: 4,
       fontFamily: 'Inter_400Regular',
-      fontSize: 11,
+      fontSize: 13,
       color: '#8490A4',
     },
 
@@ -1404,13 +1404,13 @@ const styles =
 
     infoLabel: {
       fontFamily: 'Inter_400Regular',
-      fontSize: 11,
+      fontSize: 13,
       color: '#738097',
     },
 
     infoValue: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 11,
+      fontSize: 13,
       color: '#27344C',
       marginLeft: 16,
       textAlign: 'right',
@@ -1439,7 +1439,7 @@ const styles =
     recordButtonText: {
       color: '#FFFFFF',
       fontFamily: 'Inter_700Bold',
-      fontSize: 10,
+      fontSize: 12,
     },
 
     paymentStats: {
@@ -1461,14 +1461,14 @@ const styles =
 
     paymentStatLabel: {
       fontFamily: 'Inter_500Medium',
-      fontSize: 9,
+      fontSize: 11,
       color: '#8793A6',
     },
 
     paymentStatValue: {
       marginTop: 5,
       fontFamily: 'Inter_700Bold',
-      fontSize: 15,
+      fontSize: 18,
       color: '#356DFF',
     },
 
@@ -1480,7 +1480,7 @@ const styles =
     loadingText: {
       marginTop: 7,
       fontFamily: 'Inter_400Regular',
-      fontSize: 10,
+      fontSize: 12,
       color: '#78859A',
     },
 
@@ -1504,14 +1504,14 @@ const styles =
 
     emptyIconText: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 21,
+      fontSize: 25,
       color: '#356DFF',
     },
 
     emptyTitle: {
       marginTop: 11,
       fontFamily: 'Inter_700Bold',
-      fontSize: 14,
+      fontSize: 17,
       color: '#172033',
     },
 
@@ -1521,7 +1521,7 @@ const styles =
       textAlign: 'center',
       lineHeight: 18,
       fontFamily: 'Inter_400Regular',
-      fontSize: 10,
+      fontSize: 12,
       color: '#78859A',
     },
 
@@ -1546,14 +1546,14 @@ const styles =
 
     paymentDate: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 11,
+      fontSize: 13,
       color: '#33415A',
     },
 
     paymentInstallment: {
       marginTop: 4,
       fontFamily: 'Inter_400Regular',
-      fontSize: 10,
+      fontSize: 12,
       color: '#8793A6',
     },
 
@@ -1563,14 +1563,14 @@ const styles =
 
     paymentAmount: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 15,
+      fontSize: 18,
       color: '#172033',
     },
 
     paymentStatus: {
       marginTop: 4,
       fontFamily: 'Inter_700Bold',
-      fontSize: 8,
+      fontSize: 9,
       color: '#18A673',
     },
 
@@ -1585,14 +1585,14 @@ const styles =
 
     breakdownText: {
       fontFamily: 'Inter_400Regular',
-      fontSize: 9,
+      fontSize: 11,
       color: '#78859A',
     },
 
     notesText: {
       marginTop: 9,
       fontFamily: 'Inter_400Regular',
-      fontSize: 9,
+      fontSize: 11,
       lineHeight: 14,
       color: '#66738A',
       fontStyle: 'italic',
@@ -1613,7 +1613,7 @@ const styles =
 
     editPaymentText: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 9,
+      fontSize: 11,
       color: '#356DFF',
     },
 
@@ -1626,7 +1626,7 @@ const styles =
 
     deletePaymentText: {
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 9,
+      fontSize: 11,
       color: '#C43D3D',
     },
 
@@ -1659,7 +1659,7 @@ const styles =
     },
     amortizationCardIconText: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 20,
+      fontSize: 24,
       color: '#356DFF',
     },
     amortizationCardContent: {
@@ -1681,7 +1681,7 @@ const styles =
     amortizationButtonText: {
       color: '#FFFFFF',
       fontFamily: 'Inter_700Bold',
-      fontSize: 10,
+      fontSize: 12,
     },
 
     scheduleScroll: {
@@ -1716,13 +1716,13 @@ const styles =
 
     headerCell: {
       fontFamily: 'Inter_700Bold',
-      fontSize: 10,
+      fontSize: 12,
       color: '#53627A',
     },
 
     cell: {
       fontFamily: 'Inter_400Regular',
-      fontSize: 10,
+      fontSize: 12,
       color: '#344159',
     },
 
@@ -1745,3 +1745,4 @@ const styles =
       height: 30,
     },
   });
+
