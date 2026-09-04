@@ -1,12 +1,10 @@
 import React, {
   useEffect,
-  useMemo,
   useState,
 } from 'react';
 
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -21,8 +19,20 @@ import {
 
 
 import {
-  getDashboardSummary,
-} from '../src/services/dashboardService';
+  getLoans,
+} from '../src/services/loanService';
+
+import {
+  getAllPayments,
+} from '../src/services/paymentService';
+
+import {
+  getPortfolioLoanPositionMetrics,
+} from '../src/services/loanMetricsService';
+
+import {
+  getAmortizationSchedule,
+} from '../src/services/amortizationService';
 
 import {
   getDebtFreeTarget,
@@ -30,73 +40,19 @@ import {
 } from '../src/services/debtFreeTargetService';
 
 import {
-  getAllPayments,
-} from '../src/services/paymentService';
-
-import {
   calculateTargetPerformance,
 } from '../src/engine/targetPerformance';
 
-function formatCurrency(
-  value: number
-): string {
 
-  return `₹${Math.round(
-    Number(value) || 0
-  ).toLocaleString('en-IN')}`;
-}
-
-
-function formatDateInput(
-  date: Date
-): string {
-
-  const year =
-    date.getFullYear();
-
-  const month =
-    String(
-      date.getMonth() + 1
-    ).padStart(2, '0');
-
-  const day =
-    String(
-      date.getDate()
-    ).padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
-}
-
-
-function formatDate(
-  value?: string | Date | null
-): string {
-
-  if (!value) {
-    return '-';
-  }
-
-  const date =
-    value instanceof Date
-      ? value
-      : new Date(value);
-
+function getMonthlyCommitment(loan: any): number {
   if (
-    Number.isNaN(
-      date.getTime()
-    )
+    String(loan?.repaymentType || '').toUpperCase() ===
+    'INTEREST_ONLY'
   ) {
-    return '-';
+    return Number(loan?.monthlyInterest || 0);
   }
 
-  return date.toLocaleDateString(
-    'en-IN',
-    {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    }
-  );
+  return Number(loan?.emi || 0);
 }
 
 
@@ -105,40 +61,95 @@ export default function DebtFreeTargetScreen() {
   const router =
     useRouter();
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [saving, setSaving] =
+    useState(false);
+
+  const [dashboardSummary, setDashboardSummary] =
+    useState<any>(null);
+
+
+  const [targetDate, setTargetDate] =
+    useState('');
 
   const [
-    saving,
-    setSaving,
-  ] = useState(false);
+    additionalPayment,
+    setAdditionalPayment,
+  ] = useState('0');
 
   const [
-    targetDate,
-    setTargetDate,
+    recommendedExtra,
+    setRecommendedExtra,
+  ] = useState(0);
+
+  const [
+    actualExtraPaidThisMonth,
+    setActualExtraPaidThisMonth,
+  ] = useState(0);
+
+  const [
+    extraStillNeededThisMonth,
+    setExtraStillNeededThisMonth,
+  ] = useState(0);
+
+
+  const [
+    outstanding,
+    setOutstanding,
+  ] = useState(0);
+
+
+  // IMPORTANT: keep the original target baseline when editing.
+  // The baseline must not be reset to today's outstanding amount.
+  const [
+    baselineOutstanding,
+    setBaselineOutstanding,
+  ] = useState(0);
+
+  const [
+    baselineDate,
+    setBaselineDate,
   ] = useState('');
 
-  const [
-    summary,
-    setSummary,
-  ] = useState<any>(null);
 
   const [
-    payments,
-    setPayments,
-  ] = useState<any[]>([]);
+    monthlyEMI,
+    setMonthlyEMI,
+  ] = useState(0);
+
+
+  const [
+    projectedDate,
+    setProjectedDate,
+  ] = useState<Date | null>(
+    null
+  );
+
+
+  const [
+    status,
+    setStatus,
+  ] = useState<
+    'AHEAD' |
+    'ON_TRACK' |
+    'BEHIND' |
+    null
+  >(null);
 
 
   /*
-   * =====================================================
+   * --------------------------------------------------
    * LOAD
-   * =====================================================
+   * --------------------------------------------------
    */
 
   useEffect(() => {
-    void loadData();
+
+    loadData();
+
   }, []);
 
 
@@ -147,49 +158,201 @@ export default function DebtFreeTargetScreen() {
     try {
 
       const [
-        dashboard,
-        target,
-        paymentList,
+        loans,
+        payments,
+        existingTarget,
       ] =
         await Promise.all([
-          getDashboardSummary(),
-          getDebtFreeTarget(),
+          getLoans(),
           getAllPayments(),
+          getDebtFreeTarget(),
         ]);
 
-      setSummary(
-        dashboard
+      /*
+       * IMPORTANT:
+       * Debt-free journey must use exactly the same authoritative
+       * loan-position calculation as My Loans, Dashboard and Insights.
+       *
+       * Persisted amortization schedules are therefore preferred and
+       * actual payment records are used only by the centralized
+       * loanMetricsService fallback path.
+       */
+      const safeLoans = loans || [];
+      const safePayments = payments || [];
+
+      const positionMetrics =
+        await getPortfolioLoanPositionMetrics(
+          safeLoans,
+          safePayments,
+          new Date(),
+        );
+
+      const activePositions =
+        positionMetrics.filter(
+          ({ loan }) =>
+            String(loan.status || '').toUpperCase() === 'ACTIVE',
+        );
+
+      /*
+       * The target calculator needs the same future amortization rows that
+       * drive My Loans.  Attach them as a private calculation-only field;
+       * the existing loan model and UI are not changed.
+       */
+      const schedules = await Promise.all(
+        activePositions.map(async ({ loan }) => {
+          if (!loan.id) return [];
+          try {
+            return await getAmortizationSchedule(loan.id);
+          } catch (error) {
+            console.warn(
+              '[DebtFreeTarget] Unable to load amortization schedule for target calculation.',
+              error,
+            );
+            return [];
+          }
+        }),
       );
 
-      setPayments(
-        paymentList || []
+      const calculatedLoans =
+        activePositions.map(
+          ({ loan, position }, index) => ({
+            ...loan,
+            currentOutstanding:
+              Number(position.currentOutstanding) || 0,
+            remainingMonths:
+              Number(position.remainingMonths) || 0,
+            nextEmiDate:
+              position.nextEmiDate,
+            lastEmiDate:
+              position.lastEmiDate,
+            __amortizationSchedule:
+              schedules[index],
+          }),
+        );
+
+      const currentOutstanding =
+        activePositions.reduce(
+          (sum, { position }) =>
+            sum +
+            (Number(position.currentOutstanding) || 0),
+          0,
+        );
+
+      const currentEMI =
+        activePositions.reduce(
+          (sum, { loan }) =>
+            sum +
+            getMonthlyCommitment(loan),
+          0,
+        );
+
+      const canonicalSummary = {
+        totalOutstanding: currentOutstanding,
+        totalMonthlyEMI: currentEMI,
+        loans: calculatedLoans.map(
+          (loan) => ({ loan }),
+        ),
+        payments: safePayments,
+      };
+
+      setDashboardSummary(
+        canonicalSummary,
       );
+
+      setOutstanding(
+        currentOutstanding,
+      );
+
+      setBaselineOutstanding(
+        currentOutstanding,
+      );
+
+      setBaselineDate(
+        formatDateInput(new Date()),
+      );
+
+      setMonthlyEMI(
+        currentEMI,
+      );
+
+
+      let effectiveTargetDate = '';
+      let effectiveAdditionalPayment = 0;
 
       if (
-        target?.targetDate
+        existingTarget
       ) {
 
+        effectiveTargetDate = String(existingTarget.targetDate || '');
+        effectiveAdditionalPayment = Math.max(
+          0,
+          Number(existingTarget.additionalMonthlyPayment) || 0,
+        );
+
         setTargetDate(
-          target.targetDate
+          effectiveTargetDate
+        );
+
+        // Preserve the original baseline saved when the target was created.
+        // Editing the target date/payment must NOT restart the measurement period.
+        const savedBaselineOutstanding =
+          Number(
+            existingTarget.baselineOutstanding
+          );
+
+        const savedBaselineDate =
+          String(
+            existingTarget.baselineDate || ''
+          );
+
+        if (
+          Number.isFinite(savedBaselineOutstanding) &&
+          savedBaselineOutstanding > 0
+        ) {
+          setBaselineOutstanding(
+            savedBaselineOutstanding
+          );
+        }
+
+        if (savedBaselineDate) {
+          setBaselineDate(
+            savedBaselineDate
+          );
+        }
+
+        setAdditionalPayment(
+          String(effectiveAdditionalPayment)
         );
 
       } else {
 
         /*
-         * Default to 5 years from today.
-         *
-         * This is only a convenience.
-         * The user can change it.
+         * Default target:
+         * 5 years from today.
          */
         const date =
           new Date();
 
         date.setFullYear(
-          date.getFullYear() + 5
+          date.getFullYear() +
+            5
         );
 
+        effectiveTargetDate = formatDateInput(date);
+        effectiveAdditionalPayment = 0;
+
         setTargetDate(
-          formatDateInput(date)
+          effectiveTargetDate
+        );
+
+      }
+
+      if (effectiveTargetDate) {
+        calculatePreview(
+          canonicalSummary,
+          effectiveTargetDate,
+          effectiveAdditionalPayment,
+          safePayments,
         );
       }
 
@@ -200,78 +363,98 @@ export default function DebtFreeTargetScreen() {
         error
       );
 
-      Alert.alert(
-        'Error',
-        'Unable to load debt-free target.'
-      );
-
     } finally {
 
       setLoading(false);
+
     }
   }
 
 
+  useEffect(() => {
+    if (!dashboardSummary || !targetDate) return;
+
+    const plannedExtra = Math.max(
+      0,
+      Number(additionalPayment) || 0,
+    );
+
+    calculatePreview(
+      dashboardSummary,
+      targetDate,
+      plannedExtra,
+      dashboardSummary.payments || [],
+    );
+  }, [
+    dashboardSummary,
+    targetDate,
+    additionalPayment,
+  ]);
+
+
   /*
-   * =====================================================
-   * LIVE CALCULATION
-   * =====================================================
+   * --------------------------------------------------
+   * PREVIEW
+   * --------------------------------------------------
    */
 
-  const performance =
-    useMemo(() => {
+  function calculatePreview(
+    summary: any,
+    dateValue: string,
+    plannedExtra: number,
+    payments: any[] = [],
+  ) {
 
-      if (
-        !summary ||
-        !targetDate
-      ) {
-        return null;
-      }
+    if (!dateValue) return;
 
-      const target =
-        new Date(
-          `${targetDate}T00:00:00`
-        );
+    const target = new Date(dateValue);
 
-      if (
-        Number.isNaN(
-          target.getTime()
-        )
-      ) {
-        return null;
-      }
+    if (Number.isNaN(target.getTime())) return;
 
-      const loans =
-        summary.loans?.map(
-          (item: any) =>
-            item.loan
-        ) || [];
-
-      return calculateTargetPerformance(
-        loans,
-        target,
-        payments
-      );
-
-    }, [
-      summary,
-      targetDate,
+    const performance = calculateTargetPerformance(
+      summary.loans.map(
+        (item: any) => item.loan,
+      ),
+      target,
       payments,
-    ]);
+      plannedExtra,
+    );
+
+    setRecommendedExtra(
+      Number(performance.requiredAdditionalPrincipal) || 0,
+    );
+
+    setActualExtraPaidThisMonth(
+      Number(performance.additionalPrincipalPaidThisMonth) || 0,
+    );
+
+    setExtraStillNeededThisMonth(
+      Number(performance.additionalPrincipalRemainingThisMonth) || 0,
+    );
+
+    setProjectedDate(
+      performance.projectedDebtFreeDate,
+    );
+
+    setStatus(
+      performance.status,
+    );
+  }
 
 
   /*
-   * =====================================================
+   * --------------------------------------------------
    * SAVE
-   * =====================================================
+   * --------------------------------------------------
    */
 
   async function handleSave() {
 
     const target =
       new Date(
-        `${targetDate}T00:00:00`
+        targetDate
       );
+
 
     if (
       Number.isNaN(
@@ -279,89 +462,80 @@ export default function DebtFreeTargetScreen() {
       )
     ) {
 
-      Alert.alert(
-        'Validation',
+      alert(
         'Please enter a valid target date.'
       );
 
       return;
     }
 
+
     if (
       target <=
       new Date()
     ) {
 
-      Alert.alert(
-        'Validation',
+      alert(
         'Target date must be in the future.'
       );
 
       return;
     }
 
-    const outstanding =
-      Number(
-        performance?.currentOutstanding ||
-        summary?.totalOutstanding ||
-        0
-      );
 
     if (
-      outstanding <= 0
+      outstanding <=
+      0
     ) {
 
-      Alert.alert(
-        'Validation',
+      alert(
         'There is no outstanding loan balance.'
       );
 
       return;
     }
 
+
+    const extra =
+      Math.max(
+        0,
+        Number(
+          additionalPayment
+        ) || 0
+      );
+
+
     try {
 
       setSaving(true);
 
-      /*
-       * IMPORTANT:
-       *
-       * We save the calculated value only
-       * as a snapshot for reference.
-       *
-       * The application does NOT depend
-       * on this stored value.
-       *
-       * Every time the dashboard/screen
-       * loads, the value is recalculated
-       * from the actual loan balances.
-       */
 
       await saveDebtFreeTarget({
 
         targetDate:
-          formatDateInput(target),
+          formatDateInput(
+            target
+          ),
 
+        // Never reset the original baseline while editing.
         baselineOutstanding:
-          outstanding,
+          baselineOutstanding > 0
+            ? baselineOutstanding
+            : outstanding,
 
         baselineDate:
-          formatDateInput(
-            new Date()
-          ),
+          baselineDate ||
+          formatDateInput(new Date()),
 
         additionalMonthlyPayment:
-          Math.round(
-            performance
-              ?.requiredAdditionalPrincipal ||
-            0
-          ),
+          extra,
       });
 
-      Alert.alert(
-        'Target Saved',
-        'Your debt-free target has been saved.'
+
+      alert(
+        'Debt-free target saved successfully.'
       );
+
 
       router.back();
 
@@ -372,8 +546,8 @@ export default function DebtFreeTargetScreen() {
         error
       );
 
-      Alert.alert(
-        'Error',
+
+      alert(
         error instanceof Error
           ? error.message
           : 'Unable to save debt-free target.'
@@ -382,780 +556,379 @@ export default function DebtFreeTargetScreen() {
     } finally {
 
       setSaving(false);
+
     }
   }
 
 
   /*
-   * =====================================================
+   * --------------------------------------------------
    * LOADING
-   * =====================================================
+   * --------------------------------------------------
    */
 
+  /* --------------------------------------------------
+   * PREMIUM UI
+   * -------------------------------------------------- */
   if (loading) {
-
     return (
-     
-
-        <View
-          style={styles.loading}
-        >
-
-          <ActivityIndicator
-            size="large"
-          />
-
-          <Text
-            style={styles.loadingText}
-          >
-            Loading debt-free target...
-          </Text>
-
-        </View>
-
     
+        <View style={styles.loading}>
+          <View style={styles.loadingOrb}>
+            <Text style={styles.loadingOrbText}>◷</Text>
+          </View>
+          <Text style={styles.loadingTitle}>Preparing your target</Text>
+          <Text style={styles.loadingText}>Loading your current loan position…</Text>
+        </View>
+     
     );
   }
 
-
-  /*
-   * =====================================================
-   * SCREEN
-   * =====================================================
-   */
+  const extra = Math.max(0, Number(additionalPayment) || 0);
+  const totalPlanned = monthlyEMI + extra;
+  const targetDateObj = targetDate ? new Date(targetDate) : null;
+  const validTargetDate = !!targetDateObj && !Number.isNaN(targetDateObj.getTime());
 
   return (
     
-
       <ScrollView
-        contentContainerStyle={
-          styles.content
-        }
+        style={styles.screen}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
       >
-
-        {/* HEADER */}
-
-        <View
-          style={styles.header}
-        >
-
-          <View>
-
-            <Text
-              style={styles.title}
-            >
-              🎯 Debt-Free Target
+        {/* PAGE HEADER */}
+        <View style={styles.pageHeader}>
+          <View style={styles.headerCopy}>
+            <View style={styles.eyebrowRow}>
+              <View style={styles.eyebrowDot} />
+              <Text style={styles.eyebrow}>FINANCIAL GOAL</Text>
+            </View>
+            <Text style={styles.title}>Debt-free target</Text>
+            <Text style={styles.subtitle}>
+              Set your destination, see the projected payoff date, and adjust your monthly contribution.
             </Text>
-
-            <Text
-              style={styles.subtitle}
-            >
-              Set the date. The system calculates
-              the extra principal automatically.
-            </Text>
-
           </View>
-
+          <Pressable
+            onPress={() => router.back()}
+            style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
+          >
+            <Text style={styles.backButtonText}>← Back</Text>
+          </Pressable>
         </View>
-
-
-        {/* TARGET DATE */}
-
-        <View
-          style={styles.card}
-        >
-
-          <Text
-            style={styles.cardTitle}
-          >
-            Target Date
-          </Text>
-
-          <Text
-            style={styles.label}
-          >
-            I want to be completely debt-free by
-          </Text>
-
-          <TextInput
-            value={targetDate}
-            onChangeText={
-              setTargetDate
-            }
-            placeholder="YYYY-MM-DD"
-            placeholderTextColor="#9AA49E"
-            style={styles.input}
-            keyboardType="numbers-and-punctuation"
-          />
-
-          <Text
-            style={styles.helper}
-          >
-            Enter the date in YYYY-MM-DD format.
-          </Text>
-
-        </View>
-
 
         {/* CURRENT POSITION */}
-
-        <View
-          style={styles.card}
-        >
-
-          <Text
-            style={styles.cardTitle}
-          >
-            Current Position
-          </Text>
-
-          <View
-            style={styles.grid}
-          >
-
-            <View
-              style={styles.metric}
-            >
-
-              <Text
-                style={styles.metricLabel}
-              >
-                Current Outstanding
-              </Text>
-
-              <Text
-                style={styles.metricValue}
-              >
-                {formatCurrency(
-                  performance
-                    ?.currentOutstanding ||
-                  summary?.totalOutstanding ||
-                  0
-                )}
-              </Text>
-
+        <View style={styles.positionGrid}>
+          <View style={[styles.metricCard, styles.metricBlue]}>
+            <View style={styles.metricTopRow}>
+              <Text style={styles.metricLabelLight}>CURRENT OUTSTANDING</Text>
+              <View style={styles.metricIconLight}><Text style={styles.metricIconText}>₹</Text></View>
             </View>
-
-
-            <View
-              style={styles.metric}
-            >
-
-              <Text
-                style={styles.metricLabel}
-              >
-                Monthly EMI
-              </Text>
-
-              <Text
-                style={styles.metricValue}
-              >
-                {formatCurrency(
-                  performance
-                    ?.currentMonthlyEMI ||
-                  summary?.totalMonthlyEMI ||
-                  0
-                )}
-              </Text>
-
-            </View>
-
+            <Text style={styles.metricValueLight}>{formatCurrency(outstanding)}</Text>
+            <Text style={styles.metricCaptionLight}>Balance captured for this target</Text>
           </View>
 
+          <View style={[styles.metricCard, styles.metricGreen]}>
+            <View style={styles.metricTopRow}>
+              <Text style={styles.metricLabelLight}>MONTHLY COMMITMENT</Text>
+              <View style={styles.metricIconLight}><Text style={styles.metricIconText}>↗</Text></View>
+            </View>
+            <Text style={styles.metricValueLight}>{formatCurrency(monthlyEMI)}</Text>
+            <Text style={styles.metricCaptionLight}>Regular loan repayment</Text>
+          </View>
+
+          <View style={[styles.metricCard, styles.metricPurple]}>
+            <View style={styles.metricTopRow}>
+              <Text style={styles.metricLabelLight}>TARGET DATE</Text>
+              <View style={styles.metricIconLight}><Text style={styles.metricIconText}>◷</Text></View>
+            </View>
+            <Text style={styles.metricValueLightSmall}>
+              {validTargetDate ? formatDate(targetDateObj as Date) : '—'}
+            </Text>
+            <Text style={styles.metricCaptionLight}>Your desired debt-free date</Text>
+          </View>
+
+          <View style={[styles.metricCard, styles.metricOrange]}>
+            <View style={styles.metricTopRow}>
+              <Text style={styles.metricLabelLight}>PLANNED EXTRA</Text>
+              <View style={styles.metricIconLight}><Text style={styles.metricIconText}>+</Text></View>
+            </View>
+            <Text style={styles.metricValueLight}>{formatCurrency(extra)}</Text>
+            <Text style={styles.metricCaptionLight}>Additional payment toward principal</Text>
+          </View>
         </View>
 
+        {/* CONFIGURATION */}
+        <View style={styles.sectionHeader}>
+          <View>
+            <Text style={styles.sectionEyebrow}>TARGET PLAN</Text>
+            <Text style={styles.sectionTitle}>Configure your journey</Text>
+          </View>
+          <Text style={styles.sectionHint}>Changes are saved only when you press Save</Text>
+        </View>
 
-        {/* MAIN CALCULATION */}
-
-        {performance && (
-
-          <View
-            style={styles.mainCard}
-          >
-
-            <Text
-              style={styles.mainTitle}
-            >
-              Required Additional Principal
+        <View style={styles.formGrid}>
+          <View style={styles.formCard}>
+            <View style={styles.cardIconBlue}>
+              <Text style={styles.cardIconTextBlue}>◷</Text>
+            </View>
+            <Text style={styles.cardTitle}>Debt-free date</Text>
+            <Text style={styles.helpText}>
+              Choose the date by which you want your outstanding loans to be cleared.
             </Text>
-
-            <Text
-              style={styles.mainAmount}
-            >
-              {formatCurrency(
-                performance
-                  .requiredAdditionalPrincipal
-              )}
-            </Text>
-
-            <Text
-              style={styles.mainDescription}
-            >
-              This is the EXTRA principal you need
-              to pay every month above your normal EMI
-              to reach your selected debt-free date.
-            </Text>
-
-
-            <View
-              style={styles.divider}
+            <Text style={styles.inputLabel}>TARGET DATE</Text>
+            <TextInput
+              value={targetDate}
+              onChangeText={(value) => setTargetDate(value)}
+              placeholder="YYYY-MM-DD"
+              placeholderTextColor="#9AA6B8"
+              keyboardType="numbers-and-punctuation"
+              style={styles.input}
+              maxLength={10}
             />
-
-
-            <View
-              style={styles.row}
-            >
-
-              <Text
-                style={styles.rowLabel}
-              >
-                Normal EMI
-              </Text>
-
-              <Text
-                style={styles.rowValue}
-              >
-                {formatCurrency(
-                  performance
-                    .currentMonthlyEMI
-                )}
-              </Text>
-
-            </View>
-
-
-            <View
-              style={styles.row}
-            >
-
-              <Text
-                style={styles.rowLabel}
-              >
-                Additional Principal
-              </Text>
-
-              <Text
-                style={styles.rowValue}
-              >
-                {formatCurrency(
-                  performance
-                    .requiredAdditionalPrincipal
-                )}
-              </Text>
-
-            </View>
-
-
-            <View
-              style={[
-                styles.row,
-                styles.totalRow,
-              ]}
-            >
-
-              <Text
-                style={styles.totalLabel}
-              >
-                Total Monthly Payment
-              </Text>
-
-              <Text
-                style={styles.totalValue}
-              >
-                {formatCurrency(
-                  performance
-                    .requiredTotalMonthlyPayment
-                )}
-              </Text>
-
-            </View>
-
+            <Text style={styles.inputHint}>Example: 2030-12-31</Text>
           </View>
-        )}
 
-
-        {/* THIS MONTH */}
-
-        {performance && (
-
-          <View
-            style={styles.card}
-          >
-
-            <Text
-              style={styles.cardTitle}
-            >
-              This Month's Target
+          <View style={styles.formCard}>
+            <View style={styles.cardIconOrange}>
+              <Text style={styles.cardIconTextOrange}>+</Text>
+            </View>
+            <Text style={styles.cardTitle}>Additional monthly payment</Text>
+            <Text style={styles.helpText}>
+              Add an amount above your regular commitment to accelerate principal reduction.
             </Text>
-
-
-            <View
-              style={styles.row}
-            >
-
-              <Text
-                style={styles.rowLabel}
-              >
-                Additional Principal Required
-              </Text>
-
-              <Text
-                style={styles.rowValue}
-              >
-                {formatCurrency(
-                  performance
-                    .requiredAdditionalPrincipal
-                )}
-              </Text>
-
-            </View>
-
-
-            <View
-              style={styles.row}
-            >
-
-              <Text
-                style={styles.rowLabel}
-              >
-                Additional Principal Paid
-              </Text>
-
-              <Text
-                style={styles.rowValue}
-              >
-                {formatCurrency(
-                  performance
-                    .additionalPrincipalPaidThisMonth
-                )}
-              </Text>
-
-            </View>
-
-
-            <View
-              style={styles.row}
-            >
-
-              <Text
-                style={styles.rowLabel}
-              >
-                Remaining
-              </Text>
-
-              <Text
-                style={[
-                  styles.rowValue,
-                  performance
-                    .additionalPrincipalRemainingThisMonth >
-                    0
-                    ? styles.danger
-                    : styles.success,
-                ]}
-              >
-                {formatCurrency(
-                  performance
-                    .additionalPrincipalRemainingThisMonth
-                )}
-              </Text>
-
-            </View>
-
-
-            <View
-              style={styles.progressTrack}
-            >
-
-              <View
-                style={[
-                  styles.progressFill,
-                  {
-                    width:
-                      `${performance
-                        .additionalPrincipalProgressPercent}%`,
-                  },
-                ]}
+            <Text style={styles.inputLabel}>EXTRA EACH MONTH</Text>
+            <View style={styles.amountInputRow}>
+              <Text style={styles.currencyPrefix}>₹</Text>
+              <TextInput
+                value={additionalPayment}
+                onChangeText={(value) => setAdditionalPayment(value)}
+                keyboardType="numeric"
+                style={styles.amountInput}
+                placeholder="0"
+                placeholderTextColor="#9AA6B8"
               />
-
+            </View>
+            <View style={styles.plannedRow}>
+              <Text style={styles.plannedLabel}>Total planned monthly</Text>
+              <Text style={styles.plannedValue}>{formatCurrency(totalPlanned)}</Text>
             </View>
 
-
-            <Text
-              style={styles.progressText}
-            >
-              {performance
-                .additionalPrincipalProgressPercent
-                .toFixed(0)}%
-              {' '}of this month's additional
-              principal target paid
-            </Text>
-
+            <View style={styles.recommendationBox}>
+              <View style={styles.recommendationRow}>
+                <Text style={styles.recommendationLabel}>Recommended extra / month</Text>
+                <Text style={styles.recommendationValue}>{formatCurrency(recommendedExtra)}</Text>
+              </View>
+              <Text style={styles.recommendationHint}>
+                Calculated from today's outstanding balance, interest rates, EMI and your target date.
+              </Text>
+              <View style={styles.recommendationRow}>
+                <Text style={styles.recommendationLabel}>Extra paid this month</Text>
+                <Text style={styles.recommendationActual}>{formatCurrency(actualExtraPaidThisMonth)}</Text>
+              </View>
+              <View style={styles.recommendationRow}>
+                <Text style={styles.recommendationLabel}>Still needed this month</Text>
+                <Text style={styles.recommendationRemaining}>{formatCurrency(extraStillNeededThisMonth)}</Text>
+              </View>
+              <Text style={styles.recalculationNote}>
+                The recommendation is recalculated from your latest outstanding balance and remaining time to the target. If no extra payment is made, the required extra will increase as the target gets closer.
+              </Text>
+            </View>
           </View>
-        )}
-
+        </View>
 
         {/* PROJECTION */}
-
-        {performance && (
-
-          <View
-            style={styles.card}
-          >
-
-            <Text
-              style={styles.cardTitle}
-            >
-              Projection
-            </Text>
-
-            <View
-              style={styles.row}
-            >
-
-              <Text
-                style={styles.rowLabel}
-              >
-                Target Date
+        <View style={styles.projectionCard}>
+          <View style={styles.projectionHeader}>
+            <View>
+              <Text style={styles.projectionEyebrow}>PROJECTION</Text>
+              <Text style={styles.projectionTitle}>Your debt-free outlook</Text>
+              <Text style={styles.projectionSubtitle}>
+                Based on today's outstanding balance and your planned monthly contribution.
               </Text>
-
-              <Text
-                style={styles.rowValue}
-              >
-                {formatDate(
-                  performance.targetDate
-                )}
-              </Text>
-
             </View>
-
-
-            <View
-              style={styles.row}
-            >
-
-              <Text
-                style={styles.rowLabel}
-              >
-                Projected Debt-Free Date
-              </Text>
-
-              <Text
-                style={styles.rowValue}
-              >
-                {formatDate(
-                  performance
-                    .projectedDebtFreeDate
-                )}
-              </Text>
-
-            </View>
-
-
-            <View
-              style={styles.statusBox}
-            >
-
-              <Text
-                style={styles.statusText}
-              >
-                {
-                  performance.status ===
-                  'AHEAD'
-                    ? '🟢 AHEAD OF TARGET'
-                    : performance.status ===
-                      'ON_TRACK'
-                    ? '🔵 ON TRACK'
-                    : '🔴 BEHIND TARGET'
-                }
-              </Text>
-
-            </View>
-
+            {projectedDate && (
+              <View style={[
+                styles.statusPill,
+                status === 'AHEAD' ? styles.statusAhead : status === 'ON_TRACK' ? styles.statusTrack : styles.statusBehind,
+              ]}>
+                <Text style={styles.statusPillText}>
+                  {status === 'AHEAD' ? '↗ Ahead of target' : status === 'ON_TRACK' ? '✓ On track' : '! Needs attention'}
+                </Text>
+              </View>
+            )}
           </View>
-        )}
 
+          <View style={styles.projectionBody}>
+            <View style={styles.projectionDateBlock}>
+              <Text style={styles.projectionLabel}>PROJECTED DEBT-FREE DATE</Text>
+              <Text style={styles.projectionDate}>
+                {projectedDate ? formatDate(projectedDate) : '—'}
+              </Text>
+              <Text style={styles.projectionMeta}>
+                {projectedDate && validTargetDate
+                  ? projectedDate <= (targetDateObj as Date)
+                    ? 'Your current plan reaches the goal on or before the target date.'
+                    : 'Your current plan needs a higher monthly contribution to meet the target.'
+                  : 'Enter a valid future target date to calculate the projection.'}
+              </Text>
+            </View>
 
-        {/* SAVE */}
+            <View style={styles.progressPanel}>
+              <View style={styles.progressHeaderRow}>
+                <Text style={styles.progressLabel}>Target status</Text>
+                <Text style={styles.progressStatus}>
+                  {status === 'AHEAD' ? 'AHEAD' : status === 'ON_TRACK' ? 'ON TRACK' : status === 'BEHIND' ? 'BEHIND' : '—'}
+                </Text>
+              </View>
+              <View style={styles.progressTrack}>
+                <View style={[
+                  styles.progressFill,
+                  status === 'AHEAD' ? styles.progressGreen : status === 'ON_TRACK' ? styles.progressBlue : styles.progressOrange,
+                  { width: status === 'AHEAD' ? '100%' : status === 'ON_TRACK' ? '78%' : '42%' },
+                ]} />
+              </View>
+              <View style={styles.progressFootRow}>
+                <Text style={styles.progressFootText}>Baseline {formatCurrency(baselineOutstanding)}</Text>
+                <Text style={styles.progressFootText}>{formatDate(new Date(baselineDate))}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
 
-        <Pressable
-          onPress={
-            handleSave
-          }
-          disabled={
-            saving
-          }
-          style={[
-            styles.saveButton,
-            saving &&
-              styles.saveButtonDisabled,
-          ]}
-        >
-
-          <Text
-            style={styles.saveButtonText}
-          >
-            {saving
-              ? 'Saving...'
-              : 'Save Debt-Free Target'}
+        {/* ACTION */}
+        <View style={styles.actionRow}>
+          <Text style={styles.disclaimer}>
+            Your saved baseline is preserved when editing this target. This keeps your progress measurement consistent.
           </Text>
-
-        </Pressable>
-
+          <Pressable
+            disabled={saving}
+            onPress={handleSave}
+            style={({ pressed }) => [
+              styles.saveButton,
+              saving && styles.saveButtonDisabled,
+              pressed && styles.pressed,
+            ]}
+          >
+            {saving ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.saveButtonText}>Save debt-free target</Text>
+            )}
+          </Pressable>
+        </View>
       </ScrollView>
-
-   
+    
   );
 }
 
+function formatDateInput(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
-/*
- * =========================================================
- * STYLES
- * =========================================================
- */
+function formatCurrency(value: number): string {
+  return `₹${Math.round(Number(value) || 0).toLocaleString('en-IN')}`;
+}
 
-const styles =
-  StyleSheet.create({
-
-    content: {
-      width: '100%',
-      maxWidth: 900,
-      alignSelf: 'center',
-      paddingHorizontal: 24,
-      paddingTop: 28,
-      paddingBottom: 50,
-    },
-
-    loading: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-
-    loadingText: {
-      marginTop: 10,
-      color: '#728078',
-    },
-
-    header: {
-      marginBottom: 22,
-    },
-
-    title: {
-      fontSize: 31,
-      fontWeight: '800',
-      color: '#17221B',
-    },
-
-    subtitle: {
-      marginTop: 5,
-      fontSize: 13,
-      color: '#728078',
-    },
-
-    card: {
-      backgroundColor: '#FFFFFF',
-      borderRadius: 14,
-      borderWidth: 1,
-      borderColor: '#DFE8E2',
-      padding: 20,
-      marginBottom: 16,
-    },
-
-    mainCard: {
-      backgroundColor: '#EFFAF2',
-      borderRadius: 16,
-      borderWidth: 1,
-      borderColor: '#B9E6C8',
-      padding: 24,
-      marginBottom: 16,
-      alignItems: 'center',
-    },
-
-    cardTitle: {
-      fontSize: 17,
-      fontWeight: '800',
-      color: '#17221B',
-      marginBottom: 16,
-    },
-
-    label: {
-      fontSize: 12,
-      fontWeight: '600',
-      color: '#6D7A72',
-      marginBottom: 8,
-    },
-
-    input: {
-      height: 48,
-      borderWidth: 1,
-      borderColor: '#D6E0D9',
-      borderRadius: 9,
-      paddingHorizontal: 14,
-      fontSize: 16,
-      color: '#17221B',
-      backgroundColor: '#FFFFFF',
-    },
-
-    helper: {
-      marginTop: 7,
-      fontSize: 11,
-      color: '#89948D',
-    },
-
-    grid: {
-      flexDirection: 'row',
-      gap: 14,
-    },
-
-    metric: {
-      flex: 1,
-    },
-
-    metricLabel: {
-      fontSize: 11,
-      color: '#6D7A72',
-      fontWeight: '600',
-    },
-
-    metricValue: {
-      marginTop: 6,
-      fontSize: 22,
-      fontWeight: '800',
-      color: '#17221B',
-    },
-
-    mainTitle: {
-      fontSize: 15,
-      fontWeight: '700',
-      color: '#42634D',
-      textAlign: 'center',
-    },
-
-    mainAmount: {
-      marginTop: 8,
-      fontSize: 40,
-      fontWeight: '900',
-      color: '#16803A',
-    },
-
-    mainDescription: {
-      marginTop: 8,
-      fontSize: 12,
-      lineHeight: 18,
-      color: '#5F6D64',
-      textAlign: 'center',
-      maxWidth: 600,
-    },
-
-    divider: {
-      width: '100%',
-      height: 1,
-      backgroundColor: '#D8E8DD',
-      marginVertical: 18,
-    },
-
-    row: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingVertical: 9,
-    },
-
-    rowLabel: {
-      flex: 1,
-      fontSize: 12,
-      color: '#6D7A72',
-      fontWeight: '600',
-    },
-
-    rowValue: {
-      fontSize: 14,
-      fontWeight: '800',
-      color: '#17221B',
-      textAlign: 'right',
-    },
-
-    totalRow: {
-      borderTopWidth: 1,
-      borderTopColor: '#D8E8DD',
-      marginTop: 6,
-      paddingTop: 14,
-    },
-
-    totalLabel: {
-      flex: 1,
-      fontSize: 13,
-      fontWeight: '800',
-      color: '#17221B',
-    },
-
-    totalValue: {
-      fontSize: 18,
-      fontWeight: '900',
-      color: '#16803A',
-    },
-
-    progressTrack: {
-      height: 9,
-      borderRadius: 5,
-      backgroundColor: '#E3EAE5',
-      overflow: 'hidden',
-      marginTop: 12,
-    },
-
-    progressFill: {
-      height: '100%',
-      backgroundColor: '#16803A',
-      borderRadius: 5,
-    },
-
-    progressText: {
-      marginTop: 8,
-      fontSize: 11,
-      color: '#728078',
-      textAlign: 'center',
-    },
-
-    statusBox: {
-      marginTop: 12,
-      padding: 12,
-      borderRadius: 9,
-      backgroundColor: '#F1F5F2',
-      alignItems: 'center',
-    },
-
-    statusText: {
-      fontSize: 12,
-      fontWeight: '800',
-      color: '#3F5147',
-    },
-
-    danger: {
-      color: '#C0392B',
-    },
-
-    success: {
-      color: '#16803A',
-    },
-
-    saveButton: {
-      height: 50,
-      borderRadius: 10,
-      backgroundColor: '#16803A',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginTop: 4,
-    },
-
-    saveButtonDisabled: {
-      opacity: 0.6,
-    },
-
-    saveButtonText: {
-      color: '#FFFFFF',
-      fontSize: 14,
-      fontWeight: '800',
-    },
-
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
   });
+}
+
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: '#F5F7FB' },
+  content: { width: '100%', paddingHorizontal: 28, paddingTop: 28, paddingBottom: 60 },
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F5F7FB', padding: 30 },
+  loadingOrb: { width: 64, height: 64, borderRadius: 22, backgroundColor: '#EAF0FF', alignItems: 'center', justifyContent: 'center' },
+  loadingOrbText: { fontSize: 28, color: '#356DFF', fontWeight: '800' },
+  loadingTitle: { marginTop: 18, fontSize: 18, fontWeight: '800', color: '#172033' },
+  loadingText: { marginTop: 7, fontSize: 12, color: '#7A8496' },
+  pageHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 26, gap: 20 },
+  headerCopy: { flex: 1 },
+  eyebrowRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+  eyebrowDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#356DFF' },
+  eyebrow: { fontSize: 10, fontWeight: '800', letterSpacing: 1.2, color: '#356DFF' },
+  title: { fontSize: 31, fontWeight: '800', color: '#172033', letterSpacing: -0.5 },
+  subtitle: { marginTop: 6, maxWidth: 760, fontSize: 13, lineHeight: 20, color: '#748095' },
+  backButton: { paddingHorizontal: 15, paddingVertical: 10, borderRadius: 12, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E4E8F0' },
+  backButtonText: { fontSize: 12, fontWeight: '700', color: '#46536A' },
+  pressed: { opacity: 0.78 },
+  positionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, marginBottom: 30 },
+  metricCard: { flexGrow: 1, flexBasis: 240, minHeight: 145, padding: 20, borderRadius: 20, shadowOpacity: 0.16, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 5 },
+  metricBlue: { backgroundColor: '#356DFF', shadowColor: '#356DFF' },
+  metricGreen: { backgroundColor: '#18A673', shadowColor: '#18A673' },
+  metricPurple: { backgroundColor: '#7857D8', shadowColor: '#7857D8' },
+  metricOrange: { backgroundColor: '#E99A32', shadowColor: '#E99A32' },
+  metricTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  metricLabelLight: { fontSize: 9, fontWeight: '800', letterSpacing: 0.8, color: 'rgba(255,255,255,0.78)' },
+  metricIconLight: { width: 30, height: 30, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.16)', alignItems: 'center', justifyContent: 'center' },
+  metricIconText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
+  metricValueLight: { marginTop: 17, fontSize: 27, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.5 },
+  metricValueLightSmall: { marginTop: 18, fontSize: 20, fontWeight: '800', color: '#FFFFFF' },
+  metricCaptionLight: { marginTop: 5, fontSize: 10, color: 'rgba(255,255,255,0.72)' },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 14, gap: 20 },
+  sectionEyebrow: { fontSize: 9, fontWeight: '800', letterSpacing: 1, color: '#7857D8' },
+  sectionTitle: { marginTop: 4, fontSize: 20, fontWeight: '800', color: '#172033' },
+  sectionHint: { fontSize: 10, color: '#8993A4' },
+  formGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
+  formCard: { flexGrow: 1, flexBasis: 420, padding: 22, backgroundColor: '#FFFFFF', borderRadius: 20, borderWidth: 1, borderColor: '#E5E9F1', shadowColor: '#1B2942', shadowOpacity: 0.07, shadowRadius: 16, shadowOffset: { width: 0, height: 7 }, elevation: 2 },
+  cardIconBlue: { width: 38, height: 38, borderRadius: 12, backgroundColor: '#EAF0FF', alignItems: 'center', justifyContent: 'center', marginBottom: 15 },
+  cardIconOrange: { width: 38, height: 38, borderRadius: 12, backgroundColor: '#FFF3E3', alignItems: 'center', justifyContent: 'center', marginBottom: 15 },
+  cardIconTextBlue: { color: '#356DFF', fontSize: 17, fontWeight: '800' },
+  cardIconTextOrange: { color: '#E99A32', fontSize: 18, fontWeight: '800' },
+  cardTitle: { fontSize: 17, fontWeight: '800', color: '#172033' },
+  helpText: { marginTop: 6, fontSize: 11, lineHeight: 18, color: '#7A8496' },
+  inputLabel: { marginTop: 19, marginBottom: 7, fontSize: 9, fontWeight: '800', letterSpacing: 0.8, color: '#647086' },
+  input: { height: 50, borderWidth: 1, borderColor: '#DCE2EC', borderRadius: 12, paddingHorizontal: 14, fontSize: 15, color: '#172033', backgroundColor: '#FAFBFD' },
+  inputHint: { marginTop: 6, fontSize: 10, color: '#9AA4B5' },
+  amountInputRow: { height: 52, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#DCE2EC', borderRadius: 12, backgroundColor: '#FAFBFD' },
+  currencyPrefix: { paddingLeft: 15, fontSize: 18, fontWeight: '800', color: '#E99A32' },
+  amountInput: { flex: 1, height: 50, paddingHorizontal: 10, fontSize: 16, color: '#172033' },
+  plannedRow: { marginTop: 13, paddingTop: 13, borderTopWidth: 1, borderTopColor: '#EDF0F5', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  plannedLabel: { fontSize: 11, color: '#7A8496' },
+  plannedValue: { fontSize: 15, fontWeight: '800', color: '#18A673' },
+  recommendationBox: { marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: '#F6F8FC', borderWidth: 1, borderColor: '#E7EBF2' },
+  recommendationRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginTop: 7 },
+  recommendationLabel: { flex: 1, fontSize: 10, color: '#6F7B90' },
+  recommendationValue: { fontSize: 15, fontWeight: '800', color: '#356DFF' },
+  recommendationActual: { fontSize: 13, fontWeight: '800', color: '#18A673' },
+  recommendationRemaining: { fontSize: 13, fontWeight: '800', color: '#E99A32' },
+  recommendationHint: { marginTop: 2, fontSize: 9, lineHeight: 14, color: '#98A2B3' },
+  recalculationNote: { marginTop: 10, fontSize: 10, lineHeight: 15, color: '#172033' },
+  projectionCard: { marginTop: 22, padding: 24, borderRadius: 22, backgroundColor: '#172B55', shadowColor: '#172B55', shadowOpacity: 0.18, shadowRadius: 18, shadowOffset: { width: 0, height: 9 }, elevation: 5 },
+  projectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 18 },
+  projectionEyebrow: { fontSize: 9, fontWeight: '800', letterSpacing: 1, color: '#91AEFF' },
+  projectionTitle: { marginTop: 5, fontSize: 22, fontWeight: '800', color: '#FFFFFF' },
+  projectionSubtitle: { marginTop: 5, maxWidth: 650, fontSize: 11, lineHeight: 18, color: 'rgba(255,255,255,0.65)' },
+  statusPill: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20 },
+  statusAhead: { backgroundColor: '#DDF7EC' },
+  statusTrack: { backgroundColor: '#E5EDFF' },
+  statusBehind: { backgroundColor: '#FFF0D9' },
+  statusPillText: { fontSize: 10, fontWeight: '800', color: '#24304A' },
+  projectionBody: { marginTop: 24, flexDirection: 'row', flexWrap: 'wrap', gap: 24, alignItems: 'stretch' },
+  projectionDateBlock: { flex: 1, minWidth: 280 },
+  projectionLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 0.8, color: 'rgba(255,255,255,0.52)' },
+  projectionDate: { marginTop: 8, fontSize: 31, fontWeight: '800', color: '#FFFFFF' },
+  projectionMeta: { marginTop: 8, maxWidth: 600, fontSize: 11, lineHeight: 18, color: 'rgba(255,255,255,0.65)' },
+  progressPanel: { flex: 0.8, minWidth: 280, padding: 18, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.07)' },
+  progressHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  progressLabel: { fontSize: 10, color: 'rgba(255,255,255,0.65)' },
+  progressStatus: { fontSize: 10, fontWeight: '800', color: '#FFFFFF' },
+  progressTrack: { height: 8, marginTop: 15, borderRadius: 5, backgroundColor: 'rgba(255,255,255,0.12)', overflow: 'hidden' },
+  progressFill: { height: '100%', borderRadius: 5 },
+  progressBlue: { backgroundColor: '#6F96FF' },
+  progressGreen: { backgroundColor: '#43D29D' },
+  progressOrange: { backgroundColor: '#F1B25F' },
+  progressFootRow: { marginTop: 12, flexDirection: 'row', justifyContent: 'space-between', gap: 10 },
+  progressFootText: { fontSize: 9, color: 'rgba(255,255,255,0.5)' },
+  actionRow: { marginTop: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 20 },
+  disclaimer: { flex: 1, maxWidth: 760, fontSize: 10, lineHeight: 16, color: '#8A94A5' },
+  saveButton: { minHeight: 50, paddingHorizontal: 22, borderRadius: 14, backgroundColor: '#356DFF', alignItems: 'center', justifyContent: 'center', shadowColor: '#356DFF', shadowOpacity: 0.18, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 3 },
+  saveButtonDisabled: { opacity: 0.6 },
+  saveButtonText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
+});
