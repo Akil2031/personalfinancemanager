@@ -726,28 +726,77 @@ export default function Dashboard() {
     let missed = 0;
     let prepayment = 0;
 
-    payments.forEach((payment) => {
-      switch (payment.status) {
-        case 'PAID':
-          paid += 1;
-          break;
-        case 'PARTIAL':
-          partial += 1;
-          break;
-        case 'MISSED':
-          missed += 1;
-          break;
-        case 'PREPAYMENT':
-          prepayment += 1;
-          break;
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    // The Dashboard previously looked only at the Payment collection.
+    // The current app records repayment history primarily through the
+    // authoritative amortization ledger, so use that ledger whenever it
+    // exists. Payment records remain the fallback for loans that do not yet
+    // have a persisted amortization schedule.
+    calculatedLoans.forEach((item) => {
+      const loanId = item.loan.id;
+      const entries = loanId
+        ? amortizationSchedules[loanId] || []
+        : [];
+
+      if (item.position.hasAuthoritativeSchedule && entries.length > 0) {
+        entries.forEach((entry) => {
+          const due = safeDate(entry.dueDate);
+          if (!due || due > today) return;
+
+          if (entry.entryType === 'EMI') {
+            if (entry.status === 'PAID') {
+              paid += 1;
+            } else if (entry.status === 'UNPAID') {
+              missed += 1;
+            }
+            return;
+          }
+
+          if (
+            (entry.entryType === 'PREPAYMENT' ||
+              entry.entryType === 'PART_PREPAYMENT') &&
+            entry.status === 'PAID'
+          ) {
+            prepayment += 1;
+          }
+        });
+
+        // Partial payments are represented in the payment collection. For an
+        // authoritative schedule we only add PARTIAL records here; PAID and
+        // PREPAYMENT records are already represented by the ledger above.
+        payments
+          .filter((payment) => payment.loanId === loanId)
+          .forEach((payment) => {
+            if (payment.status === 'PARTIAL') partial += 1;
+          });
+
+        return;
       }
+
+      // Legacy/fallback path for loans without an authoritative schedule.
+      payments
+        .filter((payment) => payment.loanId === loanId)
+        .forEach((payment) => {
+          switch (payment.status) {
+            case 'PAID':
+              paid += 1;
+              break;
+            case 'PARTIAL':
+              partial += 1;
+              break;
+            case 'MISSED':
+              missed += 1;
+              break;
+            case 'PREPAYMENT':
+              prepayment += 1;
+              break;
+          }
+        });
     });
 
-    const total =
-      paid +
-      partial +
-      missed +
-      prepayment;
+    const total = paid + partial + missed + prepayment;
 
     return {
       paid,
@@ -760,7 +809,7 @@ export default function Dashboard() {
           ? ((paid + prepayment) / total) * 100
           : 0,
     };
-  }, [payments]);
+  }, [calculatedLoans, amortizationSchedules, payments]);
 
   /* ------------------------------------------------------------------------ */
   /* MONTHLY PRINCIPAL REPAYMENT                                              */
@@ -3430,6 +3479,7 @@ const styles = StyleSheet.create({
   typeGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'center',
     gap: 18,
     marginBottom: 30,
   },
