@@ -23,9 +23,13 @@ import {
 } from '../../src/services/loanService';
 
 import {
-  calculateLoanPosition,
-  LoanPosition,
-} from '../../src/engine/loanPosition';
+  getPortfolioLoanPositionMetrics,
+  LoanPositionMetrics,
+} from '../../src/services/loanMetricsService';
+
+import {
+  getAllPayments,
+} from '../../src/services/paymentService';
 
 /*
  * =========================================================
@@ -35,7 +39,7 @@ import {
 
 interface LoanWithPosition {
   loan: Loan;
-  position: LoanPosition;
+  position: LoanPositionMetrics;
 }
 
 /*
@@ -264,6 +268,11 @@ export default function InsightsRoute() {
     setRefreshing,
   ] = useState(false);
 
+  const [
+    loanPositions,
+    setLoanPositions,
+  ] = useState<LoanWithPosition[]>([]);
+
   /*
    * -------------------------------------------------------
    * LOAD LOANS
@@ -274,21 +283,29 @@ export default function InsightsRoute() {
     useCallback(
       async () => {
         try {
-          const data =
-            await getLoans();
+          const [data, payments] =
+            await Promise.all([
+              getLoans(),
+              getAllPayments(),
+            ]);
 
-          setLoans(
-            data
-          );
-        } catch (
-          error
-        ) {
+          const positions =
+            await getPortfolioLoanPositionMetrics(
+              data,
+              payments,
+              new Date()
+            );
+
+          setLoans(data);
+          setLoanPositions(positions);
+        } catch (error) {
           console.error(
             'Insights loading failed:',
             error
           );
 
           setLoans([]);
+          setLoanPositions([]);
         } finally {
           setLoading(false);
           setRefreshing(false);
@@ -325,34 +342,10 @@ export default function InsightsRoute() {
    *
    * This is the same calculation used by the Loans screen.
    *
-   * Scheduled EMIs up to today are automatically considered
-   * paid by calculateLoanPosition().
+   * Every loan position is loaded through the centralized
+   * schedule-aware metrics service. Persisted lender amortization
+   * is authoritative, including adjustments and prepayments.
    */
-
-  const loanPositions =
-    useMemo<
-      LoanWithPosition[]
-    >(() => {
-      return loans
-        .filter(
-          loan =>
-            loan.status !==
-            'CLOSED'
-        )
-        .map(
-          loan => ({
-            loan,
-
-            position:
-              calculateLoanPosition(
-                loan,
-                new Date()
-              ),
-          })
-        );
-    }, [
-      loans,
-    ]);
 
   /*
    * -------------------------------------------------------
@@ -1646,40 +1639,16 @@ export default function InsightsRoute() {
             >
               {activeLoans.map(
                 item => {
-                  const original =
-                    safeNumber(
-                      item.loan
-                        .originalPrincipal
-                    );
-
-                  const outstanding =
-                    safeNumber(
-                      item.position
-                        .currentOutstanding
-                    );
-
-                  const paid =
-                    Math.max(
-                      0,
-                      original -
-                        outstanding
-                    );
-
                   const percentage =
-                    original >
-                    0
-                      ? Math.min(
-                          100,
-                          Math.max(
-                            0,
-                            (
-                              paid /
-                              original
-                            ) *
-                              100
-                          )
+                    Math.min(
+                      100,
+                      Math.max(
+                        0,
+                        safeNumber(
+                          item.position.principalPaidPercent
                         )
-                      : 0;
+                      )
+                    );
 
                   return (
                     <LoanInsightRow
@@ -2010,8 +1979,9 @@ function LoanInsightRow({
           label="EMI"
           value={formatCurrency(
             safeNumber(
-              item.loan
-                .emi
+              item.position.nextEmiAmount > 0
+                ? item.position.nextEmiAmount
+                : item.loan.emi
             )
           )}
         />
@@ -2187,6 +2157,8 @@ const styles =
 
     content: {
       width: '100%',
+      maxWidth: 1280,
+      alignSelf: 'center',
       paddingHorizontal: 28,
       paddingTop: 30,
       paddingBottom: 70,

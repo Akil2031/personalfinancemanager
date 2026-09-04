@@ -29,6 +29,7 @@ export interface LoanPositionMetrics extends AuthoritativeLoanMetrics {
   remainingMonths: number;
   nextEmiDate?: Date;
   lastEmiDate?: Date;
+  nextEmiAmount: number;
 }
 
 /**
@@ -78,6 +79,7 @@ export async function getLoanPositionMetrics(
           remainingMonths: futureEmi.length,
           nextEmiDate: firstFuture ? day(firstFuture.dueDate) ?? undefined : undefined,
           lastEmiDate: last,
+          nextEmiAmount: firstFuture ? Math.max(0, num(firstFuture.emi)) : 0,
         };
       }
     } catch (error) {
@@ -211,5 +213,29 @@ export async function getLoanPositionMetrics(
     remainingMonths: future.length,
     nextEmiDate: future[0]?.dueDate,
     lastEmiDate: calculated?.[calculated.length - 1]?.dueDate,
+    nextEmiAmount: future[0] ? Math.max(0, num(future[0].emi)) : 0,
   };
+}
+
+
+/**
+ * Centralized portfolio-level position loader used by Dashboard and Insights.
+ * Each loan is evaluated through the same authoritative schedule-aware metric
+ * engine, so those screens cannot drift from Loans / Loan Details.
+ */
+export async function getPortfolioLoanPositionMetrics(
+  loans: Loan[],
+  payments: Payment[] = [],
+  asOfDate: Date = new Date()
+): Promise<Array<{ loan: Loan; position: LoanPositionMetrics }>> {
+  return Promise.all(
+    loans.map(async (loan) => ({
+      loan,
+      position: await getLoanPositionMetrics(
+        loan,
+        payments.filter((payment) => payment.loanId === loan.id),
+        asOfDate
+      ),
+    }))
+  );
 }

@@ -35,7 +35,6 @@ const navigationItems: NavigationItem[] = [
   { label: 'Dashboard', shortLabel: 'Home', icon: '⌂', route: '/' },
   { label: 'Loans', shortLabel: 'Loans', icon: '◈', route: '/loans' },
   { label: 'Calculator', shortLabel: 'Calc', icon: '＋', route: '/calculator' },
-  { label: 'Payments', shortLabel: 'Pay', icon: '↘', route: '/payments' },
   { label: 'Insights', shortLabel: 'Insights', icon: '✦', route: '/insights' },
 ];
 

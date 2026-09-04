@@ -15,14 +15,16 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { getLoans } from '../../src/services/loanService';
 import { getAllPayments } from '../../src/services/paymentService';
 import { getDebtFreeTarget } from '../../src/services/debtFreeTargetService';
-
 import {
-  generateAdjustedLoanSchedule,
-} from '../../src/engine/loanSchedule';
-
+  getPortfolioLoanPositionMetrics,
+} from '../../src/services/loanMetricsService';
 import {
-  calculateTargetPerformance,
-} from '../../src/services/targetService';
+  getAmortizationSchedule,
+} from '../../src/services/amortizationService';
+
+import type {
+  AmortizationEntry,
+} from '../../src/models/amortization';
 
 import type {
   Loan,
@@ -33,9 +35,6 @@ import type {
   Payment,
 } from '../../src/models/payment';
 
-import type {
-  DebtFreeTarget,
-} from '../../src/models/target';
 
 /* -------------------------------------------------------------------------- */
 /* TYPES                                                                      */
@@ -73,6 +72,15 @@ type UpcomingPayment = {
 type MonthlyPaymentPoint = {
   label: string;
   value: number;
+};
+
+// Dashboard only needs the persisted target fields below.
+// Keep this local type compatible with the current target service/model.
+type DashboardTarget = {
+  targetDate: string;
+  baselineDate?: string;
+  baselineOutstanding?: number;
+  additionalMonthlyPayment?: number;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -243,12 +251,83 @@ function getCommitment(loan: Loan): number {
   return Number(loan.emi || 0);
 }
 
-function getLoanTypeLabel(type: LoanType): string {
-  return LOAN_TYPE_META[type]?.title || 'Other Loans';
+function getDynamicGreeting(date: Date = new Date()): string {
+  const hour = date.getHours();
+
+  if (hour >= 5 && hour < 12) return 'Good morning';
+  if (hour >= 12 && hour < 17) return 'Good afternoon';
+  if (hour >= 17 && hour < 22) return 'Good evening';
+  return 'Good night';
 }
 
-function getLoanTypeCode(type: LoanType): string {
-  return LOAN_TYPE_META[type]?.code || 'OT';
+function getLoanTypeLabel(type?: LoanType): string {
+  return (type ? LOAN_TYPE_META[type] : undefined)?.title || 'Other Loans';
+}
+
+function getLoanTypeCode(type?: LoanType): string {
+  return (type ? LOAN_TYPE_META[type] : undefined)?.code || 'OT';
+}
+
+function calculateTargetPerformance(
+  activeLoans: Loan[],
+  currentOutstanding: number,
+  targetDate: Date,
+  additionalMonthlyPayment: number,
+) {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  const monthsToTarget = Math.max(
+    0,
+    (targetDate.getFullYear() - now.getFullYear()) * 12 +
+      targetDate.getMonth() - now.getMonth(),
+  );
+
+  const monthlyCommitment = activeLoans.reduce(
+    (sum, loan) => sum + getCommitment(loan),
+    0,
+  );
+
+  const plannedMonthlyReduction = Math.max(
+    0,
+    monthlyCommitment + additionalMonthlyPayment,
+  );
+
+  const projectedMonths = plannedMonthlyReduction > 0
+    ? Math.ceil(currentOutstanding / plannedMonthlyReduction)
+    : Infinity;
+
+  const projectedDebtFreeDate = Number.isFinite(projectedMonths)
+    ? new Date(
+        now.getFullYear(),
+        now.getMonth() + projectedMonths,
+        now.getDate(),
+      )
+    : null;
+
+  const requiredAdditionalPayment =
+    monthsToTarget > 0
+      ? Math.max(
+          0,
+          currentOutstanding / monthsToTarget - monthlyCommitment,
+        )
+      : currentOutstanding > 0
+        ? currentOutstanding
+        : 0;
+
+  return {
+    currentOutstanding,
+    monthlyCommitment,
+    monthsToTarget,
+    projectedDebtFreeDate,
+    requiredAdditionalPayment,
+    status:
+      currentOutstanding <= 0
+        ? 'AHEAD'
+        : projectedDebtFreeDate && projectedDebtFreeDate <= targetDate
+          ? 'ON_TRACK'
+          : 'BEHIND',
+  };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -268,7 +347,12 @@ export default function Dashboard() {
 
   const [loans, setLoans] = useState<Loan[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [target, setTarget] = useState<DebtFreeTarget | null>(null);
+  const [target, setTarget] = useState<DashboardTarget | null>(null);
+  const [amortizationSchedules, setAmortizationSchedules] = useState<Record<string, AmortizationEntry[]>>({});
+  const [positionMetrics, setPositionMetrics] = useState<
+    Awaited<ReturnType<typeof getPortfolioLoanPositionMetrics>>
+  >([]);
+  const [showNextCommitmentDetails, setShowNextCommitmentDetails] = useState(false);
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -284,9 +368,46 @@ export default function Dashboard() {
         getDebtFreeTarget(),
       ]);
 
-      setLoans(loadedLoans || []);
-      setPayments(loadedPayments || []);
+      const safeLoans = loadedLoans || [];
+      const safePayments = loadedPayments || [];
+
+      const loadedPositionMetrics =
+        await getPortfolioLoanPositionMetrics(
+          safeLoans,
+          safePayments,
+          new Date(),
+        );
+
+      // The repayment chart must use the same persisted amortization ledger
+      // used by My Loans. For loans without an authoritative schedule, the
+      // existing payment records remain the fallback source.
+      const schedulePairs = await Promise.all(
+        safeLoans.map(async (loan) => {
+          if (!loan.id) return [String(loan.id || ''), [] as AmortizationEntry[]] as const;
+
+          try {
+            const entries = await getAmortizationSchedule(loan.id);
+            return [loan.id, entries] as const;
+          } catch (scheduleError) {
+            console.warn(
+              `[Dashboard] Unable to load amortization for ${loan.id}`,
+              scheduleError,
+            );
+            return [loan.id, [] as AmortizationEntry[]] as const;
+          }
+        }),
+      );
+
+      const loadedSchedules: Record<string, AmortizationEntry[]> = {};
+      schedulePairs.forEach(([loanId, entries]) => {
+        if (loanId) loadedSchedules[loanId] = entries;
+      });
+
+      setLoans(safeLoans);
+      setPayments(safePayments);
       setTarget(loadedTarget || null);
+      setAmortizationSchedules(loadedSchedules);
+      setPositionMetrics(loadedPositionMetrics);
     } catch (err) {
       console.error('Dashboard load error:', err);
 
@@ -317,68 +438,16 @@ export default function Dashboard() {
   /* ------------------------------------------------------------------------ */
 
   const calculatedLoans = useMemo<CalculatedLoan[]>(() => {
-    return loans.map((loan) => {
-      const loanPayments = payments.filter(
+    return positionMetrics.map(({ loan, position }) => ({
+      loan,
+      position,
+      payments: payments.filter(
         (payment) => payment.loanId === loan.id,
-      );
-
-      let position: any = {
-        currentOutstanding: Number(
-          loan.currentOutstanding || loan.originalPrincipal || 0,
-        ),
-        remainingMonths: Number(loan.remainingMonths || 0),
-        nextEmiDate: null,
-        maturityDate: safeDate(loan.maturityDate),
-      };
-
-      try {
-        position = generateAdjustedLoanSchedule(
-          loan,
-          loanPayments,
-          new Date(),
-        );
-      } catch (err) {
-        console.warn(
-          `Unable to calculate schedule for ${loan.loanName}`,
-          err,
-        );
-      }
-
-      const actualPrincipalPaid = loanPayments.reduce(
-        (sum, payment) =>
-          sum + Number(payment.principal || 0),
-        0,
-      );
-
-      const actualInterestPaid = loanPayments.reduce(
-        (sum, payment) =>
-          sum + Number(payment.interest || 0),
-        0,
-      );
-
-      const outstanding = Number(
-        position.currentOutstanding ??
-        loan.currentOutstanding ??
-        0,
-      );
-
-      const principalReduction = Math.max(
-        0,
-        Number(loan.originalPrincipal || 0) - outstanding,
-      );
-
-      return {
-        loan,
-        position,
-        payments: loanPayments,
-        principalPaid: Math.max(
-          actualPrincipalPaid,
-          principalReduction,
-        ),
-        interestPaid: actualInterestPaid,
-      };
-    });
-  }, [loans, payments]);
+      ),
+      principalPaid: Number(position.principalPaid || 0),
+      interestPaid: Number(position.interestPaid || 0),
+    }));
+  }, [positionMetrics, payments]);
 
   /* ------------------------------------------------------------------------ */
   /* ACTIVE LOANS                                                             */
@@ -594,6 +663,24 @@ export default function Dashboard() {
 
   const nextPayment = upcomingPayments[0] || null;
 
+  const nextCommitmentPayments = useMemo(() => {
+    if (!nextPayment) return [];
+
+    const nextDate = nextPayment.date.getTime();
+    return upcomingPayments.filter(
+      (item) => item.date.getTime() === nextDate,
+    );
+  }, [nextPayment, upcomingPayments]);
+
+  const nextCommitmentTotal = useMemo(
+    () =>
+      nextCommitmentPayments.reduce(
+        (sum, item) => sum + item.amount,
+        0,
+      ),
+    [nextCommitmentPayments],
+  );
+
   const next7DaysAmount = useMemo(() => {
     const today = new Date();
 
@@ -702,30 +789,74 @@ export default function Dashboard() {
       }
 
       return months.map((month) => {
-        const value = payments
-          .filter((payment) => {
-            const date = safeDate(
-              payment.paymentDate,
-            );
+        let value = 0;
 
-            return (
-              date &&
-              monthKey(date) === month.key
-            );
-          })
-          .reduce(
-            (sum, payment) =>
-              sum +
-              Number(payment.principal || 0),
-            0,
-          );
+        calculatedLoans.forEach((item) => {
+          const entries = item.loan.id
+            ? amortizationSchedules[item.loan.id] || []
+            : [];
+
+          // Authoritative schedule: use the same status and entry semantics
+          // as the loan metrics engine. This includes ADJUSTMENT rows.
+          if (item.position.hasAuthoritativeSchedule && entries.length > 0) {
+            entries.forEach((entry) => {
+              const due = safeDate(entry.dueDate);
+              if (!due || monthKey(due) !== month.key) return;
+              if (due > now) return;
+
+              const isEmi = entry.entryType === 'EMI';
+              const isPrepayment =
+                entry.entryType === 'PREPAYMENT' ||
+                entry.entryType === 'PART_PREPAYMENT';
+              const isAdjustment = entry.entryType === 'ADJUSTMENT';
+
+              if ((isEmi || isPrepayment) && entry.status !== 'PAID') {
+                return;
+              }
+
+              if (!isEmi && !isPrepayment && !isAdjustment) return;
+
+              if (isAdjustment) {
+                const balanceReduction = Math.max(
+                  0,
+                  Number(entry.openingBalance || 0) -
+                    Number(entry.closingBalance || 0),
+                );
+                value += Math.max(
+                  0,
+                  Number(entry.principal || 0) ||
+                    balanceReduction ||
+                    Number(entry.paidAmount || 0),
+                );
+                return;
+              }
+
+              value += Math.max(
+                0,
+                Number(entry.principal || 0),
+              );
+            });
+            return;
+          }
+
+          // Legacy/no-schedule loan: retain the payment-record fallback.
+          item.payments.forEach((payment) => {
+            const date = safeDate(payment.paymentDate);
+            if (!date || monthKey(date) !== month.key || date > now) return;
+
+            const status = String(payment.status || '').toUpperCase();
+            if (status !== 'PAID' && status !== 'PREPAYMENT') return;
+
+            value += Math.max(0, Number(payment.principal || 0));
+          });
+        });
 
         return {
           label: month.label,
           value,
         };
       });
-    }, [payments]);
+    }, [calculatedLoans, amortizationSchedules]);
 
   const maxMonthlyPayment = useMemo(
     () =>
@@ -746,9 +877,31 @@ export default function Dashboard() {
     if (!target?.targetDate) return null;
 
     try {
+      const targetDate = new Date(String(target.targetDate));
+
+      const baselineOutstanding = Number(
+        target.baselineOutstanding,
+      ) || summary.totalOutstanding || 0;
+
+      const additionalMonthlyPayment = Math.max(
+        0,
+        Number(target.additionalMonthlyPayment ?? 0) || 0,
+      );
+
+      if (
+        Number.isNaN(targetDate.getTime())
+      ) {
+        console.warn('Invalid debt-free target date:', {
+          targetDate: target.targetDate,
+        });
+        return null;
+      }
+
       return calculateTargetPerformance(
         activeLoans.map((item) => item.loan),
-        target.targetDate,
+        summary.totalOutstanding || baselineOutstanding,
+        targetDate,
+        additionalMonthlyPayment,
       );
     } catch (err) {
       console.warn(
@@ -758,7 +911,7 @@ export default function Dashboard() {
 
       return null;
     }
-  }, [target, activeLoans]);
+  }, [target, activeLoans, summary.totalOutstanding]);
 
   /* ------------------------------------------------------------------------ */
   /* INSIGHTS                                                                 */
@@ -957,6 +1110,7 @@ export default function Dashboard() {
           styles.scrollContent,
           {
             width: '100%',
+            alignSelf: 'stretch',
           },
         ]}
         refreshControl={
@@ -985,7 +1139,7 @@ export default function Dashboard() {
               </Text>
 
               <Text style={styles.pageTitle}>
-                Good morning
+                {getDynamicGreeting()}
               </Text>
 
               <Text style={styles.pageSubtitle}>
@@ -1181,45 +1335,114 @@ export default function Dashboard() {
         {/* ---------------------------------------------------------------- */}
 
         {nextPayment && (
-          <View style={styles.nextPaymentCard}>
-            <View style={styles.nextPaymentIcon}>
-              <Text style={styles.nextPaymentIconText}>
-                ◷
-              </Text>
+          <>
+            <View style={styles.nextPaymentCard}>
+              <View style={styles.nextPaymentIcon}>
+                <Text style={styles.nextPaymentIconText}>
+                  ◷
+                </Text>
+              </View>
+
+              <View style={styles.nextPaymentMain}>
+                <Text style={styles.nextPaymentEyebrow}>
+                  NEXT COMMITMENT · {nextCommitmentPayments.length} LOAN{nextCommitmentPayments.length === 1 ? '' : 'S'}
+                </Text>
+
+                <Text style={styles.nextPaymentTitle}>
+                  Total commitment
+                </Text>
+
+                <Text style={styles.nextPaymentSub}>
+                  {nextCommitmentPayments.length} loan{nextCommitmentPayments.length === 1 ? '' : 's'} due on {formatDate(nextPayment.date)}
+                </Text>
+              </View>
+
+              <View style={styles.nextPaymentRight}>
+                <Text style={styles.nextPaymentAmount}>
+                  {money(nextCommitmentTotal)}
+                </Text>
+
+                <Text style={styles.nextPaymentDate}>
+                  {formatDate(nextPayment.date)}
+                </Text>
+
+                <Pressable
+                  onPress={() =>
+                    setShowNextCommitmentDetails((value) => !value)
+                  }
+                  style={styles.nextPaymentDetailsButton}
+                  accessibilityRole="button"
+                  accessibilityLabel="View next commitment details"
+                >
+                  <Text style={styles.nextPaymentDetailsButtonText}>
+                    {showNextCommitmentDetails ? 'Hide details' : 'View details'}
+                  </Text>
+                  <Text style={styles.nextPaymentDetailsArrow}>
+                    {showNextCommitmentDetails ? '↑' : '→'}
+                  </Text>
+                </Pressable>
+              </View>
             </View>
 
-            <View style={styles.nextPaymentMain}>
-              <Text style={styles.nextPaymentEyebrow}>
-                NEXT COMMITMENT
-              </Text>
+            {showNextCommitmentDetails && (
+              <GlassCard style={styles.nextCommitmentDetailsCard}>
+                <CardHeading
+                  title="Next commitment details"
+                  subtitle={`All ${nextCommitmentPayments.length} loans due on ${formatDate(nextPayment.date)}`}
+                />
 
-              <Text style={styles.nextPaymentTitle}>
-                {nextPayment.loan.loanName}
-              </Text>
+                <View style={styles.nextCommitmentDetailsTotal}>
+                  <Text style={styles.nextCommitmentDetailsTotalLabel}>
+                    Total commitment
+                  </Text>
+                  <Text style={styles.nextCommitmentDetailsTotalValue}>
+                    {money(nextCommitmentTotal)}
+                  </Text>
+                </View>
 
-              <Text style={styles.nextPaymentSub}>
-                {getLoanTypeCode(
-                  nextPayment.loan.loanType,
-                )}{' '}
-                · {nextPayment.loan.lender}
-                {nextPayment.isInterestOnly
-                  ? ' · Interest Only'
-                  : ''}
-              </Text>
-            </View>
+                <View style={styles.nextCommitmentDetailsList}>
+                  {nextCommitmentPayments.map((item) => (
+                    <View
+                      key={`next-detail-${item.loan.id}`}
+                      style={styles.nextCommitmentDetailRow}
+                    >
+                      <View style={styles.nextCommitmentDetailIcon}>
+                        <Text style={styles.nextCommitmentDetailIconText}>
+                          {getLoanTypeCode(item.loan.loanType)}
+                        </Text>
+                      </View>
 
-            <View style={styles.nextPaymentRight}>
-              <Text style={styles.nextPaymentAmount}>
-                {money(nextPayment.amount)}
-              </Text>
+                      <View style={styles.nextCommitmentDetailInfo}>
+                        <Text
+                          style={styles.nextCommitmentDetailLoan}
+                          numberOfLines={1}
+                        >
+                          {item.loan.loanName}
+                        </Text>
+                        <Text
+                          style={styles.nextCommitmentDetailMeta}
+                          numberOfLines={1}
+                        >
+                          {item.loan.lender}
+                          {' · '}
+                          {item.isInterestOnly ? 'Interest only' : 'EMI'}
+                        </Text>
+                      </View>
 
-              <Text style={styles.nextPaymentDate}>
-                {formatDate(
-                  nextPayment.date,
-                )}
-              </Text>
-            </View>
-          </View>
+                      <View style={styles.nextCommitmentDetailAmountBox}>
+                        <Text style={styles.nextCommitmentDetailAmount}>
+                          {money(item.amount)}
+                        </Text>
+                        <Text style={styles.nextCommitmentDetailDue}>
+                          {formatDate(item.date)}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              </GlassCard>
+            )}
+          </>
         )}
 
         {/* ---------------------------------------------------------------- */}
@@ -1814,10 +2037,11 @@ export default function Dashboard() {
           ) : (
             <TargetContent
               target={target}
-              performance={
-                targetPerformance
-              }
+              performance={targetPerformance}
               router={router}
+              currentOutstanding={summary.totalOutstanding}
+              principalPaid={summary.principalPaid}
+              repaymentPercent={summary.repaymentPercent}
             />
           )}
         </GlassCard>
@@ -1879,7 +2103,9 @@ function MetricCard({
     },
   };
 
-  const current = toneMap[tone];
+  const current =
+    toneMap[tone as keyof typeof toneMap] ||
+    toneMap.blue;
 
   return (
     <View style={styles.metricCard}>
@@ -1937,7 +2163,7 @@ function LoanTypeCard({
   onPress: () => void;
 }) {
   const meta =
-    LOAN_TYPE_META[item.type];
+    item.type ? LOAN_TYPE_META[item.type] : LOAN_TYPE_META.OTHER;
 
   const share =
     totalOutstanding > 0
@@ -2180,7 +2406,7 @@ function MiniSummary({
           styles.miniSummaryDot,
           {
             backgroundColor:
-              colors[tone],
+              colors[tone as keyof typeof colors] || COLORS.blue,
           },
         ]}
       />
@@ -2269,7 +2495,9 @@ function InsightCard({
     },
   };
 
-  const current = map[tone];
+  const current =
+    map[tone as keyof typeof map] ||
+    map.blue;
 
   return (
     <View style={styles.insightCard}>
@@ -2315,10 +2543,16 @@ function TargetContent({
   target,
   performance,
   router,
+  currentOutstanding,
+  principalPaid,
+  repaymentPercent,
 }: {
-  target: DebtFreeTarget;
+  target: DashboardTarget;
   performance: any;
   router: ReturnType<typeof useRouter>;
+  currentOutstanding: number;
+  principalPaid: number;
+  repaymentPercent: number;
 }) {
   const status =
     performance?.status || 'ON_TRACK';
@@ -2349,11 +2583,20 @@ function TargetContent({
       status as keyof typeof statusConfig
     ] || statusConfig.ON_TRACK;
 
-  const currentOutstanding =
-    Number(
-      performance?.currentOutstanding ??
-        0,
-    );
+  const actualOutstanding = Math.max(
+    0,
+    Number(currentOutstanding || 0),
+  );
+
+  const actualPrincipalPaid = Math.max(
+    0,
+    Number(principalPaid || 0),
+  );
+
+  const actualRepaymentPercent = Math.max(
+    0,
+    Math.min(100, Number(repaymentPercent || 0)),
+  );
 
   const projectedDate =
     performance?.projectedDebtFreeDate;
@@ -2414,16 +2657,41 @@ function TargetContent({
         </View>
       </View>
 
+      <View style={styles.targetProgressSection}>
+        <View style={styles.targetProgressHeader}>
+          <View>
+            <Text style={styles.targetProgressLabel}>
+              REPAYMENT PROGRESS
+            </Text>
+            <Text style={styles.targetProgressValue}>
+              {Math.max(0, Math.min(100, actualRepaymentPercent)).toFixed(1)}% of principal repaid
+            </Text>
+          </View>
+
+          <Text style={styles.targetProgressAmount}>
+            {compactMoney(actualPrincipalPaid)} paid
+          </Text>
+        </View>
+
+        <View style={styles.targetProgressTrack}>
+          <View
+            style={[
+              styles.targetProgressFill,
+              {
+                width: `${Math.max(0, Math.min(100, actualRepaymentPercent))}%`,
+              },
+            ]}
+          />
+        </View>
+      </View>
+
       <View style={styles.targetMetrics}>
         <View style={styles.targetMetric}>
           <Text style={styles.targetMetricLabel}>
             Current outstanding
           </Text>
-
           <Text style={styles.targetMetricValue}>
-            {compactMoney(
-              currentOutstanding,
-            )}
+            {compactMoney(actualOutstanding)}
           </Text>
         </View>
 
@@ -2431,7 +2699,6 @@ function TargetContent({
           <Text style={styles.targetMetricLabel}>
             Target date
           </Text>
-
           <Text style={styles.targetMetricValue}>
             {formatDate(targetDate)}
           </Text>
@@ -2439,23 +2706,38 @@ function TargetContent({
 
         <View style={styles.targetMetric}>
           <Text style={styles.targetMetricLabel}>
-            Projected date
+            Projected debt-free
           </Text>
-
           <Text style={styles.targetMetricValue}>
-            {formatDate(
-              projectedDate,
-            )}
+            {formatDate(projectedDate)}
+          </Text>
+        </View>
+
+        <View style={styles.targetMetric}>
+          <Text style={styles.targetMetricLabel}>
+            Monthly commitment
+          </Text>
+          <Text style={styles.targetMetricValue}>
+            {compactMoney(Number(performance?.monthlyCommitment || 0))}
+          </Text>
+        </View>
+
+        <View style={styles.targetMetric}>
+          <Text style={styles.targetMetricLabel}>
+            Months to target
+          </Text>
+          <Text style={styles.targetMetricValue}>
+            {Number(performance?.monthsToTarget || 0)} months
           </Text>
         </View>
       </View>
 
       <View style={styles.targetBottom}>
         <Text style={styles.targetBottomText}>
-          {performance?.requiredAdditionalPrincipal
+          {performance?.requiredAdditionalPayment
             ? `${money(
-                performance.requiredAdditionalPrincipal,
-              )} additional principal reduction may be required.`
+                performance.requiredAdditionalPayment,
+              )} additional monthly payment may be needed to reach the target.`
             : 'Your current repayment path is being tracked against your target.'}
         </Text>
 
@@ -2924,6 +3206,28 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
 
+  nextPaymentLoanList: {
+    marginTop: 3,
+    gap: 5,
+  },
+
+  nextPaymentLoanRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+
+  nextPaymentLoanText: {
+    flex: 1,
+    minWidth: 0,
+  },
+
+  nextPaymentLoanAmount: {
+    color: COLORS.text,
+    fontSize: 13,
+    fontWeight: '800',
+  },
+
   nextPaymentEyebrow: {
     color: COLORS.blue,
     fontSize: 9,
@@ -2934,7 +3238,7 @@ const styles = StyleSheet.create({
   nextPaymentTitle: {
     color: COLORS.text,
     fontSize: 15,
-    fontWeight: '750',
+    fontWeight: '700',
     marginTop: 2,
   },
 
@@ -2958,6 +3262,118 @@ const styles = StyleSheet.create({
   nextPaymentDate: {
     color: COLORS.muted,
     fontSize: 11,
+    marginTop: 3,
+  },
+
+  nextPaymentDetailsButton: {
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingVertical: 3,
+  },
+
+  nextPaymentDetailsButtonText: {
+    color: COLORS.blue,
+    fontSize: 10,
+    fontWeight: '800',
+  },
+
+  nextPaymentDetailsArrow: {
+    color: COLORS.blue,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+
+  nextCommitmentDetailsCard: {
+    marginTop: -14,
+    marginBottom: 28,
+  },
+
+  nextCommitmentDetailsTotal: {
+    borderRadius: 16,
+    backgroundColor: '#F7F9FC',
+    paddingHorizontal: 15,
+    paddingVertical: 13,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+
+  nextCommitmentDetailsTotalLabel: {
+    color: COLORS.muted,
+    fontSize: 10,
+    fontWeight: '700',
+  },
+
+  nextCommitmentDetailsTotalValue: {
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: '900',
+  },
+
+  nextCommitmentDetailsList: {
+    gap: 8,
+  },
+
+  nextCommitmentDetailRow: {
+    minHeight: 64,
+    borderRadius: 15,
+    backgroundColor: '#F8FAFC',
+    paddingHorizontal: 11,
+    paddingVertical: 9,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  nextCommitmentDetailIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    backgroundColor: COLORS.blueSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 11,
+  },
+
+  nextCommitmentDetailIconText: {
+    color: COLORS.blue,
+    fontSize: 10,
+    fontWeight: '900',
+  },
+
+  nextCommitmentDetailInfo: {
+    flex: 1,
+    minWidth: 0,
+  },
+
+  nextCommitmentDetailLoan: {
+    color: COLORS.text,
+    fontSize: 13,
+    fontWeight: '800',
+  },
+
+  nextCommitmentDetailMeta: {
+    color: COLORS.muted,
+    fontSize: 10,
+    marginTop: 3,
+  },
+
+  nextCommitmentDetailAmountBox: {
+    alignItems: 'flex-end',
+    marginLeft: 10,
+  },
+
+  nextCommitmentDetailAmount: {
+    color: COLORS.text,
+    fontSize: 13,
+    fontWeight: '900',
+  },
+
+  nextCommitmentDetailDue: {
+    color: COLORS.subtle,
+    fontSize: 9,
     marginTop: 3,
   },
 
@@ -3152,7 +3568,7 @@ const styles = StyleSheet.create({
   typeStatValue: {
     color: COLORS.text,
     fontSize: 12,
-    fontWeight: '750',
+    fontWeight: '700',
     marginTop: 3,
   },
 
@@ -3243,7 +3659,7 @@ const styles = StyleSheet.create({
   distributionLabel: {
     color: COLORS.text,
     fontSize: 12,
-    fontWeight: '650',
+    fontWeight: '600',
   },
 
   distributionValue: {
@@ -3419,7 +3835,7 @@ const styles = StyleSheet.create({
   upcomingLoan: {
     color: COLORS.text,
     fontSize: 12,
-    fontWeight: '750',
+    fontWeight: '700',
   },
 
   upcomingMeta: {
@@ -3566,6 +3982,56 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 20,
+  },
+
+  targetProgressSection: {
+    marginTop: 24,
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+
+  targetProgressHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+
+  targetProgressLabel: {
+    color: COLORS.blue,
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+  },
+
+  targetProgressValue: {
+    color: COLORS.text,
+    fontSize: 13,
+    fontWeight: '800',
+    marginTop: 3,
+  },
+
+  targetProgressAmount: {
+    color: COLORS.muted,
+    fontSize: 10,
+    fontWeight: '700',
+  },
+
+  targetProgressTrack: {
+    height: 9,
+    marginTop: 12,
+    borderRadius: 99,
+    overflow: 'hidden',
+    backgroundColor: '#E8EEF8',
+  },
+
+  targetProgressFill: {
+    height: '100%',
+    borderRadius: 99,
+    backgroundColor: COLORS.blue,
   },
 
   targetEyebrow: {
