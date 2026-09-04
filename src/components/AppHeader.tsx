@@ -32,11 +32,11 @@ type NavigationItem = {
 };
 
 const navigationItems: NavigationItem[] = [
-  { label: 'Dashboard', route: '/', icon: 'grid-outline' },
-  { label: 'Loans', route: '/loans', icon: 'layers-outline' },
-  { label: 'Calculator', route: '/calculator', icon: 'calculator-outline' },
-  { label: 'Payments', route: '/payments', icon: 'swap-horizontal-outline' },
-  { label: 'Insights', route: '/insights', icon: 'sparkles-outline' },
+  { label: 'Dashboard', route: '/', icon: 'dashboard' },
+  { label: 'Loans', route: '/loans', icon: 'loans' },
+  { label: 'Calculator', route: '/calculator', icon: 'calculator' },
+  { label: 'Payments', route: '/payments', icon: 'payments' },
+  { label: 'Insights', route: '/insights', icon: 'insights' },
 ];
 
 function isRouteActive(pathname: string, route: string) {
@@ -243,8 +243,8 @@ export default function AppHeader() {
           </View>
 
           <View style={styles.brandCopy}>
-            <Text style={styles.brandName}>Finance</Text>
-            <Text style={styles.brandSubtitle}>PERSONAL MANAGER</Text>
+            <Text style={styles.brandName}>Personal Finance Manager</Text>
+            <Text style={styles.brandSubtitle}>version 1.0</Text>
           </View>
         </Pressable>
 
@@ -299,7 +299,6 @@ export default function AppHeader() {
                 placeholder="Search"
                 placeholderTextColor={theme.colors.textMuted}
                 style={styles.searchInput}
-                outlineStyle="none"
                 accessibilityLabel="Search"
               />
               <View style={styles.searchShortcut}>

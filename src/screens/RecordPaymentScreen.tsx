@@ -27,34 +27,44 @@ import {
   View,
 } from 'react-native';
 
-import AppShell from '../../src/components/AppShell';
+
 
 import {
   Loan,
-} from '../../src/models/loan';
+} from '../models/loan';
 
 import {
   Payment,
-} from '../../src/models/payment';
+} from '../models/payment';
 
 import {
   getLoans,
-} from '../../src/services/loanService';
+} from '../services/loanService';
 
 import {
   addPayment,
   deletePayment,
   getAllPayments,
   updatePayment,
-} from '../../src/services/paymentService';
+} from '../services/paymentService';
 
 import {
-  calculateRemainingEMI,
-} from '../../src/engine/emiCalculator';
+  EMIScheduleRow,
+} from '../engine/emiCalculator';
 
 import {
   allocatePayment,
-} from '../../src/engine/paymentCalculator';
+} from '../engine/paymentCalculator';
+
+type AmortizationEntry = {
+  installmentNo: number;
+  dueDate: string;
+  emi: number;
+  principal: number;
+  interest: number;
+  openingBalance: number;
+  closingBalance: number;
+};
 
 type PaymentFormMode = 'ADD' | 'EDIT';
 
@@ -139,53 +149,69 @@ function getLoanName(
   );
 }
 
-function getScheduledInstallment(
-  loan: Loan
-) {
-  const result =
-    generateLoanSchedule(
-      loan
-    );
 
-  const today =
-    new Date();
+function getFutureScheduleRow(
+  schedule: EMIScheduleRow[]
+): EMIScheduleRow | null {
+  if (!schedule.length) return null;
 
-  today.setHours(
-    23,
-    59,
-    59,
-    999
-  );
-
-  const futureRows =
-    result.schedule.filter(
-      (row: any) => {
-        const dueDate =
-          new Date(
-            row.dueDate
-          );
-
-        dueDate.setHours(
-          23,
-          59,
-          59,
-          999
-        );
-
-        return (
-          dueDate.getTime() >
-          today.getTime()
-        );
-      }
-    );
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
 
   return (
-    futureRows[0] ||
-    result.schedule[
-      result.schedule.length - 1
-    ] ||
+    schedule.find(row => {
+      const due = new Date(row.dueDate);
+      due.setHours(23, 59, 59, 999);
+      return due.getTime() > today.getTime();
+    }) ||
+    schedule[schedule.length - 1] ||
     null
   );
+}
+
+function getScheduledInstallment(
+  loan: Loan,
+  authoritativeSchedule: AmortizationEntry[],
+  editingPayment?: Payment | null
+): EMIScheduleRow | null {
+  if (authoritativeSchedule.length) {
+    if (editingPayment?.installmentNo) {
+      const editingRow = authoritativeSchedule.find(
+        entry =>
+          Number(entry.installmentNo) ===
+          Number(editingPayment.installmentNo)
+      );
+
+      if (editingRow) {
+        return {
+          installmentNo: Number(editingRow.installmentNo),
+          dueDate: new Date(editingRow.dueDate),
+          emi: Number(editingRow.emi) || 0,
+          principal: Number(editingRow.principal) || 0,
+          interest: Number(editingRow.interest) || 0,
+          openingBalance: Number(editingRow.openingBalance) || 0,
+          closingBalance: Number(editingRow.closingBalance) || 0,
+        };
+      }
+    }
+
+    return getFutureScheduleRow(
+      authoritativeSchedule.map(entry => ({
+        installmentNo: Number(entry.installmentNo),
+        dueDate: new Date(entry.dueDate),
+        emi: Number(entry.emi) || 0,
+        principal: Number(entry.principal) || 0,
+        interest: Number(entry.interest) || 0,
+        openingBalance: Number(entry.openingBalance) || 0,
+        closingBalance: Number(entry.closingBalance) || 0,
+      }))
+    );
+  }
+
+  // A lender schedule is required when no authoritative schedule
+  // has been saved. Avoid importing the removed legacy scheduler.
+  void loan;
+  return null;
 }
 
 export default function PaymentsRoute() {
@@ -232,6 +258,17 @@ export default function PaymentsRoute() {
   ] = useState<Payment | null>(
     null
   );
+
+
+  const [
+    authoritativeSchedule,
+    setAuthoritativeSchedule,
+  ] = useState<AmortizationEntry[]>([]);
+
+  const [
+    scheduleLoading,
+    setScheduleLoading,
+  ] = useState(false);
 
   const [
     selectedLoanId,
@@ -322,15 +359,49 @@ export default function PaymentsRoute() {
       ]
     );
 
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadAuthoritativeSchedule() {
+      if (!selectedLoan?.id) {
+        setAuthoritativeSchedule([]);
+        setScheduleLoading(false);
+        return;
+      }
+
+      setScheduleLoading(true);
+
+      // The amortization service is not available in this build.
+      // Keep the schedule empty until an authoritative schedule is supplied.
+      if (!cancelled) {
+        setAuthoritativeSchedule([]);
+        setScheduleLoading(false);
+      }
+    }
+
+    void loadAuthoritativeSchedule();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedLoan]);
+
   const scheduledInstallment =
     useMemo(
       () =>
         selectedLoan
           ? getScheduledInstallment(
-              selectedLoan
+              selectedLoan,
+              authoritativeSchedule,
+              editingPayment
             )
           : null,
-      [selectedLoan]
+      [
+        selectedLoan,
+        authoritativeSchedule,
+        editingPayment,
+      ]
     );
 
   const numericAmount =
@@ -389,6 +460,28 @@ export default function PaymentsRoute() {
         return null;
       }
 
+      // When the payment equals the lender's scheduled EMI,
+      // use the authoritative lender principal/interest split
+      // exactly. Do not recalculate it with a generic formula.
+      if (
+        scheduledInstallment &&
+        Math.round(numericAmount) ===
+          Math.round(
+            Number(scheduledInstallment.emi) || 0
+          )
+      ) {
+        return {
+          amount: Math.round(numericAmount),
+          principal: Math.round(
+            Number(scheduledInstallment.principal) || 0
+          ),
+          interest: Math.round(
+            Number(scheduledInstallment.interest) || 0
+          ),
+        };
+      }
+
+      // Legacy fallback when no authoritative lender row exists.
       return allocatePayment(
         numericAmount,
         scheduledInstallment
@@ -863,7 +956,7 @@ export default function PaymentsRoute() {
 
   if (loading) {
     return (
-      <AppShell>
+   
         <View
           style={
             styles.loading
@@ -882,12 +975,12 @@ export default function PaymentsRoute() {
             Loading payments...
           </Text>
         </View>
-      </AppShell>
+     
     );
   }
 
   return (
-    <AppShell>
+    
       <View
         style={
           styles.container
@@ -1181,7 +1274,12 @@ export default function PaymentsRoute() {
 
               {/* SCHEDULED EMI */}
 
-              {scheduledEmi >
+              {scheduleLoading ? (
+                <View style={styles.scheduleLoadingRow}>
+                  <ActivityIndicator size="small" color="#356DFF" />
+                  <Text style={styles.scheduleLoadingText}>Loading lender schedule...</Text>
+                </View>
+              ) : scheduledEmi >
                 0 && (
                 <View
                   style={
@@ -1585,7 +1683,7 @@ export default function PaymentsRoute() {
           />
         </ScrollView>
       </View>
-    </AppShell>
+  
   );
 }
 
@@ -1881,6 +1979,8 @@ const styles = StyleSheet.create({
   amountContainer: { minHeight: 58, flexDirection: 'row', alignItems: 'center', backgroundColor: '#FBFCFE', borderWidth: 1, borderColor: '#C9D5F5', borderRadius: 14, marginBottom: 12 },
   currency: { marginLeft: 16, fontFamily: 'Inter_700Bold', fontSize: 20, color: '#356DFF' },
   amountInput: { flex: 1, paddingHorizontal: 11, fontFamily: 'Inter_700Bold', fontSize: 22, color: '#172033' },
+  scheduleLoadingRow: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 14, marginBottom: 18, borderRadius: 14, backgroundColor: '#F5F7FF' },
+  scheduleLoadingText: { fontFamily: 'Inter_500Medium', fontSize: 10, color: '#667085' },
   scheduledRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 14, marginBottom: 18, borderRadius: 14, backgroundColor: '#F5F7FF' },
   scheduledLabel: { fontFamily: 'Inter_500Medium', fontSize: 10, color: '#667085' },
   scheduledValue: { marginTop: 4, fontFamily: 'Inter_700Bold', fontSize: 15, color: '#3156D3' },
@@ -1946,64 +2046,3 @@ const styles = StyleSheet.create({
   emptyAddButtonText: { color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontSize: 10 },
   bottomSpace: { height: 30 },
 });
-
-function generateLoanSchedule(loan: Loan) {
-  const startDate =
-    loan.startDate
-      ? new Date(loan.startDate)
-      : new Date();
-
-  const tenureMonths =
-    Number(
-      loan.tenureMonths ||
-        loan.tenure ||
-        0
-    ) || 0;
-
-  const monthlyEmi =
-    Number(
-      loan.emi ||
-        loan.monthlyEmi ||
-        0
-    ) || 0;
-
-  const schedule = Array.from(
-    {
-      length:
-        Math.max(
-          tenureMonths,
-          0
-        ),
-    },
-    (_, index) => {
-      const dueDate =
-        new Date(
-          startDate
-        );
-
-      dueDate.setMonth(
-        dueDate.getMonth() +
-          index +
-          1
-      );
-
-      return {
-        installmentNo:
-          index + 1,
-        dueDate:
-          dueDate
-            .toISOString()
-            .split('T')[0],
-        emi: monthlyEmi,
-        principal:
-          monthlyEmi,
-        interest: 0,
-      };
-    }
-  );
-
-  return {
-    schedule,
-  };
-}
-

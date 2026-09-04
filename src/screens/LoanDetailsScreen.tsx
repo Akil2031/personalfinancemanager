@@ -30,10 +30,15 @@ import {
   generateLoanSchedule,
 } from '../engine/loanSchedule';
 
+import {
+  getLoanPositionMetrics,
+} from '../services/loanMetricsService';
+
 import RecordPaymentScreen from './RecordPaymentScreen';
 
 interface Props {
   loan: Loan;
+  onOpenAmortization?: (loan: Loan) => void;
 }
 
 function money(value: number): string {
@@ -85,6 +90,7 @@ function commitmentAmount(loan: Loan): number {
 
 export default function LoanDetailsScreen({
   loan,
+  onOpenAmortization,
 }: Props) {
   const result =
     useMemo(
@@ -103,6 +109,23 @@ export default function LoanDetailsScreen({
   const [
     loadingPayments,
     setLoadingPayments,
+  ] = useState(true);
+
+
+  const [authoritativeMetrics, setAuthoritativeMetrics] = useState({
+    originalPrincipal: Number(loan.originalPrincipal || 0),
+    principalPaid: 0,
+    interestPaid: 0,
+    totalPaid: 0,
+    currentOutstanding: Number(loan.currentOutstanding || loan.originalPrincipal || 0),
+    principalPaidPercent: 0,
+  });
+
+  const authoritativeOutstanding = authoritativeMetrics.currentOutstanding;
+
+  const [
+    loadingAmortization,
+    setLoadingAmortization,
   ] = useState(true);
 
   const [
@@ -151,6 +174,32 @@ export default function LoanDetailsScreen({
   useEffect(() => {
     void loadPayments();
   }, [loan.id]);
+
+
+  async function loadAuthoritativeOutstanding() {
+    try {
+      setLoadingAmortization(true);
+      const metrics = await getLoanPositionMetrics(
+        loan,
+        payments,
+        new Date()
+      );
+      setAuthoritativeMetrics(metrics);
+    } catch (error) {
+      console.error(
+        'Unable to calculate loan metrics:',
+        error
+      );
+    } finally {
+      setLoadingAmortization(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!loadingPayments) {
+      void loadAuthoritativeOutstanding();
+    }
+  }, [loan.id, loan.currentOutstanding, loan.originalPrincipal, payments, loadingPayments]);
 
   /*
    * -------------------------------------------------------
@@ -303,31 +352,13 @@ export default function LoanDetailsScreen({
    * -------------------------------------------------------
    */
 
-  const totalActualPayments =
-    payments.reduce(
-      (
-        sum,
-        payment
-      ) =>
-        sum +
-        Number(
-          payment.amount
-        ),
-      0
-    );
+  // Use the centralized loan metrics for the financial totals.  This includes
+  // normal EMI payments, prepayments and lender adjustment/additional values
+  // from the authoritative amortization schedule.
+  const totalActualPayments = authoritativeMetrics.totalPaid;
 
-  const totalPrincipalFromPayments =
-    payments.reduce(
-      (
-        sum,
-        payment
-      ) =>
-        sum +
-        Number(
-          payment.principal
-        ),
-      0
-    );
+  const totalPrincipalFromPayments = authoritativeMetrics.principalPaid;
+  const totalInterestFromAmortization = authoritativeMetrics.interestPaid;
 
   /*
    * -------------------------------------------------------
@@ -417,7 +448,7 @@ export default function LoanDetailsScreen({
         <SummaryCard
           label="Outstanding"
           value={`₹${money(
-            loan.currentOutstanding
+            authoritativeOutstanding
           )}`}
           tone="blue"
           primary
@@ -729,6 +760,11 @@ export default function LoanDetailsScreen({
             )}
           </Text>
         </View>
+
+        <View style={styles.paymentStat}>
+          <Text style={styles.paymentStatLabel}>Interest</Text>
+          <Text style={styles.paymentStatValue}>₹{money(totalInterestFromAmortization)}</Text>
+        </View>
       </View>
 
       {loadingPayments ? (
@@ -817,205 +853,33 @@ export default function LoanDetailsScreen({
         )
       )}
 
-      {/* EMI SCHEDULE */}
+      {/* AMORTIZATION SCHEDULE */}
 
       <View
-        style={
-          styles.scheduleHeaderArea
-        }
+        style={styles.amortizationCard}
       >
-        <View>
-          <Text
-            style={
-              styles.sectionTitle
-            }
-          >
-            EMI Schedule
-          </Text>
+        <View style={styles.amortizationCardIcon}>
+          <Text style={styles.amortizationCardIconText}>₹</Text>
+        </View>
 
-          <Text
-            style={
-              styles.sectionSubtitle
-            }
-          >
-            Complete repayment schedule
+        <View style={styles.amortizationCardContent}>
+          <Text style={styles.sectionTitle}>Amortization Schedule</Text>
+          <Text style={styles.sectionSubtitle}>
+            View and manage the lender schedule, EMI status, payments and prepayments in one place.
           </Text>
         </View>
+
+        {onOpenAmortization ? (
+          <Pressable
+            style={styles.amortizationButton}
+            onPress={() => onOpenAmortization(loan)}
+          >
+            <Text style={styles.amortizationButtonText}>
+              Open Amortization
+            </Text>
+          </Pressable>
+        ) : null}
       </View>
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={
-          true
-        }
-        style={
-          styles.scheduleScroll
-        }
-      >
-        <View
-          style={
-            styles.scheduleTable
-          }
-        >
-          <View
-            style={
-              styles.scheduleHeader
-            }
-          >
-            <Text
-              style={[
-                styles.headerCell,
-                styles.no,
-              ]}
-            >
-              #
-            </Text>
-
-            <Text
-              style={[
-                styles.headerCell,
-                styles.date,
-              ]}
-            >
-              Date
-            </Text>
-
-            <Text
-              style={[
-                styles.headerCell,
-                styles.moneyCell,
-              ]}
-            >
-              EMI
-            </Text>
-
-            <Text
-              style={[
-                styles.headerCell,
-                styles.moneyCell,
-              ]}
-            >
-              Principal
-            </Text>
-
-            <Text
-              style={[
-                styles.headerCell,
-                styles.moneyCell,
-              ]}
-            >
-              Interest
-            </Text>
-
-            <Text
-              style={[
-                styles.headerCell,
-                styles.moneyCell,
-              ]}
-            >
-              Balance
-            </Text>
-          </View>
-
-          {result.schedule.map(
-            row => {
-              const due =
-                new Date(
-                  row.dueDate
-                ).getTime() <=
-                new Date().setHours(
-                  23,
-                  59,
-                  59,
-                  999
-                );
-
-              return (
-                <View
-                  key={
-                    row.installmentNo
-                  }
-                  style={[
-                    styles.scheduleRow,
-                    due &&
-                      styles.scheduleRowPaid,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.cell,
-                      styles.no,
-                    ]}
-                  >
-                    {
-                      row.installmentNo
-                    }
-                  </Text>
-
-                  <Text
-                    style={[
-                      styles.cell,
-                      styles.date,
-                    ]}
-                  >
-                    {formatDate(
-                      row.dueDate.toISOString()
-                    )}
-                  </Text>
-
-                  <Text
-                    style={[
-                      styles.cell,
-                      styles.moneyCell,
-                    ]}
-                  >
-                    ₹
-                    {money(
-                      row.emi
-                    )}
-                  </Text>
-
-                  <Text
-                    style={[
-                      styles.cell,
-                      styles.moneyCell,
-                    ]}
-                  >
-                    ₹
-                    {money(
-                      row.principal
-                    )}
-                  </Text>
-
-                  <Text
-                    style={[
-                      styles.cell,
-                      styles.moneyCell,
-                    ]}
-                  >
-                    ₹
-                    {money(
-                      row.interest
-                    )}
-                  </Text>
-
-                  <Text
-                    style={[
-                      styles.cell,
-                      styles.moneyCell,
-                    ]}
-                  >
-                    ₹
-                    {money(
-                      row.closingBalance
-                    )}
-                  </Text>
-                </View>
-              );
-            }
-          )}
-        </View>
-      </ScrollView>
 
       <View
         style={
@@ -1769,6 +1633,55 @@ const styles =
     scheduleHeaderArea: {
       marginTop: 30,
       marginBottom: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+
+    amortizationCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 14,
+      padding: 18,
+      marginBottom: 20,
+      borderRadius: 18,
+      backgroundColor: '#FFFFFF',
+      borderWidth: 1,
+      borderColor: '#E3E8F1',
+    },
+    amortizationCardIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: 14,
+      backgroundColor: '#EEF3FF',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    amortizationCardIconText: {
+      fontFamily: 'Inter_700Bold',
+      fontSize: 20,
+      color: '#356DFF',
+    },
+    amortizationCardContent: {
+      flex: 1,
+    },
+    amortizationButton: {
+      marginLeft: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+      borderRadius: 10,
+      backgroundColor: '#356DFF',
+      shadowColor: '#356DFF',
+      shadowOpacity: 0.12,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 1,
+    },
+
+    amortizationButtonText: {
+      color: '#FFFFFF',
+      fontFamily: 'Inter_700Bold',
+      fontSize: 10,
     },
 
     scheduleScroll: {

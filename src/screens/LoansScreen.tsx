@@ -29,12 +29,9 @@ import {
 } from '../models/loan';
 
 import LoanDetailsScreen from './LoanDetailsScreen';
+import AmortizationScheduleScreen from './AmortizationScheduleScreen';
 
 import AddLoanScreen from './AddLoanScreen';
-
-import {
-  generateAdjustedLoanSchedule,
-} from '../engine/loanSchedule';
 
 import {
   getAllPayments,
@@ -43,6 +40,10 @@ import {
 import {
   Payment,
 } from '../models/payment';
+
+import {
+  getLoanPositionMetrics,
+} from '../services/loanMetricsService';
 
 
 /*
@@ -199,6 +200,13 @@ export default function LoansScreen({
     null
   );
 
+  const [
+    selectedAmortizationLoan,
+    setSelectedAmortizationLoan,
+  ] = useState<Loan | null>(
+    null
+  );
+
 
   const [
     editingLoan,
@@ -285,8 +293,9 @@ export default function LoansScreen({
            */
 
           const calculatedLoans =
-            data.map(
-              (loan) => {
+            await Promise.all(
+              data.map(
+                async (loan) => {
 
                 try {
 
@@ -301,22 +310,26 @@ export default function LoansScreen({
 
 
                   const position =
-                    generateAdjustedLoanSchedule(
+                    await getLoanPositionMetrics(
                       loan,
                       loanPayments,
                       new Date()
                     );
 
+                  const principalPaid = position.principalPaid;
+                  const interestPaid = position.interestPaid;
+                  const totalPaid = position.totalPaid;
+                  const authoritativeOutstanding = position.currentOutstanding;
+                  const principalPaidPercent = position.principalPaidPercent;
 
                   return {
                     ...loan,
 
-                    /*
-                     * Current calculated position.
-                     */
-
-                    currentOutstanding:
-                      position.currentOutstanding,
+                    currentOutstanding: authoritativeOutstanding,
+                    __principalPaid: principalPaid,
+                    __interestPaid: interestPaid,
+                    __totalPaid: totalPaid,
+                    __principalPaidPercent: principalPaidPercent,
 
                     remainingMonths:
                       position.remainingMonths,
@@ -389,7 +402,8 @@ export default function LoansScreen({
 
                   return loan;
                 }
-              }
+                }
+              )
             );
 
 
@@ -818,6 +832,13 @@ export default function LoansScreen({
         );
       }
 
+      if (
+        selectedAmortizationLoan?.id ===
+        loanId
+      ) {
+        setSelectedAmortizationLoan(null);
+      }
+
 
       /*
        * Re-read Firestore.
@@ -1179,6 +1200,34 @@ export default function LoansScreen({
 
   /*
    * =======================================================
+   * AMORTIZATION SCHEDULE
+   * =======================================================
+   */
+
+  if (
+    selectedAmortizationLoan
+  ) {
+    return (
+      <View
+        style={
+          styles.container
+        }
+      >
+        <AmortizationScheduleScreen
+          loan={
+            selectedAmortizationLoan
+          }
+          onBack={() => {
+            setSelectedAmortizationLoan(null);
+          }}
+        />
+      </View>
+    );
+  }
+
+
+  /*
+   * =======================================================
    * LOAN DETAILS
    * =======================================================
    */
@@ -1249,6 +1298,9 @@ export default function LoansScreen({
           loan={
             selectedLoan
           }
+          onOpenAmortization={(loan) => {
+            setSelectedAmortizationLoan(loan);
+          }}
         />
 
       </View>
@@ -1808,30 +1860,14 @@ export default function LoansScreen({
 
 
               const paid =
-                Math.max(
-                  0,
-                  original -
-                    outstanding
-                );
-
+                Number(
+                  (loan as Loan & { __principalPaid?: number }).__principalPaid
+                ) || Math.max(0, original - outstanding);
 
               const progress =
-                original >
-                0
-                  ? Math.min(
-                      100,
-
-                      Math.max(
-                        0,
-
-                        (
-                          paid /
-                          original
-                        ) *
-                        100
-                      )
-                    )
-                  : 0;
+                Number(
+                  (loan as Loan & { __principalPaidPercent?: number }).__principalPaidPercent
+                ) || (original > 0 ? Math.min(100, Math.max(0, (paid / original) * 100)) : 0);
 
 
               return (
