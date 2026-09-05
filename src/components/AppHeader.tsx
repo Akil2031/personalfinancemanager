@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import {
   Alert,
@@ -18,23 +18,48 @@ import {
   useRouter,
 } from 'expo-router';
 
-import {
-  useAuth,
-} from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 interface NavigationItem {
   label: string;
   shortLabel: string;
   icon: string;
   path: string;
+  keywords: string[];
 }
 
 const navigationItems: NavigationItem[] = [
-  { label: 'Dashboard', shortLabel: 'Home', icon: '\u2302', path: '/' },
-  { label: 'Loans', shortLabel: 'Loans', icon: '\u25C8', path: '/loans' },
-  { label: 'Calculator', shortLabel: 'Calc', icon: '+', path: '/calculator' },
-  { label: 'Insights', shortLabel: 'Insights', icon: '\u2726', path: '/insights' },
+  {
+    label: 'Dashboard',
+    shortLabel: 'Home',
+    icon: '⌂',
+    path: '/',
+    keywords: ['dashboard', 'home', 'overview', 'summary'],
+  },
+  {
+    label: 'Loans',
+    shortLabel: 'Loans',
+    icon: '◈',
+    path: '/loans',
+    keywords: ['loan', 'loans', 'debt', 'lender', 'emi'],
+  },
+  {
+    label: 'Calculator',
+    shortLabel: 'Calc',
+    icon: '＋',
+    path: '/calculator',
+    keywords: ['calculator', 'calc', 'emi calculator', 'interest'],
+  },
+  {
+    label: 'Insights',
+    shortLabel: 'Insights',
+    icon: '✦',
+    path: '/insights',
+    keywords: ['insight', 'insights', 'analysis', 'financial insights'],
+  },
 ];
+
+const SLOGAN = 'Plan Smart. Save More. Live Better.';
 
 export default function AppHeader() {
   const router = useRouter();
@@ -43,23 +68,63 @@ export default function AppHeader() {
   const { user, logout } = useAuth();
 
   const [profileOpen, setProfileOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [search, setSearch] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
 
   const isDesktop = width >= 1050;
   const isTablet = width >= 700;
+  const isMobileApp = Platform.OS !== 'web';
   const showSearch = Platform.OS === 'web' && width >= 900;
+
+  const searchResults = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return [];
+
+    return navigationItems
+      .filter((item) => {
+        const haystack = [
+          item.label,
+          item.shortLabel,
+          ...item.keywords,
+        ]
+          .join(' ')
+          .toLowerCase();
+
+        return haystack.includes(query);
+      })
+      .slice(0, 5);
+  }, [search]);
 
   function navigate(path: string) {
     setProfileOpen(false);
+    setNotificationOpen(false);
+    setSearch('');
     router.push(path as any);
   }
 
   function isActive(path: string) {
     if (path === '/') {
-      return pathname === '/' || pathname === '';
+      return pathname === '/' || pathname === '' || pathname === '/index';
     }
 
     return pathname === path || pathname.startsWith(`${path}/`);
+  }
+
+  function handleSearchSubmit() {
+    const query = search.trim().toLowerCase();
+    if (!query) return;
+
+    const exact = navigationItems.find(
+      (item) =>
+        item.label.toLowerCase() === query ||
+        item.shortLabel.toLowerCase() === query,
+    );
+
+    const result = exact ?? searchResults[0];
+    if (result) {
+      navigate(result.path);
+    }
   }
 
   async function performLogout() {
@@ -94,7 +159,6 @@ export default function AppHeader() {
       );
 
       if (!confirmed) return;
-
       await performLogout();
       return;
     }
@@ -114,17 +178,32 @@ export default function AppHeader() {
   }
 
   const userEmail = user?.email || 'Signed in';
+  const profileInitial =
+    user?.displayName?.trim()?.charAt(0)?.toUpperCase() ||
+    user?.email?.charAt(0)?.toUpperCase() ||
+    'A';
+
+  function toggleNotifications() {
+    setNotificationOpen((previous) => !previous);
+    setProfileOpen(false);
+  }
+
+  function toggleProfile() {
+    setProfileOpen((previous) => !previous);
+    setNotificationOpen(false);
+  }
 
   return (
     <View style={styles.header}>
       <View style={styles.topAccent} />
 
-      <View style={[
-        styles.topBar,
-        !isDesktop && styles.topBarTablet,
-        !isTablet && styles.topBarMobile,
-      ]}>
-
+      <View
+        style={[
+          styles.topBar,
+          !isDesktop && styles.topBarTablet,
+          !isTablet && styles.topBarMobile,
+        ]}
+      >
         {/* BRAND */}
         <Pressable
           style={[
@@ -132,6 +211,8 @@ export default function AppHeader() {
             !isDesktop && styles.brandCompact,
           ]}
           onPress={() => navigate('/')}
+          accessibilityRole="button"
+          accessibilityLabel="Personal Finance Manager home"
         >
           <View style={styles.logoFrame}>
             <Image
@@ -142,14 +223,11 @@ export default function AppHeader() {
           </View>
 
           <View style={styles.brandTextContainer}>
-            <Text style={styles.brandName}>
-              Finance
+            <Text style={styles.brandName} numberOfLines={1}>
+              Personal Finance Manager
             </Text>
-            <Text style={styles.brandSubtitle}>
-              PERSONAL FINANCE MANAGER
-            </Text>
-            <Text style={styles.brandSlogan}>
-              Plan Smarter • Spend Better • Grow Stronger
+            <Text style={styles.brandSubtitle} numberOfLines={1}>
+              {SLOGAN}
             </Text>
           </View>
         </Pressable>
@@ -168,18 +246,27 @@ export default function AppHeader() {
                   active && styles.navItemActive,
                   pressed && styles.navItemPressed,
                 ]}
+                accessibilityRole="button"
+                accessibilityLabel={item.label}
               >
-                <View style={[
-                  styles.navIcon,
-                  active && styles.navIconActive,
-                ]}>
-                  <Text style={[
-                    styles.navIconText,
-                    active && styles.navIconTextActive,
-                  ]}>
-                    {item.icon}
-                  </Text>
-                </View>
+                {/* Icons are deliberately shown only inside native mobile apps. */}
+                {isMobileApp && (
+                  <View
+                    style={[
+                      styles.navIcon,
+                      active && styles.navIconActive,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.navIconText,
+                        active && styles.navIconTextActive,
+                      ]}
+                    >
+                      {item.icon}
+                    </Text>
+                  </View>
+                )}
 
                 <Text
                   style={[
@@ -188,7 +275,9 @@ export default function AppHeader() {
                   ]}
                   numberOfLines={1}
                 >
-                  {isDesktop ? item.label : item.shortLabel}
+                  {isDesktop || !isMobileApp
+                    ? item.label
+                    : item.shortLabel}
                 </Text>
               </Pressable>
             );
@@ -197,47 +286,140 @@ export default function AppHeader() {
 
         {/* RIGHT SIDE */}
         <View style={styles.rightSide}>
-
           {showSearch && (
-            <View style={styles.searchContainer}>
-              <Text style={styles.searchIcon}>\u2315</Text>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search"
-                placeholderTextColor="#7B8AA0"
-              />
-              <View style={styles.searchShortcut}>
-                <Text style={styles.searchShortcutText}>\u2318 K</Text>
+            <View style={styles.searchWrapper}>
+              <View
+                style={[
+                  styles.searchContainer,
+                  search.length > 0 && styles.searchContainerFocused,
+                ]}
+              >
+                <Text style={styles.searchIcon}>⌕</Text>
+
+                <TextInput
+                  value={search}
+                  onChangeText={setSearch}
+                  onSubmitEditing={handleSearchSubmit}
+                  returnKeyType="search"
+                  style={styles.searchInput}
+                  placeholder="Search"
+                  placeholderTextColor="#7B8AA0"
+                  autoCorrect={false}
+                  accessibilityLabel="Search"
+                />
+
+                <View style={styles.searchShortcut}>
+                  <Text style={styles.searchShortcutText}>⌘ K</Text>
+                </View>
               </View>
+
+              {search.length > 0 && (
+                <View style={styles.searchResults}>
+                  {searchResults.length > 0 ? (
+                    searchResults.map((item) => (
+                      <Pressable
+                        key={item.path}
+                        onPress={() => navigate(item.path)}
+                        style={({ pressed }) => [
+                          styles.searchResult,
+                          pressed && styles.searchResultPressed,
+                        ]}
+                      >
+                        <View style={styles.searchResultIcon}>
+                          <Text style={styles.searchResultIconText}>
+                            {item.icon}
+                          </Text>
+                        </View>
+                        <View style={styles.searchResultTextWrap}>
+                          <Text style={styles.searchResultTitle}>
+                            {item.label}
+                          </Text>
+                          <Text style={styles.searchResultHint}>
+                            Open {item.label}
+                          </Text>
+                        </View>
+                      </Pressable>
+                    ))
+                  ) : (
+                    <View style={styles.noSearchResults}>
+                      <Text style={styles.noSearchResultsTitle}>
+                        No matching section
+                      </Text>
+                      <Text style={styles.noSearchResultsText}>
+                        Try Dashboard, Loans, Calculator or Insights.
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              )}
             </View>
           )}
 
-          <Pressable
-            style={({ pressed }) => [
-              styles.actionButton,
-              pressed && styles.actionButtonPressed,
-            ]}
-            accessibilityLabel="Notifications"
-          >
-            <Text style={styles.actionIcon}>\u2667</Text>
-            <View style={styles.notificationDot} />
-          </Pressable>
+          {/* NOTIFICATIONS */}
+          <View style={styles.notificationWrapper}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.actionButton,
+                notificationOpen && styles.actionButtonActive,
+                pressed && styles.actionButtonPressed,
+              ]}
+              onPress={toggleNotifications}
+              accessibilityRole="button"
+              accessibilityLabel="Notifications"
+              accessibilityState={{ expanded: notificationOpen }}
+            >
+              <Text style={styles.actionIcon}>♧</Text>
+              <View style={styles.notificationDot} />
+            </Pressable>
 
+            {notificationOpen && (
+              <View style={styles.notificationMenu}>
+                <View style={styles.dropdownHeader}>
+                  <View>
+                    <Text style={styles.dropdownTitle}>Notifications</Text>
+                    <Text style={styles.dropdownSubtitle}>
+                      Your latest account updates
+                    </Text>
+                  </View>
+                  <View style={styles.notificationBadge}>
+                    <Text style={styles.notificationBadgeText}>0</Text>
+                  </View>
+                </View>
+
+                <View style={styles.notificationEmpty}>
+                  <Text style={styles.notificationEmptyIcon}>✓</Text>
+                  <Text style={styles.notificationEmptyTitle}>
+                    You're all caught up
+                  </Text>
+                  <Text style={styles.notificationEmptyText}>
+                    No new notifications right now.
+                  </Text>
+                </View>
+              </View>
+            )}
+          </View>
+
+          {/* PROFILE */}
           <View style={styles.profileWrapper}>
             <Pressable
               style={[
                 styles.profile,
                 profileOpen && styles.profileActive,
               ]}
-              onPress={() => setProfileOpen((previous) => !previous)}
+              onPress={toggleProfile}
+              accessibilityRole="button"
+              accessibilityLabel="Profile"
+              accessibilityState={{ expanded: profileOpen }}
             >
               <View style={styles.profileAvatar}>
-                <Text style={styles.profileText}>A</Text>
+                <Text style={styles.profileText}>
+                  {profileInitial}
+                </Text>
               </View>
 
               {isDesktop && (
                 <Text style={styles.profileChevron}>
-                  \u2304
+                  {profileOpen ? '⌃' : '⌄'}
                 </Text>
               )}
             </Pressable>
@@ -246,7 +428,9 @@ export default function AppHeader() {
               <View style={styles.profileMenu}>
                 <View style={styles.profileMenuHeader}>
                   <View style={styles.profileMenuAvatar}>
-                    <Text style={styles.profileMenuAvatarText}>A</Text>
+                    <Text style={styles.profileMenuAvatarText}>
+                      {profileInitial}
+                    </Text>
                   </View>
 
                   <View style={styles.profileMenuIdentity}>
@@ -264,6 +448,11 @@ export default function AppHeader() {
 
                 <View style={styles.profileMenuDivider} />
 
+                <View style={styles.accountInfoRow}>
+                  <Text style={styles.accountInfoLabel}>Status</Text>
+                  <Text style={styles.accountInfoValue}>Signed in</Text>
+                </View>
+
                 <Pressable
                   disabled={loggingOut}
                   onPress={handleLogout}
@@ -273,7 +462,7 @@ export default function AppHeader() {
                     loggingOut && styles.logoutButtonDisabled,
                   ]}
                 >
-                  <Text style={styles.logoutIcon}>\u21AA</Text>
+                  <Text style={styles.logoutIcon}>↪</Text>
                   <Text style={styles.logoutText}>
                     {loggingOut ? 'Logging out...' : 'Logout'}
                   </Text>
@@ -306,7 +495,7 @@ const styles = StyleSheet.create({
 
   topBar: {
     width: '100%',
-    minHeight: 74,
+    minHeight: 78,
     paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
@@ -328,18 +517,18 @@ const styles = StyleSheet.create({
   brand: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: 255,
+    width: 320,
     flexShrink: 0,
   },
 
   brandCompact: {
-    width: 175,
+    width: 210,
   },
 
   logoFrame: {
-    width: 56,
-    height: 56,
-    borderRadius: 15,
+    width: 58,
+    height: 58,
+    borderRadius: 16,
     backgroundColor: '#F5F8FC',
     borderWidth: 1,
     borderColor: '#E2E8F0',
@@ -350,38 +539,31 @@ const styles = StyleSheet.create({
   },
 
   logoImage: {
-    width: 51,
-    height: 51,
+    width: 53,
+    height: 53,
   },
 
   brandTextContainer: {
+    flex: 1,
+    minWidth: 0,
     justifyContent: 'center',
   },
 
   brandName: {
-    fontSize: 22,
-    lineHeight: 23,
+    fontSize: 20,
+    lineHeight: 22,
     fontWeight: '800',
     color: '#16213A',
-    letterSpacing: -0.35,
+    letterSpacing: -0.25,
   },
 
   brandSubtitle: {
-    marginTop: 2,
-    fontSize: 9.5,
-    lineHeight: 11,
-    fontWeight: '800',
-    letterSpacing: 0.65,
-    color: '#71809A',
-  },
-
-  brandSlogan: {
-    marginTop: 2,
-    fontSize: 8.5,
-    lineHeight: 10,
+    marginTop: 3,
+    fontSize: 10,
+    lineHeight: 12,
     fontWeight: '700',
-    letterSpacing: 0.25,
-    color: '#356AF3',
+    letterSpacing: 0.35,
+    color: '#71809A',
   },
 
   navigation: {
@@ -389,14 +571,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
+    gap: 5,
     minWidth: 0,
   },
 
   navItem: {
-    minHeight: 44,
-    paddingHorizontal: 13,
-    borderRadius: 14,
+    minHeight: 46,
+    paddingHorizontal: 15,
+    borderRadius: 13,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -436,8 +618,8 @@ const styles = StyleSheet.create({
   },
 
   navLabel: {
-    fontSize: 15,
-    lineHeight: 17,
+    fontSize: 16,
+    lineHeight: 19,
     fontWeight: '600',
     color: '#647188',
   },
@@ -457,10 +639,15 @@ const styles = StyleSheet.create({
     zIndex: 2000,
   },
 
+  searchWrapper: {
+    position: 'relative',
+    zIndex: 3000,
+  },
+
   searchContainer: {
-    width: 170,
+    width: 175,
     height: 40,
-    paddingLeft: 9,
+    paddingLeft: 8,
     paddingRight: 7,
     flexDirection: 'row',
     alignItems: 'center',
@@ -468,6 +655,11 @@ const styles = StyleSheet.create({
     borderColor: '#DCE4EF',
     borderRadius: 12,
     backgroundColor: '#F8FAFD',
+  },
+
+  searchContainerFocused: {
+    borderColor: '#AFC4FF',
+    backgroundColor: '#FFFFFF',
   },
 
   searchIcon: {
@@ -499,6 +691,84 @@ const styles = StyleSheet.create({
     color: '#8793A5',
   },
 
+  searchResults: {
+    position: 'absolute',
+    top: 46,
+    left: 0,
+    width: 300,
+    padding: 7,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E0E7F0',
+    borderRadius: 13,
+    shadowColor: '#17233A',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.14,
+    shadowRadius: 18,
+    elevation: 20,
+    zIndex: 99999,
+  },
+
+  searchResult: {
+    minHeight: 50,
+    paddingHorizontal: 9,
+    borderRadius: 9,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  searchResultPressed: {
+    backgroundColor: '#F2F6FF',
+  },
+
+  searchResultIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F0F4FB',
+    marginRight: 10,
+  },
+
+  searchResultIconText: {
+    fontSize: 16,
+    color: '#356AF3',
+  },
+
+  searchResultTextWrap: {
+    flex: 1,
+  },
+
+  searchResultTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1D2940',
+  },
+
+  searchResultHint: {
+    marginTop: 2,
+    fontSize: 11,
+    color: '#8793A5',
+  },
+
+  noSearchResults: {
+    padding: 14,
+  },
+
+  noSearchResultsTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#1D2940',
+  },
+
+  noSearchResultsText: {
+    marginTop: 4,
+    fontSize: 11,
+    lineHeight: 16,
+    color: '#8793A5',
+  },
+
   actionButton: {
     width: 40,
     height: 40,
@@ -511,6 +781,11 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
 
+  actionButtonActive: {
+    backgroundColor: '#EEF4FF',
+    borderColor: '#C9D8FF',
+  },
+
   actionButtonPressed: {
     opacity: 0.7,
   },
@@ -519,6 +794,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: '#53627A',
+  },
+
+  notificationWrapper: {
+    position: 'relative',
+    zIndex: 9999,
   },
 
   notificationDot: {
@@ -531,6 +811,91 @@ const styles = StyleSheet.create({
     backgroundColor: '#356AF3',
     borderWidth: 1,
     borderColor: '#FFFFFF',
+  },
+
+  notificationMenu: {
+    position: 'absolute',
+    top: 48,
+    right: -8,
+    width: 310,
+    padding: 14,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E0E7F0',
+    borderRadius: 15,
+    shadowColor: '#17233A',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.14,
+    shadowRadius: 20,
+    elevation: 20,
+    zIndex: 99999,
+  },
+
+  dropdownHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  dropdownTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#18243A',
+  },
+
+  dropdownSubtitle: {
+    marginTop: 3,
+    fontSize: 11,
+    color: '#7B879A',
+  },
+
+  notificationBadge: {
+    minWidth: 24,
+    height: 24,
+    paddingHorizontal: 6,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EEF4FF',
+  },
+
+  notificationBadgeText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#356AF3',
+  },
+
+  notificationEmpty: {
+    marginTop: 14,
+    paddingVertical: 18,
+    alignItems: 'center',
+    borderRadius: 11,
+    backgroundColor: '#F8FAFD',
+  },
+
+  notificationEmptyIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    textAlign: 'center',
+    lineHeight: 32,
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#16803A',
+    backgroundColor: '#EAF8EF',
+  },
+
+  notificationEmptyTitle: {
+    marginTop: 9,
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#1D2940',
+  },
+
+  notificationEmptyText: {
+    marginTop: 4,
+    fontSize: 11,
+    color: '#8793A5',
   },
 
   profileWrapper: {
@@ -575,8 +940,8 @@ const styles = StyleSheet.create({
   },
 
   profileChevron: {
-    marginTop: -3,
-    fontSize: 17,
+    marginTop: -2,
+    fontSize: 16,
     color: '#708099',
   },
 
@@ -584,17 +949,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 48,
     right: 0,
-    width: 270,
+    width: 285,
     padding: 14,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#E0E7F0',
     borderRadius: 15,
     shadowColor: '#17233A',
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.14,
     shadowRadius: 20,
     elevation: 20,
@@ -608,8 +970,8 @@ const styles = StyleSheet.create({
   },
 
   profileMenuAvatar: {
-    width: 38,
-    height: 38,
+    width: 40,
+    height: 40,
     borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
@@ -646,8 +1008,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#E9EEF5',
   },
 
+  accountInfoRow: {
+    minHeight: 30,
+    marginBottom: 10,
+    paddingHorizontal: 9,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F8FAFD',
+  },
+
+  accountInfoLabel: {
+    fontSize: 11,
+    color: '#7B879A',
+  },
+
+  accountInfoValue: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#16803A',
+  },
+
   logoutButton: {
-    minHeight: 40,
+    minHeight: 42,
     paddingHorizontal: 10,
     borderRadius: 9,
     flexDirection: 'row',
@@ -675,4 +1059,3 @@ const styles = StyleSheet.create({
     color: '#C62828',
   },
 });
-
