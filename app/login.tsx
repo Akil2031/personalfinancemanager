@@ -102,7 +102,7 @@ export default function LoginScreen() {
             </View>
 
             <Text style={styles.brandEyebrow}>WELCOME BACK</Text>
-            <Text style={styles.brandTitle}>Personal Finance{`\n`}Manager</Text>
+            <Text style={styles.brandTitle}>Personal Finance Manager</Text>
             <Text style={styles.brandDescription}>
               One clear view of your loans, repayments and financial goals.
             </Text>
@@ -141,7 +141,7 @@ export default function LoginScreen() {
                   value={email}
                   onChangeText={setEmail}
                   placeholder="you@example.com"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor="#6B5A1A"
                   autoCapitalize="none"
                   autoCorrect={false}
                   keyboardType="email-address"
@@ -163,7 +163,7 @@ export default function LoginScreen() {
                   value={password}
                   onChangeText={setPassword}
                   placeholder="Enter your password"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor="#6B5A1A"
                   secureTextEntry={!showPassword}
                   textContentType="password"
                   style={styles.input}
@@ -203,7 +203,7 @@ export default function LoginScreen() {
               ]}
             >
               {loading ? (
-                <ActivityIndicator color="#FFFFFF" />
+                <ActivityIndicator color="#F4C400" />
               ) : (
                 <>
                   <Text style={styles.loginButtonText}>Sign in</Text>
@@ -223,7 +223,7 @@ export default function LoginScreen() {
           </View>
         </View>
 
-        <Text style={styles.footerText}>PERSONAL FINANCE MANAGER</Text>
+        <Text style={styles.footerText}>PERSONAL FINANCE MANAGER {`\n`}              VERSION 1.0.0</Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -232,7 +232,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#F4F7FB',
+    backgroundColor: '#FFD83D',
   },
 
   scrollContent: {
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     width: 430,
     height: 430,
     borderRadius: 215,
-    backgroundColor: '#EAF1FF',
+    backgroundColor: '#FFE9A3',
     top: -230,
     right: -150,
   },
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     width: 340,
     height: 340,
     borderRadius: 170,
-    backgroundColor: '#E8F7F1',
+    backgroundColor: '#E7F2A8',
     bottom: -220,
     left: -170,
   },
@@ -288,16 +288,18 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 560,
     borderRadius: 28,
-    backgroundColor: '#0B3A82',
+    backgroundColor: '#171A24',
     paddingHorizontal: 42,
     paddingVertical: 42,
     justifyContent: 'center',
     overflow: 'hidden',
-    shadowColor: '#0B3A82',
-    shadowOffset: { width: 0, height: 14 },
-    shadowOpacity: 0.16,
-    shadowRadius: 28,
-    elevation: 7,
+    borderWidth: 1,
+    borderColor: '#2A2E3A',
+    shadowColor: '#171A24',
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.24,
+    shadowRadius: 30,
+    elevation: 8,
   },
 
   brandPanelCompact: {
@@ -311,12 +313,17 @@ const styles = StyleSheet.create({
     width: 112,
     height: 112,
     borderRadius: 32,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F4C400',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 28,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.65)',
+    borderWidth: 10,
+    borderColor: '#FFD43B',
+    shadowColor: '#F4C400',
+    shadowOffset: { width: 18, height: 18 },
+    shadowOpacity: 0.22,
+    shadowRadius: 16,
+    elevation: 4,
   },
 
   logo: {
@@ -325,26 +332,26 @@ const styles = StyleSheet.create({
   },
 
   brandEyebrow: {
-    fontSize: 14,
+    fontSize: 25,
     fontWeight: '800',
     letterSpacing: 2.2,
-    color: '#FFC107',
+    color: '#F4C400',
     marginBottom: 10,
   },
 
   brandTitle: {
-    fontSize: 42,
+    fontSize: 35,
     lineHeight: 42,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: '#FFF7D6',
     marginBottom: 16,
   },
 
   brandDescription: {
     maxWidth: 430,
-    fontSize: 18,
+    fontSize: 16,
     lineHeight: 23,
-    color: '#DCE9FF',
+    color: '#FFF4B8',
   },
 
   brandHighlights: {
@@ -365,36 +372,36 @@ const styles = StyleSheet.create({
   },
 
   dotBlue: {
-    backgroundColor: '#7DB5FF',
+    backgroundColor: '#F4C400',
   },
 
   dotGold: {
-    backgroundColor: '#FFC107',
+    backgroundColor: '#F4C400',
   },
 
   dotGreen: {
-    backgroundColor: '#58D7A7',
+    backgroundColor: '#43D29D',
   },
 
   highlightText: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#EAF2FF',
+    color: '#FFF4B8',
   },
 
   card: {
     flex: 0.82,
     minHeight: 560,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF0A8',
     borderRadius: 28,
     paddingHorizontal: 38,
     paddingVertical: 40,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E7C33A',
     justifyContent: 'center',
-    shadowColor: '#0F172A',
+    shadowColor: '#171A24',
     shadowOffset: { width: 0, height: 14 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.13,
     shadowRadius: 28,
     elevation: 5,
   },
@@ -407,14 +414,14 @@ const styles = StyleSheet.create({
     fontSize: 35,
     lineHeight: 36,
     fontWeight: '800',
-    color: '#0F172A',
+    color: '#171A24',
   },
 
   cardSubtitle: {
     marginTop: 7,
     fontSize: 17,
     lineHeight: 21,
-    color: '#64748B',
+    color: '#4D5566',
   },
 
   fieldGroup: {
@@ -430,7 +437,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 15,
     fontWeight: '700',
-    color: '#334155',
+    color: '#3D3210',
   },
 
   inputShell: {
@@ -438,10 +445,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#D5AA00',
     borderRadius: 14,
     paddingHorizontal: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF9D6',
   },
 
   inputIconCircle: {
@@ -450,14 +457,14 @@ const styles = StyleSheet.create({
     borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#EEF4FF',
+    backgroundColor: '#FFF0A8',
     marginRight: 10,
   },
 
   inputIcon: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#356DFF',
+    color: '#A66B00',
   },
 
   input: {
@@ -465,7 +472,7 @@ const styles = StyleSheet.create({
     height: '100%',
     paddingHorizontal: 2,
     fontSize: 18,
-    color: '#0F172A',
+    color: '#171A24',
   },
 
   passwordToggle: {
@@ -479,7 +486,7 @@ const styles = StyleSheet.create({
   passwordToggleText: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#356DFF',
+    color: '#A66B00',
   },
 
   errorBox: {
@@ -489,9 +496,9 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     padding: 12,
     borderRadius: 12,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: '#FCE4E4',
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: '#F0AAAA',
   },
 
   errorIcon: {
@@ -500,33 +507,33 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#DC2626',
+    backgroundColor: '#D93636',
     marginRight: 9,
   },
 
   errorIconText: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: '#FFF7D6',
   },
 
   errorText: {
     flex: 1,
     fontSize: 15,
     lineHeight: 18,
-    color: '#B91C1C',
+    color: '#B52D2D',
   },
 
   loginButton: {
     height: 54,
     borderRadius: 14,
     marginTop: 20,
-    backgroundColor: '#007BFF',
+    backgroundColor: '#171A24',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 18,
-    shadowColor: '#007BFF',
+    shadowColor: '#171A24',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.22,
     shadowRadius: 14,
@@ -543,14 +550,14 @@ const styles = StyleSheet.create({
   },
 
   loginButtonText: {
-    color: '#FFFFFF',
+    color: '#F4C400',
     fontSize: 18,
     fontWeight: '800',
   },
 
   loginButtonArrow: {
     marginLeft: 10,
-    color: '#FFFFFF',
+    color: '#F4C400',
     fontSize: 25,
     fontWeight: '500',
     lineHeight: 22,
@@ -563,7 +570,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     paddingTop: 18,
     borderTopWidth: 1,
-    borderTopColor: '#EEF2F7',
+    borderTopColor: '#E7C33A',
   },
 
   securityIcon: {
@@ -572,19 +579,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#E8F8F1',
+    backgroundColor: '#E2F6EC',
     marginRight: 8,
   },
 
   securityIconText: {
     fontSize: 14,
     fontWeight: '900',
-    color: '#18A673',
+    color: '#159A68',
   },
 
   securityText: {
     fontSize: 13,
-    color: '#64748B',
+    color: '#4D5566',
   },
 
   pressed: {
@@ -597,7 +604,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 2,
-    color: '#94A3B8',
+    color: '#6B5A1A',
   },
 });
 

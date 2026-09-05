@@ -1593,7 +1593,7 @@ export default function AddLoanScreen({
       >
         {saving ? (
           <ActivityIndicator
-            color="#FFFFFF"
+            color="#FFF0A8"
           />
         ) : (
           <Text
@@ -1975,7 +1975,7 @@ const styles =
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#F5F7FB',
+      backgroundColor: '#FFD83D',
     },
 
     content: {
@@ -1997,7 +1997,7 @@ const styles =
     title: {
       fontFamily: 'Inter_800ExtraBold',
       fontSize: 35,
-      color: '#172033',
+      color: '#171A24',
       letterSpacing: -0.6,
     },
 
@@ -2014,24 +2014,24 @@ const styles =
       paddingHorizontal: 16,
       paddingVertical: 10,
       borderRadius: 11,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#FFF0A8',
       borderWidth: 1,
-      borderColor: '#E0E6F0',
+      borderColor: '#E7C33A',
     },
 
     cancelText: {
       fontFamily: 'Inter_600SemiBold',
       fontSize: 14,
-      color: '#4F5D73',
+      color: '#4D5566',
     },
 
     formCard: {
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#FFF0A8',
       borderWidth: 1,
-      borderColor: '#E3E8F1',
+      borderColor: '#E7C33A',
       borderRadius: 18,
       padding: 24,
-      shadowColor: '#1D2A44',
+      shadowColor: '#171A24',
       shadowOpacity: 0.05,
       shadowRadius: 18,
       shadowOffset: { width: 0, height: 7 },
@@ -2043,13 +2043,13 @@ const styles =
       fontFamily: 'Inter_700Bold',
       fontSize: 11,
       letterSpacing: 1.1,
-      color: '#356DFF',
+      color: '#171A24',
     },
 
     sectionTitle: {
       fontFamily: 'Inter_700Bold',
       fontSize: 20,
-      color: '#172033',
+      color: '#171A24',
       marginBottom: 4,
       letterSpacing: -0.2,
     },
@@ -2063,19 +2063,19 @@ const styles =
       marginBottom: 7,
       fontFamily: 'Inter_600SemiBold',
       fontSize: 13,
-      color: '#46546B',
+      color: '#4D5566',
     },
 
     input: {
       height: 46,
       borderWidth: 1,
-      borderColor: '#DCE3EE',
+      borderColor: '#DCC43A',
       borderRadius: 11,
       paddingHorizontal: 14,
-      backgroundColor: '#FBFCFE',
+      backgroundColor: '#FFF9D6',
       fontFamily: 'Inter_500Medium',
       fontSize: 15,
-      color: '#172033',
+      color: '#171A24',
     },
 
     helper: {
@@ -2083,7 +2083,7 @@ const styles =
       fontFamily: 'Inter_400Regular',
       fontSize: 12,
       lineHeight: 15,
-      color: '#8793A6',
+      color: '#7D8492',
     },
 
     optionGrid: {
@@ -2104,23 +2104,23 @@ const styles =
       paddingVertical: 10,
       borderRadius: 11,
       borderWidth: 1,
-      borderColor: '#DCE3EE',
-      backgroundColor: '#FAFBFD',
+      borderColor: '#DCC43A',
+      backgroundColor: '#FFF9D6',
     },
 
     optionButtonSelected: {
-      backgroundColor: '#EAF0FF',
-      borderColor: '#AFC3FF',
+      backgroundColor: '#FFF4B8',
+      borderColor: '#E7C33A',
     },
 
     optionText: {
       fontFamily: 'Inter_600SemiBold',
       fontSize: 13,
-      color: '#68758A',
+      color: '#4D5566',
     },
 
     optionTextSelected: {
-      color: '#356DFF',
+      color: '#171A24',
     },
 
     twoColumn: {
@@ -2134,9 +2134,9 @@ const styles =
 
     calculatedCard: {
       marginTop: 18,
-      backgroundColor: '#F3F6FF',
+      backgroundColor: '#FFF0A8',
       borderWidth: 1,
-      borderColor: '#CFDAFF',
+      borderColor: '#E7C33A',
       borderRadius: 18,
       padding: 22,
     },
@@ -2144,7 +2144,7 @@ const styles =
     calculatedTitle: {
       fontFamily: 'Inter_700Bold',
       fontSize: 20,
-      color: '#274DBB',
+      color: '#171A24',
       letterSpacing: -0.2,
     },
 
@@ -2153,7 +2153,7 @@ const styles =
       fontFamily: 'Inter_400Regular',
       fontSize: 13,
       lineHeight: 16,
-      color: '#6F7D96',
+      color: '#6B5A1A',
     },
 
     calculatedGrid: {
@@ -2173,18 +2173,18 @@ const styles =
     calculatedLabel: {
       fontFamily: 'Inter_500Medium',
       fontSize: 12,
-      color: '#7A879C',
+      color: '#6B5A1A',
     },
 
     calculatedValue: {
       marginTop: 5,
       fontFamily: 'Inter_700Bold',
       fontSize: 20,
-      color: '#1D2940',
+      color: '#171A24',
     },
 
     calculatedValueAccent: {
-      color: '#356DFF',
+      color: '#171A24',
     },
 
     assumption: {
@@ -2193,15 +2193,15 @@ const styles =
       marginTop: 14,
       padding: 11,
       borderRadius: 11,
-      backgroundColor: '#EAF0FF',
+      backgroundColor: '#FFF4B8',
     },
 
     assumptionIcon: {
       width: 22,
       height: 22,
       borderRadius: 11,
-      backgroundColor: '#356DFF',
-      color: '#FFFFFF',
+      backgroundColor: '#171A24',
+      color: '#FFF0A8',
       textAlign: 'center',
       lineHeight: 22,
       fontFamily: 'Inter_700Bold',
@@ -2214,23 +2214,23 @@ const styles =
       fontFamily: 'Inter_400Regular',
       fontSize: 12,
       lineHeight: 15,
-      color: '#536585',
+      color: '#4D5566',
     },
 
     calculationEmpty: {
       marginTop: 18,
       padding: 16,
       borderRadius: 11,
-      backgroundColor: '#F5F7FB',
+      backgroundColor: '#FFD83D',
       borderWidth: 1,
-      borderColor: '#E6EAF1',
+      borderColor: '#E7C33A',
     },
 
     calculationEmptyText: {
       fontFamily: 'Inter_400Regular',
       fontSize: 13,
       lineHeight: 17,
-      color: '#748198',
+      color: '#4D5566',
     },
 
     calculateButton: {
@@ -2238,24 +2238,24 @@ const styles =
       paddingVertical: 13,
       borderRadius: 11,
       alignItems: 'center',
-      backgroundColor: '#EAF0FF',
+      backgroundColor: '#FFF4B8',
       borderWidth: 1,
-      borderColor: '#C9D7FF',
+      borderColor: '#E7C33A',
     },
 
     calculateButtonText: {
       fontFamily: 'Inter_700Bold',
       fontSize: 14,
-      color: '#356DFF',
+      color: '#171A24',
     },
 
     statusCard: {
       marginTop: 16,
       padding: 20,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#FFF0A8',
       borderRadius: 16,
       borderWidth: 1,
-      borderColor: '#E3E8F1',
+      borderColor: '#E7C33A',
     },
 
     saveButton: {
@@ -2264,8 +2264,8 @@ const styles =
       borderRadius: 12,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#356DFF',
-      shadowColor: '#356DFF',
+      backgroundColor: '#171A24',
+      shadowColor: '#171A24',
       shadowOpacity: 0.18,
       shadowRadius: 12,
       shadowOffset: { width: 0, height: 6 },
@@ -2277,7 +2277,7 @@ const styles =
     },
 
     saveButtonText: {
-      color: '#FFFFFF',
+      color: '#FFF0A8',
       fontFamily: 'Inter_700Bold',
       fontSize: 15,
     },

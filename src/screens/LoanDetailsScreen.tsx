@@ -774,7 +774,7 @@ export default function LoanDetailsScreen({
           }
         >
           <ActivityIndicator
-            color="#356DFF"
+            color="#F4C400"
           />
 
           <Text
@@ -1146,14 +1146,14 @@ const styles =
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#F5F7FB',
+      backgroundColor: '#FFF7D6',
     },
 
     content: {
       width: '100%',
       paddingHorizontal: 28,
       paddingTop: 24,
-      paddingBottom: 48,
+      paddingBottom: 52,
     },
 
     hero: {
@@ -1161,16 +1161,16 @@ const styles =
       justifyContent: 'space-between',
       alignItems: 'center',
       marginBottom: 18,
-      padding: 20,
-      borderRadius: 18,
-      backgroundColor: '#FFFFFF',
+      padding: 22,
+      borderRadius: 22,
+      backgroundColor: '#171A24',
       borderWidth: 1,
-      borderColor: '#E3E8F1',
-      shadowColor: '#1D2A44',
-      shadowOpacity: 0.05,
+      borderColor: '#292D38',
+      shadowColor: '#171A24',
+      shadowOpacity: 0.16,
       shadowRadius: 18,
-      shadowOffset: { width: 0, height: 7 },
-      elevation: 2,
+      shadowOffset: { width: 0, height: 9 },
+      elevation: 5,
     },
 
     heroLeft: {
@@ -1181,243 +1181,252 @@ const styles =
     },
 
     loanIcon: {
-      width: 52,
-      height: 52,
-      borderRadius: 15,
-      backgroundColor: '#EAF0FF',
+      width: 56,
+      height: 56,
+      borderRadius: 17,
+      backgroundColor: '#F4C400',
       alignItems: 'center',
       justifyContent: 'center',
-      marginRight: 14,
+      marginRight: 15,
+      borderWidth: 1,
+      borderColor: '#FFD83D',
     },
 
     loanIconText: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 25,
-      color: '#356DFF',
+      fontSize: 26,
+      color: '#171A24',
     },
 
     title: {
       fontFamily: 'Inter_800ExtraBold',
       fontSize: 31,
-      color: '#172033',
-      letterSpacing: -0.5,
+      color: '#FFD83D',
+      letterSpacing: -0.6,
     },
 
     lender: {
-      marginTop: 4,
+      marginTop: 5,
       fontFamily: 'Inter_400Regular',
       fontSize: 14,
-      color: '#738097',
+      color: 'rgba(255,255,255,0.68)',
     },
 
     heroStatus: {
       paddingHorizontal: 11,
       paddingVertical: 7,
       borderRadius: 20,
-      backgroundColor: '#E8F7F1',
+      backgroundColor: '#E2F6EC',
+      borderWidth: 1,
+      borderColor: '#B8E5CE',
       marginLeft: 14,
     },
 
     statusText: {
-      fontFamily: 'Inter_700Bold',
-      fontSize: 11,
-      letterSpacing: 0.4,
-      color: '#168B63',
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 10,
+      letterSpacing: 0.5,
+      color: '#159A68',
     },
 
     summaryGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 11,
+      gap: 12,
     },
 
     summaryCard: {
       flexGrow: 1,
       flexBasis: 170,
-      minHeight: 98,
-      padding: 16,
-      borderRadius: 16,
-      backgroundColor: '#FFFFFF',
+      minHeight: 112,
+      padding: 17,
+      borderRadius: 18,
+      backgroundColor: '#FFF0A8',
       borderWidth: 1,
-      borderColor: '#E3E8F1',
-      shadowColor: '#1D2A44',
-      shadowOpacity: 0.035,
+      borderColor: '#E7C33A',
+      shadowColor: '#171A24',
+      shadowOpacity: 0.055,
       shadowRadius: 12,
-      shadowOffset: { width: 0, height: 5 },
-      elevation: 1,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 2,
     },
 
     summaryBlue: {
-      backgroundColor: '#356DFF',
-      borderColor: '#356DFF',
-      shadowColor: '#2454D8',
+      backgroundColor: '#F4C400',
+      borderColor: '#E0B300',
+      shadowColor: '#B48B00',
       shadowOpacity: 0.18,
       shadowRadius: 16,
       shadowOffset: { width: 0, height: 8 },
-      elevation: 5,
+      elevation: 4,
     },
 
     summaryPurple: {
-      backgroundColor: '#7857D8',
-      borderColor: '#7857D8',
-      shadowColor: '#5B3FB7',
-      shadowOpacity: 0.18,
+      backgroundColor: '#FFB84A',
+      borderColor: '#F0A12A',
+      shadowColor: '#C77800',
+      shadowOpacity: 0.16,
       shadowRadius: 16,
       shadowOffset: { width: 0, height: 8 },
-      elevation: 5,
+      elevation: 4,
     },
 
     summaryGreen: {
-      backgroundColor: '#18A673',
-      borderColor: '#18A673',
-      shadowColor: '#087A55',
-      shadowOpacity: 0.18,
+      backgroundColor: '#E7F2A8',
+      borderColor: '#C9D97A',
+      shadowColor: '#8FA83A',
+      shadowOpacity: 0.14,
       shadowRadius: 16,
       shadowOffset: { width: 0, height: 8 },
-      elevation: 5,
+      elevation: 4,
     },
 
     summaryOrange: {
-      backgroundColor: '#E99A32',
-      borderColor: '#E99A32',
-      shadowColor: '#C87818',
-      shadowOpacity: 0.18,
+      backgroundColor: '#FFE08A',
+      borderColor: '#E7C33A',
+      shadowColor: '#C89E00',
+      shadowOpacity: 0.14,
       shadowRadius: 16,
       shadowOffset: { width: 0, height: 8 },
-      elevation: 5,
+      elevation: 3,
     },
 
     summaryLabel: {
-      fontFamily: 'Inter_700Bold',
-      fontSize: 12,
-      color: '#7A879C',
-      letterSpacing: 0.55,
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 10,
+      color: '#4D3D0D',
+      letterSpacing: 0.65,
       textTransform: 'uppercase',
     },
 
     summaryValue: {
       marginTop: 9,
-      fontFamily: 'Inter_700Bold',
-      fontSize: 20,
-      lineHeight: 22,
-      color: '#1D2940',
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 21,
+      lineHeight: 24,
+      color: '#171A24',
     },
 
     summaryPrimaryValue: {
       marginTop: 9,
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 22,
-      lineHeight: 24,
-      color: '#FFFFFF',
+      fontSize: 23,
+      lineHeight: 25,
+      color: '#171A24',
     },
 
     summaryBlueLabel: {
-      color: 'rgba(255,255,255,0.88)',
+      color: '#4D3D0D',
     },
 
     summaryColorValue: {
-      color: '#FFFFFF',
+      color: '#171A24',
     },
 
     nextCard: {
       marginTop: 14,
-      padding: 18,
-      borderRadius: 16,
-      backgroundColor: '#356DFF',
+      padding: 20,
+      borderRadius: 18,
+      backgroundColor: '#171A24',
+      borderWidth: 1,
+      borderColor: '#292D38',
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      shadowColor: '#356DFF',
-      shadowOpacity: 0.15,
-      shadowRadius: 14,
-      shadowOffset: { width: 0, height: 7 },
-      elevation: 2,
+      shadowColor: '#171A24',
+      shadowOpacity: 0.16,
+      shadowRadius: 15,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 4,
     },
 
     nextLabel: {
-      fontFamily: 'Inter_700Bold',
-      fontSize: 11,
-      letterSpacing: 0.8,
-      color: 'rgba(255,255,255,0.72)',
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 10,
+      letterSpacing: 0.85,
+      color: '#FFD83D',
     },
 
     nextDate: {
-      marginTop: 5,
-      fontFamily: 'Inter_700Bold',
-      fontSize: 21,
+      marginTop: 6,
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 22,
       color: '#FFFFFF',
     },
 
     nextAmountBox: {
       alignItems: 'flex-end',
       marginLeft: 14,
+      paddingLeft: 20,
+      borderLeftWidth: 1,
+      borderLeftColor: 'rgba(255,216,61,0.30)',
     },
 
     nextAmount: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 22,
-      color: '#FFFFFF',
+      fontSize: 23,
+      color: '#FFD83D',
     },
 
     nextAmountLabel: {
       marginTop: 3,
       fontFamily: 'Inter_400Regular',
       fontSize: 11,
-      color: 'rgba(255,255,255,0.72)',
+      color: 'rgba(255,255,255,0.66)',
     },
 
     infoCard: {
       marginTop: 18,
       padding: 20,
-      borderRadius: 16,
-      backgroundColor: '#FFFFFF',
+      borderRadius: 18,
+      backgroundColor: '#FFF0A8',
       borderWidth: 1,
-      borderColor: '#E3E8F1',
-      shadowColor: '#1D2A44',
-      shadowOpacity: 0.035,
+      borderColor: '#E7C33A',
+      shadowColor: '#171A24',
+      shadowOpacity: 0.055,
       shadowRadius: 14,
       shadowOffset: { width: 0, height: 6 },
-      elevation: 1,
+      elevation: 2,
     },
 
     sectionTitle: {
-      fontFamily: 'Inter_700Bold',
+      fontFamily: 'Inter_800ExtraBold',
       fontSize: 20,
-      color: '#172033',
+      color: '#171A24',
     },
 
     sectionSubtitle: {
       marginTop: 4,
       fontFamily: 'Inter_400Regular',
       fontSize: 13,
-      color: '#8490A4',
+      color: '#6B5A1A',
     },
 
     infoRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingVertical: 11,
+      paddingVertical: 12,
       borderBottomWidth: 1,
-      borderBottomColor: '#EEF1F6',
+      borderBottomColor: '#E4C83E',
     },
 
     infoLabel: {
-      fontFamily: 'Inter_400Regular',
+      fontFamily: 'Inter_500Medium',
       fontSize: 13,
-      color: '#738097',
+      color: '#806E2D',
     },
 
     infoValue: {
-      fontFamily: 'Inter_600SemiBold',
+      fontFamily: 'Inter_700Bold',
       fontSize: 13,
-      color: '#27344C',
+      color: '#2B2410',
       marginLeft: 16,
       textAlign: 'right',
     },
 
     paymentHeader: {
-      marginTop: 28,
+      marginTop: 30,
       marginBottom: 12,
       flexDirection: 'row',
       alignItems: 'center',
@@ -1427,18 +1436,20 @@ const styles =
     recordButton: {
       paddingHorizontal: 14,
       paddingVertical: 10,
-      borderRadius: 10,
-      backgroundColor: '#356DFF',
-      shadowColor: '#356DFF',
-      shadowOpacity: 0.12,
+      borderRadius: 11,
+      backgroundColor: '#F4C400',
+      borderWidth: 1,
+      borderColor: '#E0B300',
+      shadowColor: '#B48B00',
+      shadowOpacity: 0.14,
       shadowRadius: 8,
       shadowOffset: { width: 0, height: 4 },
-      elevation: 1,
+      elevation: 2,
     },
 
     recordButtonText: {
-      color: '#FFFFFF',
-      fontFamily: 'Inter_700Bold',
+      color: '#171A24',
+      fontFamily: 'Inter_800ExtraBold',
       fontSize: 12,
     },
 
@@ -1452,24 +1463,29 @@ const styles =
     paymentStat: {
       flex: 1,
       minWidth: 150,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#FFF9D6',
       borderWidth: 1,
-      borderColor: '#E3E8F1',
-      borderRadius: 13,
-      padding: 14,
+      borderColor: '#E4C83E',
+      borderRadius: 15,
+      padding: 15,
+      shadowColor: '#171A24',
+      shadowOpacity: 0.035,
+      shadowRadius: 9,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 1,
     },
 
     paymentStatLabel: {
-      fontFamily: 'Inter_500Medium',
+      fontFamily: 'Inter_600SemiBold',
       fontSize: 11,
-      color: '#8793A6',
+      color: '#806E2D',
     },
 
     paymentStatValue: {
       marginTop: 5,
-      fontFamily: 'Inter_700Bold',
+      fontFamily: 'Inter_800ExtraBold',
       fontSize: 18,
-      color: '#356DFF',
+      color: '#171A24',
     },
 
     loadingPayments: {
@@ -1481,23 +1497,23 @@ const styles =
       marginTop: 7,
       fontFamily: 'Inter_400Regular',
       fontSize: 12,
-      color: '#78859A',
+      color: '#6B5A1A',
     },
 
     emptyPayment: {
       padding: 32,
       alignItems: 'center',
-      backgroundColor: '#FFFFFF',
-      borderRadius: 15,
+      backgroundColor: '#FFF0A8',
+      borderRadius: 16,
       borderWidth: 1,
-      borderColor: '#E3E8F1',
+      borderColor: '#E4C83E',
     },
 
     emptyIcon: {
       width: 52,
       height: 52,
-      borderRadius: 15,
-      backgroundColor: '#EAF0FF',
+      borderRadius: 16,
+      backgroundColor: '#F4C400',
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -1505,14 +1521,14 @@ const styles =
     emptyIconText: {
       fontFamily: 'Inter_800ExtraBold',
       fontSize: 25,
-      color: '#356DFF',
+      color: '#171A24',
     },
 
     emptyTitle: {
       marginTop: 11,
-      fontFamily: 'Inter_700Bold',
+      fontFamily: 'Inter_800ExtraBold',
       fontSize: 17,
-      color: '#172033',
+      color: '#171A24',
     },
 
     emptyText: {
@@ -1522,18 +1538,18 @@ const styles =
       lineHeight: 18,
       fontFamily: 'Inter_400Regular',
       fontSize: 12,
-      color: '#78859A',
+      color: '#6B5A1A',
     },
 
     paymentCard: {
       marginBottom: 10,
       padding: 16,
-      borderRadius: 14,
-      backgroundColor: '#FFFFFF',
+      borderRadius: 15,
+      backgroundColor: '#FFF9D6',
       borderWidth: 1,
-      borderColor: '#E3E8F1',
-      shadowColor: '#1D2A44',
-      shadowOpacity: 0.025,
+      borderColor: '#E4C83E',
+      shadowColor: '#171A24',
+      shadowOpacity: 0.035,
       shadowRadius: 10,
       shadowOffset: { width: 0, height: 4 },
       elevation: 1,
@@ -1545,16 +1561,16 @@ const styles =
     },
 
     paymentDate: {
-      fontFamily: 'Inter_600SemiBold',
+      fontFamily: 'Inter_700Bold',
       fontSize: 13,
-      color: '#33415A',
+      color: '#2B2410',
     },
 
     paymentInstallment: {
       marginTop: 4,
       fontFamily: 'Inter_400Regular',
       fontSize: 12,
-      color: '#8793A6',
+      color: '#806E2D',
     },
 
     paymentAmountArea: {
@@ -1562,16 +1578,16 @@ const styles =
     },
 
     paymentAmount: {
-      fontFamily: 'Inter_700Bold',
+      fontFamily: 'Inter_800ExtraBold',
       fontSize: 18,
-      color: '#172033',
+      color: '#171A24',
     },
 
     paymentStatus: {
       marginTop: 4,
-      fontFamily: 'Inter_700Bold',
+      fontFamily: 'Inter_800ExtraBold',
       fontSize: 9,
-      color: '#18A673',
+      color: '#159A68',
     },
 
     paymentBreakdown: {
@@ -1580,13 +1596,13 @@ const styles =
       marginTop: 12,
       paddingTop: 10,
       borderTopWidth: 1,
-      borderTopColor: '#EEF1F6',
+      borderTopColor: '#E4C83E',
     },
 
     breakdownText: {
       fontFamily: 'Inter_400Regular',
       fontSize: 11,
-      color: '#78859A',
+      color: '#6B5A1A',
     },
 
     notesText: {
@@ -1594,7 +1610,7 @@ const styles =
       fontFamily: 'Inter_400Regular',
       fontSize: 11,
       lineHeight: 14,
-      color: '#66738A',
+      color: '#6B5A1A',
       fontStyle: 'italic',
     },
 
@@ -1608,26 +1624,30 @@ const styles =
       paddingHorizontal: 12,
       paddingVertical: 7,
       borderRadius: 8,
-      backgroundColor: '#EAF0FF',
+      backgroundColor: '#FFF0A8',
+      borderWidth: 1,
+      borderColor: '#E4C83E',
     },
 
     editPaymentText: {
-      fontFamily: 'Inter_600SemiBold',
+      fontFamily: 'Inter_700Bold',
       fontSize: 11,
-      color: '#356DFF',
+      color: '#171A24',
     },
 
     deletePaymentButton: {
       paddingHorizontal: 12,
       paddingVertical: 7,
       borderRadius: 8,
-      backgroundColor: '#FFF1F0',
+      backgroundColor: '#FCE4E4',
+      borderWidth: 1,
+      borderColor: '#E9A3A3',
     },
 
     deletePaymentText: {
-      fontFamily: 'Inter_600SemiBold',
+      fontFamily: 'Inter_700Bold',
       fontSize: 11,
-      color: '#C43D3D',
+      color: '#D93636',
     },
 
     scheduleHeaderArea: {
@@ -1645,22 +1665,27 @@ const styles =
       padding: 18,
       marginBottom: 20,
       borderRadius: 18,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#171A24',
       borderWidth: 1,
-      borderColor: '#E3E8F1',
+      borderColor: '#292D38',
+      shadowColor: '#171A24',
+      shadowOpacity: 0.12,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 3,
     },
     amortizationCardIcon: {
       width: 48,
       height: 48,
       borderRadius: 14,
-      backgroundColor: '#EEF3FF',
+      backgroundColor: '#F4C400',
       alignItems: 'center',
       justifyContent: 'center',
     },
     amortizationCardIconText: {
-      fontFamily: 'Inter_700Bold',
+      fontFamily: 'Inter_800ExtraBold',
       fontSize: 24,
-      color: '#356DFF',
+      color: '#171A24',
     },
     amortizationCardContent: {
       flex: 1,
@@ -1670,8 +1695,10 @@ const styles =
       paddingHorizontal: 14,
       paddingVertical: 10,
       borderRadius: 10,
-      backgroundColor: '#356DFF',
-      shadowColor: '#356DFF',
+      backgroundColor: '#FFD83D',
+      borderWidth: 1,
+      borderColor: '#F4C400',
+      shadowColor: '#000000',
       shadowOpacity: 0.12,
       shadowRadius: 8,
       shadowOffset: { width: 0, height: 4 },
@@ -1679,8 +1706,8 @@ const styles =
     },
 
     amortizationButtonText: {
-      color: '#FFFFFF',
-      fontFamily: 'Inter_700Bold',
+      color: '#171A24',
+      fontFamily: 'Inter_800ExtraBold',
       fontSize: 12,
     },
 
@@ -1690,16 +1717,16 @@ const styles =
 
     scheduleTable: {
       minWidth: 760,
-      backgroundColor: '#FFFFFF',
-      borderRadius: 14,
+      backgroundColor: '#FFF9D6',
+      borderRadius: 16,
       overflow: 'hidden',
       borderWidth: 1,
-      borderColor: '#E3E8F1',
+      borderColor: '#E4C83E',
     },
 
     scheduleHeader: {
       flexDirection: 'row',
-      backgroundColor: '#EEF3FF',
+      backgroundColor: '#F4C400',
       paddingVertical: 12,
     },
 
@@ -1707,23 +1734,23 @@ const styles =
       flexDirection: 'row',
       paddingVertical: 11,
       borderBottomWidth: 1,
-      borderBottomColor: '#EEF1F6',
+      borderBottomColor: '#E4C83E',
     },
 
     scheduleRowPaid: {
-      backgroundColor: '#FBFCFE',
+      backgroundColor: '#E7F2A8',
     },
 
     headerCell: {
-      fontFamily: 'Inter_700Bold',
+      fontFamily: 'Inter_800ExtraBold',
       fontSize: 12,
-      color: '#53627A',
+      color: '#171A24',
     },
 
     cell: {
       fontFamily: 'Inter_400Regular',
       fontSize: 12,
-      color: '#344159',
+      color: '#2B2410',
     },
 
     no: {
@@ -1742,7 +1769,7 @@ const styles =
     },
 
     bottomSpace: {
-      height: 30,
+      height: 34,
     },
   });
 

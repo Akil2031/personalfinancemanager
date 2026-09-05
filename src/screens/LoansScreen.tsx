@@ -1327,7 +1327,7 @@ export default function LoansScreen({
 
         <ActivityIndicator
           size="large"
-          color="#16803A"
+          color="#159A68"
         />
 
 
@@ -1370,7 +1370,7 @@ export default function LoansScreen({
             handleRefresh
           }
 
-          tintColor="#16803A"
+          tintColor="#159A68"
         />
       }
 
@@ -2451,70 +2451,80 @@ const styles =
 
     container: {
       flex: 1,
-      backgroundColor: '#F3F7F6',
+      backgroundColor: '#FFF7D6',
     },
 
     content: {
-      paddingBottom: 44,
+      paddingBottom: 52,
     },
 
     loading: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#F3F7F6',
+      backgroundColor: '#FFF7D6',
     },
 
     loadingText: {
       marginTop: 12,
       fontFamily: 'Inter_500Medium',
       fontSize: 15,
-      color: '#667085',
+      color: '#4D5566',
     },
 
     header: {
-      paddingHorizontal: 30,
-      paddingTop: 30,
-      paddingBottom: 24,
+      marginHorizontal: 24,
+      marginTop: 24,
+      marginBottom: 6,
+      padding: 22,
+      borderRadius: 22,
+      backgroundColor: '#171A24',
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: 18,
+      shadowColor: '#171A24',
+      shadowOpacity: 0.16,
+      shadowRadius: 18,
+      shadowOffset: { width: 0, height: 9 },
+      elevation: 5,
     },
 
     title: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 35,
+      fontSize: 30,
       letterSpacing: -0.7,
-      color: '#101828',
+      color: '#FFD83D',
     },
 
     subtitle: {
-      marginTop: 7,
+      marginTop: 6,
       fontFamily: 'Inter_400Regular',
-      fontSize: 15,
-      color: '#667085',
+      fontSize: 14,
+      color: 'rgba(255,255,255,0.70)',
     },
 
     addButton: {
-      minHeight: 46,
-      paddingHorizontal: 19,
-      paddingVertical: 12,
-      borderRadius: 13,
-      backgroundColor: '#356DFF',
+      minHeight: 44,
+      paddingHorizontal: 18,
+      paddingVertical: 11,
+      borderRadius: 12,
+      backgroundColor: '#F4C400',
       alignItems: 'center',
       justifyContent: 'center',
-      shadowColor: '#2454D8',
-      shadowOpacity: 0.22,
-      shadowRadius: 13,
-      shadowOffset: { width: 0, height: 6 },
+      borderWidth: 1,
+      borderColor: '#FFD83D',
+      shadowColor: '#000000',
+      shadowOpacity: 0.18,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 5 },
       elevation: 4,
     },
 
     addButtonText: {
-      fontFamily: 'Inter_700Bold',
-      color: '#FFFFFF',
-      fontSize: 14,
+      fontFamily: 'Inter_800ExtraBold',
+      color: '#171A24',
+      fontSize: 13,
       letterSpacing: 0.1,
     },
 
@@ -2523,81 +2533,82 @@ const styles =
       flexWrap: 'wrap',
       gap: 14,
       paddingHorizontal: 24,
+      paddingTop: 18,
     },
 
     summaryCard: {
       flexGrow: 1,
-      flexBasis: 225,
-      minHeight: 150,
+      flexBasis: 235,
+      minHeight: 132,
       padding: 20,
       borderRadius: 20,
-      backgroundColor: '#356DFF',
+      backgroundColor: '#FFF0A8',
       borderWidth: 1,
-      borderColor: '#356DFF',
-      shadowColor: '#2454D8',
-      shadowOpacity: 0.18,
-      shadowRadius: 16,
-      shadowOffset: { width: 0, height: 8 },
-      elevation: 5,
+      borderColor: '#E7C33A',
+      shadowColor: '#171A24',
+      shadowOpacity: 0.07,
+      shadowRadius: 14,
+      shadowOffset: { width: 0, height: 7 },
+      elevation: 2,
       overflow: 'hidden',
       position: 'relative',
     },
 
     summaryCardBlue: {
-      backgroundColor: '#356DFF',
-      borderColor: '#356DFF',
-      shadowColor: '#2454D8',
+      backgroundColor: '#F4C400',
+      borderColor: '#E0B300',
+      shadowColor: '#B48B00',
     },
 
     summaryCardPurple: {
-      backgroundColor: '#7857D8',
-      borderColor: '#7857D8',
-      shadowColor: '#5B3FB7',
+      backgroundColor: '#FFB84A',
+      borderColor: '#F0A12A',
+      shadowColor: '#C77800',
     },
 
     summaryCardGreen: {
-      backgroundColor: '#18A673',
-      borderColor: '#18A673',
-      shadowColor: '#087A55',
+      backgroundColor: '#E7F2A8',
+      borderColor: '#C9D97A',
+      shadowColor: '#8FA83A',
     },
 
     summaryCardOrange: {
-      backgroundColor: '#E99A32',
-      borderColor: '#E99A32',
-      shadowColor: '#C87818',
+      backgroundColor: '#FFE08A',
+      borderColor: '#E7C33A',
+      shadowColor: '#C89E00',
     },
 
     summaryLabel: {
-      fontFamily: 'Inter_700Bold',
-      fontSize: 12,
-      color: 'rgba(255,255,255,0.82)',
-      letterSpacing: 0.65,
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 11,
+      color: '#4D3D0D',
+      letterSpacing: 0.75,
       textTransform: 'uppercase',
     },
 
     summaryValue: {
-      marginTop: 11,
+      marginTop: 10,
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 30,
-      letterSpacing: -0.7,
-      color: '#FFFFFF',
+      fontSize: 27,
+      letterSpacing: -0.65,
+      color: '#171A24',
     },
 
     summaryHint: {
       marginTop: 7,
-      fontFamily: 'Inter_400Regular',
+      fontFamily: 'Inter_500Medium',
       fontSize: 12,
-      color: 'rgba(255,255,255,0.72)',
+      color: '#6B5A1A',
     },
 
     summaryCircleLarge: {
       position: 'absolute',
-      width: 145,
-      height: 145,
-      borderRadius: 73,
-      right: -52,
-      top: -72,
-      backgroundColor: 'rgba(255,255,255,0.11)',
+      width: 150,
+      height: 150,
+      borderRadius: 75,
+      right: -58,
+      top: -78,
+      backgroundColor: 'rgba(23,26,36,0.07)',
     },
 
     summaryCircleSmall: {
@@ -2606,27 +2617,27 @@ const styles =
       height: 105,
       borderRadius: 53,
       left: -58,
-      bottom: -66,
-      backgroundColor: 'rgba(255,255,255,0.07)',
+      bottom: -70,
+      backgroundColor: 'rgba(23,26,36,0.05)',
     },
 
     searchContainer: {
       marginHorizontal: 24,
-      marginTop: 22,
+      marginTop: 18,
     },
 
     searchInput: {
-      height: 48,
-      paddingHorizontal: 16,
-      borderRadius: 13,
+      height: 50,
+      paddingHorizontal: 17,
+      borderRadius: 14,
       backgroundColor: '#FFFFFF',
       borderWidth: 1,
-      borderColor: '#E4E8F0',
+      borderColor: '#E2C63C',
       fontFamily: 'Inter_400Regular',
-      fontSize: 15,
-      color: '#101828',
-      shadowColor: '#101828',
-      shadowOpacity: 0.035,
+      fontSize: 14,
+      color: '#171A24',
+      shadowColor: '#171A24',
+      shadowOpacity: 0.04,
       shadowRadius: 10,
       shadowOffset: { width: 0, height: 4 },
       elevation: 1,
@@ -2637,64 +2648,72 @@ const styles =
       flexWrap: 'wrap',
       gap: 8,
       marginHorizontal: 24,
-      marginTop: 12,
+      marginTop: 10,
     },
 
     filterButton: {
       paddingHorizontal: 15,
       paddingVertical: 9,
       borderRadius: 22,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#FFF0A8',
       borderWidth: 1,
-      borderColor: '#E1E6EF',
+      borderColor: '#E1C43A',
     },
 
     filterButtonActive: {
-      backgroundColor: '#EAF0FF',
-      borderColor: '#C9D7FF',
+      backgroundColor: '#171A24',
+      borderColor: '#171A24',
+      shadowColor: '#171A24',
+      shadowOpacity: 0.12,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 3 },
+      elevation: 2,
     },
 
     filterText: {
-      fontFamily: 'Inter_600SemiBold',
+      fontFamily: 'Inter_700Bold',
       fontSize: 12,
-      color: '#667085',
+      color: '#5B4A16',
     },
 
     filterTextActive: {
-      color: '#356DFF',
+      color: '#FFD83D',
     },
 
     sectionHeader: {
-      paddingHorizontal: 28,
-      paddingTop: 30,
-      paddingBottom: 14,
+      paddingHorizontal: 24,
+      paddingTop: 28,
+      paddingBottom: 13,
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      justifyContent: 'space-between',
     },
 
     sectionTitle: {
-      fontFamily: 'Inter_700Bold',
-      fontSize: 22,
-      letterSpacing: -0.25,
-      color: '#101828',
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 23,
+      letterSpacing: -0.35,
+      color: '#171A24',
     },
 
     sectionSubtitle: {
       marginTop: 4,
       fontFamily: 'Inter_400Regular',
       fontSize: 13,
-      color: '#98A2B3',
+      color: '#6B5A1A',
     },
 
     loanCard: {
       marginHorizontal: 24,
       marginBottom: 14,
       padding: 20,
-      borderRadius: 19,
-      backgroundColor: '#FFFFFF',
+      borderRadius: 20,
+      backgroundColor: '#FFF0A8',
       borderWidth: 1,
-      borderColor: '#E7EBF2',
-      shadowColor: '#101828',
-      shadowOpacity: 0.055,
-      shadowRadius: 16,
+      borderColor: '#E4C83E',
+      shadowColor: '#171A24',
+      shadowOpacity: 0.065,
+      shadowRadius: 15,
       shadowOffset: { width: 0, height: 7 },
       elevation: 2,
     },
@@ -2713,36 +2732,35 @@ const styles =
     },
 
     loanIcon: {
-      width: 48,
-      height: 48,
-      borderRadius: 15,
+      width: 50,
+      height: 50,
+      borderRadius: 16,
       marginRight: 13,
-      backgroundColor: '#EAF0FF',
+      backgroundColor: '#F4C400',
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 1,
-      borderColor: '#C9D7FF',
+      borderColor: '#DDB000',
     },
 
     loanIconText: {
       fontFamily: 'Inter_800ExtraBold',
-      fontSize: 15,
-      letterSpacing: 0.2,
-      color: '#356DFF',
+      fontSize: 17,
+      color: '#171A24',
     },
 
     loanName: {
-      fontFamily: 'Inter_700Bold',
+      fontFamily: 'Inter_800ExtraBold',
       fontSize: 19,
-      letterSpacing: -0.2,
-      color: '#101828',
+      letterSpacing: -0.25,
+      color: '#171A24',
     },
 
     lender: {
       marginTop: 4,
-      fontFamily: 'Inter_400Regular',
+      fontFamily: 'Inter_500Medium',
       fontSize: 13,
-      color: '#667085',
+      color: '#6B5A1A',
     },
 
     statusBadge: {
@@ -2752,39 +2770,45 @@ const styles =
     },
 
     statusActive: {
-      backgroundColor: '#ECFDF3',
+      backgroundColor: '#E2F6EC',
+      borderWidth: 1,
+      borderColor: '#B8E5CE',
     },
 
     statusClosed: {
-      backgroundColor: '#F2F4F7',
+      backgroundColor: '#F1E7C4',
+      borderWidth: 1,
+      borderColor: '#DDCB8A',
     },
 
     statusPaused: {
-      backgroundColor: '#FFFAEB',
+      backgroundColor: '#FFF0D4',
+      borderWidth: 1,
+      borderColor: '#F1CC8A',
     },
 
     statusText: {
-      fontFamily: 'Inter_700Bold',
-      fontSize: 11,
-      letterSpacing: 0.25,
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 10,
+      letterSpacing: 0.35,
     },
 
     statusTextActive: {
-      color: '#027A48',
+      color: '#159A68',
     },
 
     statusTextClosed: {
-      color: '#667085',
+      color: '#5B4A16',
     },
 
     statusTextPaused: {
-      color: '#B54708',
+      color: '#D97706',
     },
 
     divider: {
       height: 1,
       marginVertical: 17,
-      backgroundColor: '#EEF1F5',
+      backgroundColor: '#E4C83E',
     },
 
     metrics: {
@@ -2801,14 +2825,14 @@ const styles =
     metricLabel: {
       fontFamily: 'Inter_500Medium',
       fontSize: 12,
-      color: '#98A2B3',
+      color: '#806E2D',
     },
 
     metricValue: {
       marginTop: 5,
-      fontFamily: 'Inter_600SemiBold',
+      fontFamily: 'Inter_700Bold',
       fontSize: 15,
-      color: '#344054',
+      color: '#2B2410',
     },
 
     metricValuePrimary: {
@@ -2816,7 +2840,7 @@ const styles =
       fontFamily: 'Inter_800ExtraBold',
       fontSize: 20,
       letterSpacing: -0.2,
-      color: '#356DFF',
+      color: '#171A24',
     },
 
     progressSection: {
@@ -2830,43 +2854,43 @@ const styles =
     },
 
     progressLabel: {
-      fontFamily: 'Inter_500Medium',
+      fontFamily: 'Inter_600SemiBold',
       fontSize: 12,
-      color: '#667085',
+      color: '#5B4A16',
     },
 
     progressPercent: {
-      fontFamily: 'Inter_700Bold',
+      fontFamily: 'Inter_800ExtraBold',
       fontSize: 12,
-      color: '#356DFF',
+      color: '#159A68',
     },
 
     progressTrack: {
-      height: 7,
+      height: 8,
       marginTop: 8,
       borderRadius: 8,
-      backgroundColor: '#EAF0FF',
+      backgroundColor: '#E2D27D',
       overflow: 'hidden',
     },
 
     progressFill: {
-      height: 7,
+      height: 8,
       borderRadius: 8,
-      backgroundColor: '#356DFF',
+      backgroundColor: '#159A68',
     },
 
     progressText: {
       marginTop: 6,
       fontFamily: 'Inter_400Regular',
       fontSize: 11,
-      color: '#98A2B3',
+      color: '#806E2D',
     },
 
     loanFooter: {
       marginTop: 18,
       paddingTop: 15,
       borderTopWidth: 1,
-      borderTopColor: '#EEF1F5',
+      borderTopColor: '#E4C83E',
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -2883,14 +2907,14 @@ const styles =
     footerLabel: {
       fontFamily: 'Inter_400Regular',
       fontSize: 11,
-      color: '#98A2B3',
+      color: '#806E2D',
     },
 
     footerValue: {
       marginTop: 3,
-      fontFamily: 'Inter_600SemiBold',
+      fontFamily: 'Inter_700Bold',
       fontSize: 13,
-      color: '#344054',
+      color: '#2B2410',
     },
 
     actions: {
@@ -2903,14 +2927,14 @@ const styles =
       paddingHorizontal: 12,
       paddingVertical: 8,
       borderRadius: 9,
-      backgroundColor: '#EAF0FF',
+      backgroundColor: '#171A24',
       borderWidth: 1,
-      borderColor: '#C9D7FF',
+      borderColor: '#171A24',
     },
 
     actionButtonDanger: {
-      backgroundColor: '#FFF1F0',
-      borderColor: '#FECACA',
+      backgroundColor: '#FCE4E4',
+      borderColor: '#E9A3A3',
     },
 
     actionButtonDisabled: {
@@ -2920,22 +2944,22 @@ const styles =
     actionButtonText: {
       fontFamily: 'Inter_700Bold',
       fontSize: 12,
-      color: '#356DFF',
+      color: '#FFD83D',
     },
 
     actionButtonTextDanger: {
-      color: '#D92D20',
+      color: '#D93636',
     },
 
     emptyCard: {
       marginHorizontal: 24,
       padding: 42,
-      borderRadius: 19,
-      backgroundColor: '#FFFFFF',
+      borderRadius: 20,
+      backgroundColor: '#FFF0A8',
       alignItems: 'center',
       borderWidth: 1,
-      borderColor: '#E7EBF2',
-      shadowColor: '#101828',
+      borderColor: '#E4C83E',
+      shadowColor: '#171A24',
       shadowOpacity: 0.04,
       shadowRadius: 14,
       shadowOffset: { width: 0, height: 5 },
@@ -2945,8 +2969,8 @@ const styles =
     emptyIcon: {
       width: 58,
       height: 58,
-      borderRadius: 17,
-      backgroundColor: '#EAF0FF',
+      borderRadius: 18,
+      backgroundColor: '#F4C400',
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -2954,67 +2978,70 @@ const styles =
     emptyIconText: {
       fontFamily: 'Inter_800ExtraBold',
       fontSize: 26,
-      color: '#356DFF',
+      color: '#171A24',
     },
 
     emptyTitle: {
       marginTop: 14,
-      fontFamily: 'Inter_700Bold',
-      fontSize: 20,
-      color: '#101828',
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 18,
+      color: '#171A24',
     },
 
     emptyText: {
       marginTop: 7,
-      maxWidth: 430,
+      maxWidth: 560,
       textAlign: 'center',
+      lineHeight: 18,
       fontFamily: 'Inter_400Regular',
-      fontSize: 14,
-      lineHeight: 19,
-      color: '#667085',
+      fontSize: 12,
+      color: '#6B5A1A',
     },
 
     bottomSpace: {
-      height: 34,
+      height: 36,
     },
 
     viewHeader: {
-      height: 70,
+      height: 66,
       paddingHorizontal: 24,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#171A24',
       borderBottomWidth: 1,
-      borderBottomColor: '#E7EBF2',
+      borderBottomColor: '#2A2E3A',
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+      shadowColor: '#171A24',
+      shadowOpacity: 0.14,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 3,
     },
 
     backButton: {
-      minWidth: 96,
-      paddingHorizontal: 13,
+      paddingHorizontal: 14,
       paddingVertical: 9,
       borderRadius: 10,
-      backgroundColor: '#EAF0FF',
+      backgroundColor: '#FFD83D',
       borderWidth: 1,
-      borderColor: '#C9D7FF',
-      alignItems: 'center',
-      justifyContent: 'center',
+      borderColor: '#F4C400',
     },
 
     backButtonText: {
       fontFamily: 'Inter_700Bold',
       fontSize: 13,
-      color: '#356DFF',
+      color: '#171A24',
     },
 
     viewHeaderTitle: {
-      fontFamily: 'Inter_700Bold',
-      fontSize: 18,
-      color: '#101828',
+      fontFamily: 'Inter_800ExtraBold',
+      fontSize: 17,
+      color: '#FFD83D',
+      letterSpacing: 0.1,
     },
 
     headerSpacer: {
-      minWidth: 96,
+      width: 86,
     },
 
   });
