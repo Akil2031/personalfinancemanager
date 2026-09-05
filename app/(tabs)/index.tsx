@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
+import { theme } from '../../src/theme';
 
 import { getLoans } from '../../src/services/loanService';
 import { getAllPayments } from '../../src/services/paymentService';
@@ -127,28 +128,7 @@ const LOAN_TYPE_META: Record<
   },
 };
 
-const COLORS = {
-  background: '#F4F7FB',
-  surface: 'rgba(255,255,255,0.82)',
-  surfaceSolid: '#FFFFFF',
-  border: 'rgba(148,163,184,0.18)',
-  text: '#14213D',
-  muted: '#718096',
-  subtle: '#94A3B8',
-  blue: '#356DFF',
-  blueDark: '#2454D8',
-  blueSoft: '#EAF0FF',
-  green: '#18A673',
-  greenSoft: '#E8F8F1',
-  orange: '#E99A32',
-  orangeSoft: '#FFF4E4',
-  red: '#E45C65',
-  redSoft: '#FFF0F1',
-  purple: '#7857D8',
-  purpleSoft: '#F1EDFF',
-  cyan: '#199BB5',
-  cyanSoft: '#E9F8FB',
-};
+
 
 /* -------------------------------------------------------------------------- */
 /* HELPERS                                                                    */
@@ -1081,7 +1061,7 @@ export default function Dashboard() {
         <View style={styles.loadingOrb}>
           <ActivityIndicator
             size="large"
-            color={COLORS.blue}
+            color={theme.colors.primary}
           />
         </View>
 
@@ -1153,6 +1133,22 @@ export default function Dashboard() {
         ]}
       />
 
+      <View
+        pointerEvents="none"
+        style={[
+          styles.backgroundBlob,
+          styles.backgroundBlobPink,
+        ]}
+      />
+
+      <View
+        pointerEvents="none"
+        style={[
+          styles.backgroundBlob,
+          styles.backgroundBlobCyan,
+        ]}
+      />
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -1166,7 +1162,7 @@ export default function Dashboard() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={COLORS.blue}
+            tintColor={theme.colors.primary}
           />
         }
       >
@@ -1586,12 +1582,12 @@ export default function Dashboard() {
                               {
                                 backgroundColor:
                                   [
-                                    COLORS.blue,
-                                    COLORS.purple,
-                                    COLORS.cyan,
-                                    COLORS.green,
-                                    COLORS.orange,
-                                    COLORS.red,
+                                    theme.colors.primary,
+                                    theme.colors.primaryDark,
+                                    theme.colors.primary,
+                                    theme.colors.success,
+                                    theme.colors.warning,
+                                    theme.colors.danger,
                                   ][
                                     index % 6
                                   ],
@@ -1640,12 +1636,12 @@ export default function Dashboard() {
                               )}%`,
                               backgroundColor:
                                 [
-                                  COLORS.blue,
-                                  COLORS.purple,
-                                  COLORS.cyan,
-                                  COLORS.green,
-                                  COLORS.orange,
-                                  COLORS.red,
+                                  theme.colors.primary,
+                                  theme.colors.primaryDark,
+                                  theme.colors.primary,
+                                  theme.colors.success,
+                                  theme.colors.warning,
+                                  theme.colors.danger,
                                 ][
                                   index % 6
                                 ],
@@ -1952,7 +1948,7 @@ export default function Dashboard() {
                 <HealthRow
                   label="Paid"
                   value={paymentHealth.paid}
-                  dot={COLORS.green}
+                  dot={theme.colors.success}
                 />
 
                 <HealthRow
@@ -1960,7 +1956,7 @@ export default function Dashboard() {
                   value={
                     paymentHealth.prepayment
                   }
-                  dot={COLORS.blue}
+                  dot={theme.colors.primary}
                 />
 
                 <HealthRow
@@ -1968,7 +1964,7 @@ export default function Dashboard() {
                   value={
                     paymentHealth.partial
                   }
-                  dot={COLORS.orange}
+                  dot={theme.colors.warning}
                 />
 
                 <HealthRow
@@ -1976,7 +1972,7 @@ export default function Dashboard() {
                   value={
                     paymentHealth.missed
                   }
-                  dot={COLORS.red}
+                  dot={theme.colors.danger}
                 />
               </View>
             </View>
@@ -2135,20 +2131,24 @@ function MetricCard({
 }) {
   const toneMap = {
     blue: {
-      background: COLORS.blueSoft,
-      icon: COLORS.blue,
+      background: theme.colors.primarySoft,
+      cardBackground: '#FFE16A',
+      icon: theme.colors.primaryDark,
     },
     purple: {
-      background: COLORS.purpleSoft,
-      icon: COLORS.purple,
+      background: '#FFD08A',
+      cardBackground: '#FFC83D',
+      icon: theme.colors.primaryDark,
     },
     green: {
-      background: COLORS.greenSoft,
-      icon: COLORS.green,
+      background: '#DFF3C4',
+      cardBackground: '#E7F2A8',
+      icon: theme.colors.success,
     },
     orange: {
-      background: COLORS.orangeSoft,
-      icon: COLORS.orange,
+      background: '#FFE0A8',
+      cardBackground: '#FFB84A',
+      icon: theme.colors.primaryDark,
     },
   };
 
@@ -2157,7 +2157,12 @@ function MetricCard({
     toneMap.blue;
 
   return (
-    <View style={styles.metricCard}>
+    <View
+      style={[
+        styles.metricCard,
+        { backgroundColor: current.cardBackground },
+      ]}
+    >
       <View
         style={[
           styles.metricIcon,
@@ -2443,9 +2448,9 @@ function MiniSummary({
   tone: 'blue' | 'green' | 'orange';
 }) {
   const colors = {
-    blue: COLORS.blue,
-    green: COLORS.green,
-    orange: COLORS.orange,
+    blue: theme.colors.primary,
+    green: theme.colors.success,
+    orange: theme.colors.warning,
   };
 
   return (
@@ -2455,7 +2460,7 @@ function MiniSummary({
           styles.miniSummaryDot,
           {
             backgroundColor:
-              colors[tone as keyof typeof colors] || COLORS.blue,
+              colors[tone as keyof typeof colors] || theme.colors.primary,
           },
         ]}
       />
@@ -2527,20 +2532,20 @@ function InsightCard({
 }) {
   const map = {
     blue: {
-      background: COLORS.blueSoft,
-      icon: COLORS.blue,
+      background: theme.colors.primarySoft,
+      icon: theme.colors.primary,
     },
     green: {
-      background: COLORS.greenSoft,
-      icon: COLORS.green,
+      background: theme.colors.successSoft,
+      icon: theme.colors.success,
     },
     orange: {
-      background: COLORS.orangeSoft,
-      icon: COLORS.orange,
+      background: theme.colors.warningSoft,
+      icon: theme.colors.warning,
     },
     red: {
-      background: COLORS.redSoft,
-      icon: COLORS.red,
+      background: theme.colors.dangerSoft,
+      icon: theme.colors.danger,
     },
   };
 
@@ -2609,20 +2614,20 @@ function TargetContent({
   const statusConfig = {
     AHEAD: {
       label: 'Ahead of target',
-      background: COLORS.greenSoft,
-      color: COLORS.green,
+      background: theme.colors.successSoft,
+      color: theme.colors.success,
       icon: '↗',
     },
     ON_TRACK: {
       label: 'On track',
-      background: COLORS.blueSoft,
-      color: COLORS.blue,
+      background: theme.colors.primarySoft,
+      color: theme.colors.primaryDark,
       icon: '✓',
     },
     BEHIND: {
       label: 'Needs attention',
-      background: COLORS.orangeSoft,
-      color: COLORS.orange,
+      background: theme.colors.warningSoft,
+      color: theme.colors.warning,
       icon: '!',
     },
   } as const;
@@ -2856,39 +2861,57 @@ function EmptyState({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor:
-      COLORS.background,
+    backgroundColor: theme.colors.background,
     position: 'relative',
   },
 
   scrollContent: {
-    paddingHorizontal: 28,
-    paddingTop: 28,
-    paddingBottom: 70,
+    paddingHorizontal: 30,
+    paddingTop: 30,
+    paddingBottom: 80,
   },
 
   /* Background ----------------------------------------------------------- */
 
   backgroundBlob: {
     position: 'absolute',
-    borderRadius: 300,
-    opacity: 0.16,
+    borderRadius: 500,
   },
 
   backgroundBlobBlue: {
-    width: 420,
-    height: 420,
-    backgroundColor: '#AFC5FF',
-    top: -170,
-    right: -130,
+    width: 620,
+    height: 620,
+    backgroundColor: theme.colors.primary,
+    top: -260,
+    right: -150,
+    opacity: 0.42,
   },
 
   backgroundBlobPurple: {
-    width: 330,
-    height: 330,
-    backgroundColor: '#D9CCFF',
-    top: 520,
-    left: -180,
+    width: 520,
+    height: 520,
+    backgroundColor: theme.colors.secondary,
+    top: 470,
+    left: -250,
+    opacity: 0.26,
+  },
+
+  backgroundBlobPink: {
+    width: 360,
+    height: 360,
+    backgroundColor: theme.colors.magenta,
+    top: 980,
+    right: -150,
+    opacity: 0.10,
+  },
+
+  backgroundBlobCyan: {
+    width: 300,
+    height: 300,
+    backgroundColor: theme.colors.cyan,
+    top: 1500,
+    left: -120,
+    opacity: 0.08,
   },
 
   /* Header --------------------------------------------------------------- */
@@ -2908,10 +2931,10 @@ const styles = StyleSheet.create({
   },
 
   logoMark: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: COLORS.text,
+    width: 52,
+    height: 52,
+    borderRadius: 17,
+    backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
 
@@ -2926,13 +2949,13 @@ const styles = StyleSheet.create({
   },
 
   logoMarkText: {
-    color: '#FFFFFF',
+    color: theme.colors.surface,
     fontSize: 25,
     fontWeight: '800',
   },
 
   eyebrow: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 1.7,
@@ -2940,7 +2963,7 @@ const styles = StyleSheet.create({
   },
 
   pageTitle: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 35,
     lineHeight: 35,
     fontWeight: '800',
@@ -2948,7 +2971,7 @@ const styles = StyleSheet.create({
   },
 
   pageSubtitle: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 17,
     marginTop: 4,
   },
@@ -2957,10 +2980,9 @@ const styles = StyleSheet.create({
     height: 42,
     paddingHorizontal: 14,
     borderRadius: 14,
-    backgroundColor:
-      'rgba(255,255,255,0.76)',
+    backgroundColor: '#FFC928',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: '#D5AA00',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
@@ -2968,13 +2990,13 @@ const styles = StyleSheet.create({
 
   refreshIcon: {
     fontSize: 24,
-    color: COLORS.text,
+    color: theme.colors.text,
   },
 
   refreshText: {
     fontSize: 15,
     fontWeight: '700',
-    color: COLORS.text,
+    color: theme.colors.text,
   },
 
   /* Hero ----------------------------------------------------------------- */
@@ -2990,15 +3012,14 @@ const styles = StyleSheet.create({
   },
 
   heroCard: {
-    minHeight: 300,
-    borderRadius: 28,
-    padding: 28,
+    minHeight: 330,
+    borderRadius: 30,
+    padding: 30,
     overflow: 'hidden',
     position: 'relative',
-    backgroundColor:
-      '#3168F6',
+    backgroundColor: theme.colors.primary,
 
-    shadowColor: '#2855C9',
+    shadowColor: '#8A6500',
     shadowOpacity: 0.22,
     shadowRadius: 28,
     shadowOffset: {
@@ -3010,24 +3031,24 @@ const styles = StyleSheet.create({
 
   heroGlowOne: {
     position: 'absolute',
-    width: 310,
-    height: 310,
-    borderRadius: 200,
+    width: 420,
+    height: 420,
+    borderRadius: 220,
     backgroundColor:
-      'rgba(255,255,255,0.10)',
-    top: -170,
-    right: -70,
+      'rgba(255,193,7,0.34)',
+    top: -220,
+    right: -110,
   },
 
   heroGlowTwo: {
     position: 'absolute',
-    width: 240,
-    height: 240,
-    borderRadius: 150,
+    width: 300,
+    height: 300,
+    borderRadius: 180,
     backgroundColor:
-      'rgba(103,161,255,0.22)',
-    bottom: -130,
-    left: -70,
+      'rgba(255,122,0,0.32)',
+    bottom: -170,
+    left: -90,
   },
 
   heroTop: {
@@ -3037,14 +3058,14 @@ const styles = StyleSheet.create({
   },
 
   heroLabel: {
-    color: 'rgba(255,255,255,0.76)',
+    color: theme.colors.primaryDark,
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 1.5,
   },
 
   heroHint: {
-    color: 'rgba(255,255,255,0.58)',
+    color: 'rgba(23,26,36,0.62)',
     fontSize: 14,
     marginTop: 4,
   },
@@ -3054,22 +3075,22 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 99,
     backgroundColor:
-      'rgba(255,255,255,0.15)',
+      'rgba(255,255,255,0.12)',
     borderWidth: 1,
     borderColor:
       'rgba(255,255,255,0.16)',
   },
 
   heroBadgeText: {
-    color: '#FFFFFF',
+    color: theme.colors.text,
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 1.2,
   },
 
   heroAmount: {
-    color: '#FFFFFF',
-    fontSize: 64,
+    color: theme.colors.text,
+    fontSize: 68,
     lineHeight: 62,
     fontWeight: '800',
     letterSpacing: -2,
@@ -3085,7 +3106,7 @@ const styles = StyleSheet.create({
   },
 
   heroProgressText: {
-    color: 'rgba(255,255,255,0.72)',
+    color: 'rgba(23,26,36,0.72)',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -3095,13 +3116,13 @@ const styles = StyleSheet.create({
     borderRadius: 99,
     overflow: 'hidden',
     backgroundColor:
-      'rgba(255,255,255,0.17)',
+      'rgba(255,255,255,0.12)',
   },
 
   heroProgressFill: {
     height: '100%',
     borderRadius: 99,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.text,
   },
 
   heroBottom: {
@@ -3112,12 +3133,12 @@ const styles = StyleSheet.create({
   },
 
   heroBottomLabel: {
-    color: 'rgba(255,255,255,0.55)',
+    color: 'rgba(23,26,36,0.58)',
     fontSize: 12,
   },
 
   heroBottomValue: {
-    color: '#FFFFFF',
+    color: theme.colors.text,
     fontSize: 18,
     fontWeight: '700',
     marginTop: 3,
@@ -3128,13 +3149,13 @@ const styles = StyleSheet.create({
     height: 42,
     borderRadius: 15,
     backgroundColor:
-      'rgba(255,255,255,0.13)',
+      'rgba(255,255,255,0.10)',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   heroArrowText: {
-    color: '#FFFFFF',
+    color: theme.colors.text,
     fontSize: 24,
   },
 
@@ -3154,17 +3175,17 @@ const styles = StyleSheet.create({
   metricCard: {
     flexGrow: 1,
     flexBasis: 210,
-    minHeight: 141,
-    padding: 20,
-    borderRadius: 22,
-    backgroundColor:
-      COLORS.surface,
+    minHeight: 158,
+    padding: 22,
+    borderRadius: 24,
+    backgroundColor: '#FFE16A',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: '#D5AA00',
+    borderTopWidth: 4,
 
-    shadowColor: '#64748B',
-    shadowOpacity: 0.08,
-    shadowRadius: 18,
+    shadowColor: theme.colors.primary,
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
     shadowOffset: {
       width: 0,
       height: 7,
@@ -3173,12 +3194,12 @@ const styles = StyleSheet.create({
   },
 
   metricIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
+    width: 42,
+    height: 42,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 13,
+    marginBottom: 15,
   },
 
   metricIconText: {
@@ -3187,14 +3208,14 @@ const styles = StyleSheet.create({
   },
 
   metricLabel: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 13,
     fontWeight: '600',
   },
 
   metricValue: {
-    color: COLORS.text,
-    fontSize: 30,
+    color: theme.colors.text,
+    fontSize: 32,
     lineHeight: 30,
     fontWeight: '800',
     marginTop: 3,
@@ -3202,7 +3223,7 @@ const styles = StyleSheet.create({
   },
 
   metricDetail: {
-    color: COLORS.subtle,
+    color: theme.colors.textMuted,
     fontSize: 12,
     marginTop: 4,
   },
@@ -3210,19 +3231,18 @@ const styles = StyleSheet.create({
   /* Next payment --------------------------------------------------------- */
 
   nextPaymentCard: {
-    minHeight: 82,
-    borderRadius: 20,
-    padding: 16,
+    minHeight: 92,
+    borderRadius: 22,
+    padding: 18,
     paddingHorizontal: 20,
     marginBottom: 28,
 
     flexDirection: 'row',
     alignItems: 'center',
 
-    backgroundColor:
-      'rgba(255,255,255,0.82)',
+    backgroundColor: '#FFC928',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: '#D5AA00',
 
     shadowColor: '#64748B',
     shadowOpacity: 0.06,
@@ -3238,14 +3258,14 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 15,
-    backgroundColor: COLORS.blueSoft,
+    backgroundColor: theme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,
   },
 
   nextPaymentIconText: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 24,
     fontWeight: '700',
   },
@@ -3272,27 +3292,27 @@ const styles = StyleSheet.create({
   },
 
   nextPaymentLoanAmount: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 15,
     fontWeight: '800',
   },
 
   nextPaymentEyebrow: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 1.2,
   },
 
   nextPaymentTitle: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 18,
     fontWeight: '700',
     marginTop: 2,
   },
 
   nextPaymentSub: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 13,
     marginTop: 2,
   },
@@ -3303,13 +3323,13 @@ const styles = StyleSheet.create({
   },
 
   nextPaymentAmount: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 21,
     fontWeight: '800',
   },
 
   nextPaymentDate: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 13,
     marginTop: 3,
   },
@@ -3323,13 +3343,13 @@ const styles = StyleSheet.create({
   },
 
   nextPaymentDetailsButtonText: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 12,
     fontWeight: '800',
   },
 
   nextPaymentDetailsArrow: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 14,
     fontWeight: '800',
   },
@@ -3341,7 +3361,7 @@ const styles = StyleSheet.create({
 
   nextCommitmentDetailsTotal: {
     borderRadius: 16,
-    backgroundColor: '#F7F9FC',
+    backgroundColor: theme.colors.surfaceSoft,
     paddingHorizontal: 15,
     paddingVertical: 13,
     flexDirection: 'row',
@@ -3351,13 +3371,13 @@ const styles = StyleSheet.create({
   },
 
   nextCommitmentDetailsTotalLabel: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 12,
     fontWeight: '700',
   },
 
   nextCommitmentDetailsTotalValue: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 21,
     fontWeight: '900',
   },
@@ -3369,7 +3389,7 @@ const styles = StyleSheet.create({
   nextCommitmentDetailRow: {
     minHeight: 64,
     borderRadius: 15,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: theme.colors.surfaceSoft,
     paddingHorizontal: 11,
     paddingVertical: 9,
     flexDirection: 'row',
@@ -3380,14 +3400,14 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 13,
-    backgroundColor: COLORS.blueSoft,
+    backgroundColor: theme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 11,
   },
 
   nextCommitmentDetailIconText: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 12,
     fontWeight: '900',
   },
@@ -3398,13 +3418,13 @@ const styles = StyleSheet.create({
   },
 
   nextCommitmentDetailLoan: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 15,
     fontWeight: '800',
   },
 
   nextCommitmentDetailMeta: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 12,
     marginTop: 3,
   },
@@ -3415,13 +3435,13 @@ const styles = StyleSheet.create({
   },
 
   nextCommitmentDetailAmount: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 15,
     fontWeight: '900',
   },
 
   nextCommitmentDetailDue: {
-    color: COLORS.subtle,
+    color: theme.colors.textMuted,
     fontSize: 11,
     marginTop: 3,
   },
@@ -3434,7 +3454,7 @@ const styles = StyleSheet.create({
   },
 
   sectionEyebrow: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 1.5,
@@ -3442,14 +3462,14 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 26,
     fontWeight: '800',
     letterSpacing: -0.5,
   },
 
   sectionDescription: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 14,
     marginTop: 4,
   },
@@ -3459,10 +3479,9 @@ const styles = StyleSheet.create({
   glassCard: {
     borderRadius: 24,
     padding: 22,
-    backgroundColor:
-      COLORS.surface,
+    backgroundColor: '#FFF0A8',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: '#D5AA00',
 
     shadowColor: '#64748B',
     shadowOpacity: 0.07,
@@ -3489,10 +3508,9 @@ const styles = StyleSheet.create({
     minWidth: 280,
     borderRadius: 23,
     padding: 21,
-    backgroundColor:
-      'rgba(255,255,255,0.82)',
+    backgroundColor: '#FFE89A',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: '#D5AA00',
 
     shadowColor: '#64748B',
     shadowOpacity: 0.06,
@@ -3528,26 +3546,26 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 14,
-    backgroundColor: COLORS.blueSoft,
+    backgroundColor: theme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 11,
   },
 
   typeCodeText: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 14,
     fontWeight: '900',
   },
 
   typeTitle: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 17,
     fontWeight: '800',
   },
 
   typeDescription: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 12,
     marginTop: 2,
   },
@@ -3557,18 +3575,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 12,
-    backgroundColor: '#F4F6FA',
+    backgroundColor: theme.colors.surfaceSoft,
     alignItems: 'center',
   },
 
   typeCount: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 18,
     fontWeight: '800',
   },
 
   typeCountLabel: {
-    color: COLORS.subtle,
+    color: theme.colors.textMuted,
     fontSize: 9,
   },
 
@@ -3577,12 +3595,12 @@ const styles = StyleSheet.create({
   },
 
   typeBalanceLabel: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 12,
   },
 
   typeBalanceValue: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 34,
     lineHeight: 34,
     fontWeight: '800',
@@ -3593,7 +3611,7 @@ const styles = StyleSheet.create({
   typeProgressTrack: {
     height: 5,
     borderRadius: 99,
-    backgroundColor: '#EDF1F6',
+    backgroundColor: theme.colors.border,
     overflow: 'hidden',
     marginTop: 17,
   },
@@ -3601,7 +3619,7 @@ const styles = StyleSheet.create({
   typeProgressFill: {
     height: '100%',
     borderRadius: 99,
-    backgroundColor: COLORS.blue,
+    backgroundColor: theme.colors.primary,
   },
 
   typeStats: {
@@ -3611,12 +3629,12 @@ const styles = StyleSheet.create({
   },
 
   typeStatLabel: {
-    color: COLORS.subtle,
+    color: theme.colors.textMuted,
     fontSize: 11,
   },
 
   typeStatValue: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 14,
     fontWeight: '700',
     marginTop: 3,
@@ -3633,13 +3651,13 @@ const styles = StyleSheet.create({
   },
 
   typeFooterText: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 12,
     fontWeight: '600',
   },
 
   typeArrow: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 21,
   },
 
@@ -3666,13 +3684,13 @@ const styles = StyleSheet.create({
   },
 
   cardTitle: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 20,
     fontWeight: '800',
   },
 
   cardSubtitle: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 13,
     marginTop: 3,
   },
@@ -3707,13 +3725,13 @@ const styles = StyleSheet.create({
   },
 
   distributionLabel: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 14,
     fontWeight: '600',
   },
 
   distributionValue: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 14,
     fontWeight: '800',
   },
@@ -3721,7 +3739,7 @@ const styles = StyleSheet.create({
   distributionTrack: {
     height: 7,
     borderRadius: 99,
-    backgroundColor: '#EDF1F6',
+    backgroundColor: theme.colors.border,
     overflow: 'hidden',
   },
 
@@ -3731,7 +3749,7 @@ const styles = StyleSheet.create({
   },
 
   distributionShare: {
-    color: COLORS.subtle,
+    color: theme.colors.textMuted,
     fontSize: 11,
   },
 
@@ -3753,7 +3771,7 @@ const styles = StyleSheet.create({
   },
 
   chartValue: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 9,
     height: 18,
     textAlign: 'center',
@@ -3764,7 +3782,7 @@ const styles = StyleSheet.create({
     width: '70%',
     minWidth: 18,
     borderRadius: 99,
-    backgroundColor: '#F0F3F8',
+    backgroundColor: theme.colors.surfaceSoft,
     justifyContent: 'flex-end',
     overflow: 'hidden',
   },
@@ -3772,12 +3790,12 @@ const styles = StyleSheet.create({
   chartBar: {
     width: '100%',
     borderRadius: 99,
-    backgroundColor: COLORS.blue,
+    backgroundColor: theme.colors.primary,
     opacity: 0.86,
   },
 
   chartLabel: {
-    color: COLORS.subtle,
+    color: theme.colors.textMuted,
     fontSize: 11,
     marginTop: 8,
   },
@@ -3792,12 +3810,12 @@ const styles = StyleSheet.create({
   },
 
   chartFooterLabel: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 12,
   },
 
   chartFooterValue: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 14,
     fontWeight: '800',
   },
@@ -3817,7 +3835,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 9,
     borderRadius: 14,
-    backgroundColor: '#F7F9FC',
+    backgroundColor: theme.colors.surfaceSoft,
     flexGrow: 1,
   },
 
@@ -3829,12 +3847,12 @@ const styles = StyleSheet.create({
   },
 
   miniSummaryLabel: {
-    color: COLORS.subtle,
+    color: theme.colors.textMuted,
     fontSize: 9,
   },
 
   miniSummaryValue: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 14,
     fontWeight: '800',
     marginTop: 2,
@@ -3847,7 +3865,7 @@ const styles = StyleSheet.create({
   upcomingRow: {
     minHeight: 61,
     borderRadius: 15,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: theme.colors.surfaceSoft,
     paddingHorizontal: 10,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -3858,21 +3876,21 @@ const styles = StyleSheet.create({
     width: 45,
     height: 45,
     borderRadius: 13,
-    backgroundColor: COLORS.blueSoft,
+    backgroundColor: theme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 11,
   },
 
   upcomingDate: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 18,
     lineHeight: 17,
     fontWeight: '900',
   },
 
   upcomingMonth: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 8,
     fontWeight: '800',
   },
@@ -3883,19 +3901,19 @@ const styles = StyleSheet.create({
   },
 
   upcomingLoan: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 14,
     fontWeight: '700',
   },
 
   upcomingMeta: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 11,
     marginTop: 3,
   },
 
   upcomingAmount: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 15,
     fontWeight: '800',
     marginLeft: 10,
@@ -3913,7 +3931,7 @@ const styles = StyleSheet.create({
     width: 132,
     height: 132,
     borderRadius: 80,
-    backgroundColor: COLORS.greenSoft,
+    backgroundColor: theme.colors.successSoft,
     borderWidth: 9,
     borderColor: '#D8F3E7',
     alignItems: 'center',
@@ -3921,13 +3939,13 @@ const styles = StyleSheet.create({
   },
 
   healthScoreValue: {
-    color: COLORS.green,
+    color: theme.colors.success,
     fontSize: 32,
     fontWeight: '900',
   },
 
   healthScoreLabel: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 11,
     marginTop: 1,
   },
@@ -3956,12 +3974,12 @@ const styles = StyleSheet.create({
   },
 
   healthText: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 12,
   },
 
   healthValue: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 14,
     fontWeight: '800',
   },
@@ -3984,10 +4002,9 @@ const styles = StyleSheet.create({
     minWidth: 240,
     padding: 17,
     borderRadius: 19,
-    backgroundColor:
-      'rgba(255,255,255,0.76)',
+    backgroundColor: '#FFC928',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: '#D5AA00',
     flexDirection: 'row',
     gap: 12,
   },
@@ -4010,13 +4027,13 @@ const styles = StyleSheet.create({
   },
 
   insightTitle: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 14,
     fontWeight: '800',
   },
 
   insightDescription: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 12,
     lineHeight: 15,
     marginTop: 4,
@@ -4026,6 +4043,8 @@ const styles = StyleSheet.create({
 
   targetCard: {
     marginBottom: 25,
+    backgroundColor: '#FFE36A',
+    borderColor: '#D5AA00',
   },
 
   targetHeader: {
@@ -4038,9 +4057,9 @@ const styles = StyleSheet.create({
     marginTop: 24,
     padding: 16,
     borderRadius: 16,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFF0A8',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: '#D5AA00',
   },
 
   targetProgressHeader: {
@@ -4051,21 +4070,21 @@ const styles = StyleSheet.create({
   },
 
   targetProgressLabel: {
-    color: COLORS.blue,
+    color: '#5C4700',
     fontSize: 9,
     fontWeight: '800',
     letterSpacing: 1.2,
   },
 
   targetProgressValue: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 15,
     fontWeight: '800',
     marginTop: 3,
   },
 
   targetProgressAmount: {
-    color: COLORS.muted,
+    color: '#5C4700',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -4075,31 +4094,31 @@ const styles = StyleSheet.create({
     marginTop: 12,
     borderRadius: 99,
     overflow: 'hidden',
-    backgroundColor: '#E8EEF8',
+    backgroundColor: '#E4BE2A',
   },
 
   targetProgressFill: {
     height: '100%',
     borderRadius: 99,
-    backgroundColor: COLORS.blue,
+    backgroundColor: theme.colors.success,
   },
 
   targetEyebrow: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 1.4,
   },
 
   targetTitle: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 26,
     fontWeight: '800',
     marginTop: 5,
   },
 
   targetSubtitle: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 13,
     marginTop: 5,
     maxWidth: 650,
@@ -4136,16 +4155,18 @@ const styles = StyleSheet.create({
     minWidth: 180,
     padding: 15,
     borderRadius: 15,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFD95A',
+    borderWidth: 1,
+    borderColor: '#E0B900',
   },
 
   targetMetricLabel: {
-    color: COLORS.subtle,
+    color: '#5C4700',
     fontSize: 11,
   },
 
   targetMetricValue: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 19,
     fontWeight: '800',
     marginTop: 5,
@@ -4155,7 +4176,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#EEF1F5',
+    borderTopColor: '#D9B52A',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -4163,7 +4184,7 @@ const styles = StyleSheet.create({
   },
 
   targetBottomText: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 12,
     flex: 1,
   },
@@ -4180,25 +4201,25 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 16,
-    backgroundColor: COLORS.blueSoft,
+    backgroundColor: theme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 11,
   },
 
   emptyIconText: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 24,
   },
 
   emptyTitle: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 17,
     fontWeight: '800',
   },
 
   emptyDescription: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 12,
     textAlign: 'center',
     maxWidth: 360,
@@ -4219,13 +4240,13 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 19,
-    backgroundColor: COLORS.blueSoft,
+    backgroundColor: theme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   targetEmptyIconText: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 27,
   },
 
@@ -4234,13 +4255,13 @@ const styles = StyleSheet.create({
   },
 
   targetEmptyTitle: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 19,
     fontWeight: '800',
   },
 
   targetEmptyText: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 13,
     lineHeight: 16,
     marginTop: 4,
@@ -4253,13 +4274,13 @@ const styles = StyleSheet.create({
     height: 42,
     paddingHorizontal: 18,
     borderRadius: 14,
-    backgroundColor: COLORS.blue,
+    backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   primaryButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.surface,
     fontSize: 13,
     fontWeight: '800',
   },
@@ -4268,20 +4289,20 @@ const styles = StyleSheet.create({
     height: 40,
     paddingHorizontal: 14,
     borderRadius: 13,
-    backgroundColor: COLORS.blueSoft,
+    backgroundColor: theme.colors.primarySoft,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 7,
   },
 
   secondaryButtonText: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 12,
     fontWeight: '800',
   },
 
   secondaryButtonArrow: {
-    color: COLORS.blue,
+    color: theme.colors.primaryDark,
     fontSize: 18,
   },
 
@@ -4289,7 +4310,7 @@ const styles = StyleSheet.create({
 
   loadingContainer: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: theme.colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 30,
@@ -4299,20 +4320,20 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 25,
-    backgroundColor: COLORS.blueSoft,
+    backgroundColor: theme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
   },
 
   loadingTitle: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 21,
     fontWeight: '800',
   },
 
   loadingSubtitle: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 14,
     textAlign: 'center',
     marginTop: 7,
@@ -4325,18 +4346,18 @@ const styles = StyleSheet.create({
     maxWidth: 440,
     padding: 28,
     borderRadius: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFE89A',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: theme.colors.border,
   },
 
   errorIcon: {
     width: 48,
     height: 48,
     borderRadius: 16,
-    backgroundColor: COLORS.redSoft,
-    color: COLORS.red,
+    backgroundColor: theme.colors.dangerSoft,
+    color: theme.colors.danger,
     textAlign: 'center',
     lineHeight: 48,
     fontSize: 26,
@@ -4345,13 +4366,13 @@ const styles = StyleSheet.create({
   },
 
   errorTitle: {
-    color: COLORS.text,
+    color: theme.colors.text,
     fontSize: 20,
     fontWeight: '800',
   },
 
   errorText: {
-    color: COLORS.muted,
+    color: theme.colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',
     lineHeight: 16,
@@ -4367,7 +4388,7 @@ const styles = StyleSheet.create({
   },
 
   footerText: {
-    color: COLORS.subtle,
+    color: theme.colors.textMuted,
     fontSize: 11,
   },
 });

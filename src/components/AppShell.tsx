@@ -36,7 +36,7 @@ const navigationItems: NavigationItem[] = [
   { label: 'Dashboard', shortLabel: 'Home', icon: '⌂', route: '/' },
   { label: 'Loans', shortLabel: 'Loans', icon: '◈', route: '/loans' },
   { label: 'Calculator', shortLabel: 'Calc', icon: '＋', route: '/calculator' },
- 
+  //{ label: 'Payments', shortLabel: 'Pay', icon: '↘', route: '/payments' },
   { label: 'Insights', shortLabel: 'Insights', icon: '✦', route: '/insights' },
 ];
 
@@ -385,9 +385,9 @@ const styles = StyleSheet.create({
   headerOuter: {
     width: '100%',
     height: 76,
-    backgroundColor: 'rgba(255,255,255,0.96)',
+    backgroundColor: theme.colors.primary,
     borderBottomWidth: 1,
-    borderBottomColor: '#E4EAF2',
+    borderBottomColor: theme.colors.borderStrong,
     position: 'relative',
     zIndex: 1000,
     ...(Platform.OS === 'web'
@@ -420,16 +420,16 @@ const styles = StyleSheet.create({
   },
 
   logoFrame: {
-    width: 46,
-    height: 46,
+    width: 52,
+    height: 52,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   },
 
   logoImage: {
-    width: 46,
-    height: 46,
+    width: 52,
+    height: 52,
   },
 
   brandTextContainer: {
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
   },
 
   brandName: {
-    color: '#14213D',
+    color: theme.colors.text,
     fontSize: 18,
     lineHeight: 21,
     fontWeight: '800',
@@ -447,8 +447,8 @@ const styles = StyleSheet.create({
 
   brandSubtitle: {
     marginTop: 3,
-    color: '#8A97AB',
-    fontSize: 8,
+    color: 'rgb(218, 7, 7)',
+    fontSize: 12,
     lineHeight: 11,
     fontWeight: '700',
     fontFamily: 'Inter_700Bold',
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
   },
 
   navItemActive: {
-    backgroundColor: '#EEF3FF',
+    backgroundColor: theme.colors.surface,
   },
 
   navItemPressed: {
@@ -507,23 +507,23 @@ const styles = StyleSheet.create({
   },
 
   navIconBoxActive: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
   },
 
   navIcon: {
     fontSize: 14,
     lineHeight: 18,
-    color: '#7C899D',
+    color: 'rgba(23,26,36,0.62)',
     fontWeight: '700',
     fontFamily: 'Inter_700Bold',
   },
 
   navIconActive: {
-    color: '#356DFF',
+    color: theme.colors.secondary,
   },
 
   navLabel: {
-    color: '#58677D',
+    color: 'rgba(23,26,36,0.78)',
     fontSize: 15,
     lineHeight: 19,
     fontWeight: '600',
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
   },
 
   navLabelActive: {
-    color: '#356DFF',
+    color: theme.colors.text,
     fontWeight: '700',
     fontFamily: 'Inter_700Bold',
   },
@@ -550,8 +550,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DFE6F0',
-    backgroundColor: '#F7F9FC',
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceSoft,
     flexDirection: 'row',
     alignItems: 'center',
     paddingLeft: 11,
@@ -580,12 +580,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     height: 22,
     borderRadius: 6,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     justifyContent: 'center',
   },
 
   searchShortcutText: {
-    color: '#9AA6B8',
+    color: theme.colors.textMuted,
     fontSize: 8,
     fontFamily: 'Inter_600SemiBold',
   },
@@ -594,9 +594,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#DFE6F0',
+    borderColor: theme.colors.border,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#356DFF',
+    backgroundColor: theme.colors.primary,
   },
 
   profileWrapper: {
@@ -633,9 +633,9 @@ const styles = StyleSheet.create({
     minWidth: 62,
     paddingHorizontal: 7,
     borderRadius: 13,
-    backgroundColor: '#F4F7FC',
+    backgroundColor: theme.colors.surfaceSoft,
     borderWidth: 1,
-    borderColor: '#DFE6F0',
+    borderColor: theme.colors.border,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
   },
 
   profileButtonActive: {
-    backgroundColor: '#EEF3FF',
+    backgroundColor: theme.colors.surface,
     borderColor: '#C9D7FF',
   },
 
@@ -651,8 +651,8 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
     borderRadius: 8,
-    backgroundColor: '#356DFF',
-    color: '#FFFFFF',
+    backgroundColor: theme.colors.primary,
+    color: theme.colors.text,
     textAlign: 'center',
     lineHeight: 25,
     fontSize: 11,
@@ -672,7 +672,7 @@ const styles = StyleSheet.create({
     right: 0,
     width: 250,
     padding: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
     borderColor: '#E0E7F0',
     borderRadius: 15,
@@ -745,7 +745,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 12,
-    backgroundColor: '#356DFF',
+    backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -767,7 +767,7 @@ const styles = StyleSheet.create({
     bottom: 12,
     height: 64,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.96)',
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
     borderColor: '#E0E7F0',
     flexDirection: 'row',
@@ -803,16 +803,16 @@ const styles = StyleSheet.create({
   },
 
   mobileNavIconBoxActive: {
-    backgroundColor: '#EEF3FF',
+    backgroundColor: theme.colors.primarySoft,
   },
 
   mobileNavIcon: {
     fontSize: 16,
-    color: '#7C899D',
+    color: 'rgba(23,26,36,0.62)',
   },
 
   mobileNavIconActive: {
-    color: '#356DFF',
+    color: theme.colors.primary,
   },
 
   mobileNavLabel: {
@@ -820,10 +820,10 @@ const styles = StyleSheet.create({
     lineHeight: 12,
     fontWeight: '700',
     fontFamily: 'Inter_700Bold',
-    color: '#7C899D',
+    color: 'rgba(23,26,36,0.62)',
   },
 
   mobileNavLabelActive: {
-    color: '#356DFF',
+    color: theme.colors.primary,
   },
 });

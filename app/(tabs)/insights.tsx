@@ -31,6 +31,8 @@ import {
   getAllPayments,
 } from '../../src/services/paymentService';
 
+import { theme } from '../../src/theme';
+
 /*
  * =========================================================
  * TYPES
@@ -781,6 +783,9 @@ export default function InsightsRoute() {
 
   return (
     <View style={styles.container}>
+      <View pointerEvents="none" style={styles.decorBlobOne} />
+      <View pointerEvents="none" style={styles.decorBlobTwo} />
+      <View pointerEvents="none" style={styles.decorCircle} />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
@@ -789,7 +794,7 @@ export default function InsightsRoute() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            tintColor="#356DFF"
+            tintColor={theme.colors.success}
           />
         }
       >
@@ -849,7 +854,7 @@ export default function InsightsRoute() {
           />
           <MetricCard
             label="Interest Paid"
-            tone="indigo"
+            tone="green"
             value={formatCurrency(totalInterestPaid)}
             caption="Interest recognized to date"
           />
@@ -981,8 +986,20 @@ export default function InsightsRoute() {
             PRIORITY INSIGHT
         ================================================== */}
         {primaryInsight && (
-          <View style={styles.priorityCard}>
-            <View style={styles.priorityIcon}>
+          <View
+            style={[
+              styles.priorityCard,
+              primaryInsight.severity === 'HIGH' && styles.priorityCardDanger,
+              primaryInsight.severity === 'MEDIUM' && styles.priorityCardWarning,
+              primaryInsight.severity === 'POSITIVE' && styles.priorityCardPositive,
+            ]}
+          >
+            <View
+              style={[
+                styles.priorityIcon,
+                primaryInsight.severity === 'HIGH' && styles.priorityIconDanger,
+              ]}
+            >
               <Text style={styles.priorityIconText}>
                 {primaryInsight.severity === 'HIGH' ? '!' : '✓'}
               </Text>
@@ -1559,7 +1576,7 @@ const styles =
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#F5F7FB',
+      backgroundColor: theme.colors.background,
     },
 
     scroll: { flex: 1 },
@@ -1577,12 +1594,12 @@ const styles =
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#F5F7FB',
+      backgroundColor: theme.colors.background,
     },
 
     loadingText: {
       marginTop: 12,
-      color: '#667085',
+      color: theme.colors.textSecondary,
       fontSize: 15,
       fontFamily: 'Inter_500Medium',
     },
@@ -1595,14 +1612,14 @@ const styles =
       fontSize: 35,
       lineHeight: 38,
       fontFamily: 'Inter_800ExtraBold',
-      color: '#172033',
+      color: theme.colors.text,
       letterSpacing: -0.6,
     },
 
     subtitle: {
       marginTop: 6,
       maxWidth: 850,
-      color: '#667085',
+      color: theme.colors.textSecondary,
       fontSize: 15,
       lineHeight: 20,
       fontFamily: 'Inter_400Regular',
@@ -1629,45 +1646,45 @@ const styles =
     },
 
     metricBlue: {
-      backgroundColor: '#356DFF',
-      borderColor: '#356DFF',
-      shadowColor: '#2454D8',
+      backgroundColor: '#FFD83D',
+      borderColor: '#E0B900',
+      shadowColor: '#B58F00',
     },
     metricPurple: {
-      backgroundColor: '#7857D8',
-      borderColor: '#7857D8',
-      shadowColor: '#5B3FB7',
+      backgroundColor: '#FFC928',
+      borderColor: '#E0A900',
+      shadowColor: '#B57F00',
     },
     metricGreen: {
-      backgroundColor: '#18A673',
-      borderColor: '#18A673',
-      shadowColor: '#087A55',
+      backgroundColor: '#E9F6B8',
+      borderColor: '#B9D95A',
+      shadowColor: '#7E9D2B',
     },
     metricOrange: {
-      backgroundColor: '#E99A32',
-      borderColor: '#E99A32',
-      shadowColor: '#C87818',
+      backgroundColor: '#FFB347',
+      borderColor: '#E38A19',
+      shadowColor: '#B86A08',
     },
 
     metricIndigo: {
-      backgroundColor: '#5B4CC4',
-      borderColor: '#5B4CC4',
-      shadowColor: '#43359A',
+      backgroundColor: '#171A24',
+      borderColor: '#171A24',
+      shadowColor: '#0C0E15',
     },
 
     metricCardHighlight: {
-      borderColor: '#356DFF',
+      borderColor: '#B58F00',
     },
 
     metricLabel: {
-      color: '#FFFFFF',
+      color: '#171A24',
       fontSize: 12,
       fontFamily: 'Inter_700Bold',
       textTransform: 'uppercase',
       letterSpacing: 0.65,
     },
 
-    metricLabelColored: { color: 'rgba(255,255,255,0.82)' },
+    metricLabelColored: { color: 'rgba(23,26,36,0.70)' },
 
     metricValue: {
       marginTop: 11,
@@ -1678,16 +1695,16 @@ const styles =
       letterSpacing: -0.7,
     },
 
-    metricValueBlue: { color: '#FFFFFF' },
-    metricValuePurple: { color: '#FFFFFF' },
-    metricValueGreen: { color: '#FFFFFF' },
-    metricValueOrange: { color: '#FFFFFF' },
+    metricValueBlue: { color: '#171A24' },
+    metricValuePurple: { color: '#171A24' },
+    metricValueGreen: { color: '#171A24' },
+    metricValueOrange: { color: '#171A24' },
     metricValueIndigo: { color: '#FFFFFF' },
-    metricValueHighlight: { color: '#FFFFFF' },
+    metricValueHighlight: { color: '#171A24' },
 
     metricCaption: {
       marginTop: 7,
-      color: 'rgba(255,255,255,0.72)',
+      color: 'rgba(23,26,36,0.62)',
       fontSize: 12,
       lineHeight: 14,
       fontFamily: 'Inter_400Regular',
@@ -1696,10 +1713,10 @@ const styles =
     card: {
       marginTop: 18,
       padding: 22,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: theme.colors.surfaceSoft,
       borderRadius: 20,
       borderWidth: 1,
-      borderColor: '#E7EBF3',
+      borderColor: theme.colors.borderStrong,
       shadowColor: '#172033',
       shadowOpacity: 0.035,
       shadowRadius: 14,
@@ -1708,7 +1725,7 @@ const styles =
     },
 
     cardTitle: {
-      color: '#172033',
+      color: theme.colors.text,
       fontSize: 20,
       lineHeight: 23,
       fontFamily: 'Inter_700Bold',
@@ -1724,14 +1741,14 @@ const styles =
 
     sectionSubtitle: {
       marginTop: 5,
-      color: '#7B8496',
+      color: theme.colors.textSecondary,
       fontSize: 12,
       lineHeight: 15,
       fontFamily: 'Inter_400Regular',
     },
 
     muted: {
-      color: '#7B8496',
+      color: theme.colors.textSecondary,
       fontSize: 12,
       lineHeight: 17,
       fontFamily: 'Inter_400Regular',
@@ -1745,20 +1762,20 @@ const styles =
     },
 
     progressLabel: {
-      color: '#667085',
+      color: theme.colors.textSecondary,
       fontSize: 12,
       fontFamily: 'Inter_500Medium',
     },
 
     progressValue: {
       marginTop: 4,
-      color: '#172033',
+      color: theme.colors.text,
       fontSize: 26,
       fontFamily: 'Inter_800ExtraBold',
     },
 
     progressPercent: {
-      color: '#3156D3',
+      color: theme.colors.success,
       fontSize: 24,
       fontFamily: 'Inter_800ExtraBold',
     },
@@ -1766,14 +1783,14 @@ const styles =
     progressTrack: {
       height: 10,
       marginTop: 14,
-      backgroundColor: '#EDF1F7',
+      backgroundColor: 'rgba(23,26,36,0.12)',
       borderRadius: 99,
       overflow: 'hidden',
     },
 
     progressFill: {
       height: '100%',
-      backgroundColor: '#356DFF',
+      backgroundColor: theme.colors.success,
       borderRadius: 99,
     },
 
@@ -1784,7 +1801,7 @@ const styles =
     },
 
     progressFooterValue: {
-      color: '#344054',
+      color: theme.colors.text,
       fontSize: 12,
       fontFamily: 'Inter_600SemiBold',
     },
@@ -1796,29 +1813,29 @@ const styles =
       alignItems: 'center',
       padding: 18,
       borderRadius: 16,
-      backgroundColor: '#F2F5FF',
+      backgroundColor: theme.colors.primarySoft,
       borderWidth: 1,
-      borderColor: '#DCE5FF',
+      borderColor: theme.colors.border,
     },
 
     nextEMILeft: { flex: 1, paddingRight: 16 },
 
     nextEMILoan: {
-      color: '#172033',
+      color: theme.colors.text,
       fontSize: 18,
       fontFamily: 'Inter_700Bold',
     },
 
     nextEMILender: {
       marginTop: 3,
-      color: '#667085',
+      color: theme.colors.textSecondary,
       fontSize: 12,
       fontFamily: 'Inter_500Medium',
     },
 
     nextEMIType: {
       marginTop: 7,
-      color: '#3156D3',
+      color: theme.colors.text,
       fontSize: 11,
       fontFamily: 'Inter_600SemiBold',
     },
@@ -1826,14 +1843,14 @@ const styles =
     nextEMIRight: { alignItems: 'flex-end' },
 
     nextEMIAmount: {
-      color: '#3156D3',
+      color: theme.colors.text,
       fontSize: 26,
       fontFamily: 'Inter_800ExtraBold',
     },
 
     nextEMIDate: {
       marginTop: 4,
-      color: '#667085',
+      color: theme.colors.textSecondary,
       fontSize: 11,
       fontFamily: 'Inter_500Medium',
     },
@@ -1849,15 +1866,15 @@ const styles =
       minWidth: 30,
       height: 30,
       borderRadius: 15,
-      backgroundColor: '#F2F5FF',
+      backgroundColor: theme.colors.primarySoft,
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 1,
-      borderColor: '#DCE5FF',
+      borderColor: theme.colors.border,
     },
 
     insightCountText: {
-      color: '#3156D3',
+      color: theme.colors.text,
       fontSize: 13,
       fontFamily: 'Inter_700Bold',
     },
@@ -1870,14 +1887,14 @@ const styles =
     insightCard: {
       padding: 16,
       borderRadius: 16,
-      backgroundColor: '#F8FAFC',
+      backgroundColor: '#FFF0A8',
       borderWidth: 1,
-      borderColor: '#E7EBF3',
+      borderColor: theme.colors.border,
     },
 
-    insightHigh: { backgroundColor: '#FFF4F2', borderColor: '#F6D7D1' },
-    insightMedium: { backgroundColor: '#FFF8EC', borderColor: '#F4E0BA' },
-    insightPositive: { backgroundColor: '#F2F5FF', borderColor: '#DCE5FF' },
+    insightHigh: { backgroundColor: '#FFE0D8', borderColor: '#E6A08F' },
+    insightMedium: { backgroundColor: '#FFE3A8', borderColor: '#E3B65D' },
+    insightPositive: { backgroundColor: theme.colors.primarySoft, borderColor: theme.colors.border },
 
     insightTitleRow: {
       flexDirection: 'row',
@@ -1889,11 +1906,11 @@ const styles =
       width: 27,
       height: 27,
       borderRadius: 9,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: theme.colors.primarySoft,
       textAlign: 'center',
       textAlignVertical: 'center',
       paddingTop: 5,
-      color: '#3156D3',
+      color: theme.colors.text,
       fontSize: 14,
       fontFamily: 'Inter_800ExtraBold',
       overflow: 'hidden',
@@ -1901,7 +1918,7 @@ const styles =
 
     insightTitle: {
       flex: 1,
-      color: '#172033',
+      color: theme.colors.text,
       fontSize: 14,
       fontFamily: 'Inter_700Bold',
     },
@@ -1916,7 +1933,7 @@ const styles =
 
     insightRecommendation: {
       marginTop: 9,
-      color: '#344054',
+      color: theme.colors.text,
       fontSize: 11,
       lineHeight: 15,
       fontFamily: 'Inter_600SemiBold',
@@ -1927,9 +1944,9 @@ const styles =
     loanRow: {
       padding: 17,
       borderRadius: 16,
-      backgroundColor: '#FBFCFE',
+      backgroundColor: '#FFE8A3',
       borderWidth: 1,
-      borderColor: '#E7EBF3',
+      borderColor: theme.colors.border,
     },
 
     loanRowTop: {
@@ -1941,14 +1958,14 @@ const styles =
     loanIdentity: { flex: 1, paddingRight: 14 },
 
     loanName: {
-      color: '#172033',
+      color: theme.colors.text,
       fontSize: 15,
       fontFamily: 'Inter_700Bold',
     },
 
     loanLender: {
       marginTop: 4,
-      color: '#7B8496',
+      color: theme.colors.textSecondary,
       fontSize: 11,
       fontFamily: 'Inter_400Regular',
     },
@@ -1956,14 +1973,14 @@ const styles =
     loanOutstandingBox: { alignItems: 'flex-end' },
 
     loanOutstanding: {
-      color: '#3156D3',
+      color: theme.colors.text,
       fontSize: 19,
       fontFamily: 'Inter_800ExtraBold',
     },
 
     loanOutstandingLabel: {
       marginTop: 3,
-      color: '#98A2B3',
+      color: theme.colors.textMuted,
       fontSize: 9,
       textTransform: 'uppercase',
       letterSpacing: 0.4,
@@ -1982,13 +1999,13 @@ const styles =
       flexGrow: 1,
       padding: 10,
       borderRadius: 11,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: theme.colors.primarySoft,
       borderWidth: 1,
-      borderColor: '#EDF0F5',
+      borderColor: theme.colors.border,
     },
 
     loanMetricLabel: {
-      color: '#98A2B3',
+      color: theme.colors.textMuted,
       fontSize: 9,
       textTransform: 'uppercase',
       letterSpacing: 0.35,
@@ -1997,7 +2014,7 @@ const styles =
 
     loanMetricValue: {
       marginTop: 4,
-      color: '#344054',
+      color: theme.colors.text,
       fontSize: 12,
       fontFamily: 'Inter_700Bold',
     },
@@ -2009,7 +2026,7 @@ const styles =
     },
 
     loanProgressLabel: {
-      color: '#667085',
+      color: theme.colors.textSecondary,
       fontSize: 11,
       fontFamily: 'Inter_500Medium',
     },
@@ -2024,7 +2041,7 @@ const styles =
       height: 7,
       marginTop: 7,
       borderRadius: 99,
-      backgroundColor: '#EDF1F7',
+      backgroundColor: 'rgba(23,26,36,0.12)',
       overflow: 'hidden',
     },
 
@@ -2040,28 +2057,28 @@ const styles =
       alignItems: 'center',
       paddingVertical: 13,
       borderBottomWidth: 1,
-      borderBottomColor: '#EEF1F5',
+      borderBottomColor: theme.colors.border,
     },
 
     summaryRowLabel: {
-      color: '#667085',
+      color: theme.colors.textSecondary,
       fontSize: 12,
       fontFamily: 'Inter_400Regular',
     },
 
     summaryRowValue: {
-      color: '#344054',
+      color: theme.colors.text,
       fontSize: 13,
       fontFamily: 'Inter_600SemiBold',
     },
 
     summaryRowLabelStrong: {
-      color: '#172033',
+      color: theme.colors.text,
       fontFamily: 'Inter_700Bold',
     },
 
     summaryRowValueStrong: {
-      color: '#3156D3',
+      color: theme.colors.success,
       fontFamily: 'Inter_800ExtraBold',
     },
 
@@ -2069,14 +2086,14 @@ const styles =
       marginTop: 14,
       padding: 22,
       borderRadius: 15,
-      backgroundColor: '#F8FAFC',
+      backgroundColor: '#FFF0A8',
       alignItems: 'center',
       borderWidth: 1,
-      borderColor: '#E7EBF3',
+      borderColor: theme.colors.border,
     },
 
     emptyTitle: {
-      color: '#344054',
+      color: theme.colors.text,
       fontSize: 14,
       fontFamily: 'Inter_700Bold',
     },
@@ -2088,11 +2105,11 @@ const styles =
       alignItems: 'center',
       gap: 24,
       marginBottom: 24,
-      padding: 24,
-      borderRadius: 24,
-      backgroundColor: '#FFFFFF',
+      padding: 26,
+      borderRadius: 26,
+      backgroundColor: theme.colors.primary,
       borderWidth: 1,
-      borderColor: '#E7EBF3',
+      borderColor: theme.colors.borderStrong,
       shadowColor: '#172033',
       shadowOpacity: 0.04,
       shadowRadius: 18,
@@ -2103,7 +2120,7 @@ const styles =
     heroCopy: { flex: 1 },
 
     eyebrow: {
-      color: '#3156D3',
+      color: theme.colors.text,
       fontSize: 11,
       letterSpacing: 1.1,
       fontFamily: 'Inter_800ExtraBold',
@@ -2114,14 +2131,14 @@ const styles =
       paddingHorizontal: 18,
       paddingVertical: 15,
       borderRadius: 18,
-      backgroundColor: '#F2F5FF',
+      backgroundColor: theme.colors.primarySoft,
       borderWidth: 1,
-      borderColor: '#DCE5FF',
+      borderColor: theme.colors.border,
       alignItems: 'center',
     },
 
     healthBadgeLabel: {
-      color: '#667085',
+      color: theme.colors.textSecondary,
       fontSize: 9,
       letterSpacing: 0.8,
       fontFamily: 'Inter_700Bold',
@@ -2129,13 +2146,13 @@ const styles =
 
     healthBadgeScore: {
       marginTop: 4,
-      color: '#3156D3',
+      color: theme.colors.text,
       fontSize: 34,
       fontFamily: 'Inter_800ExtraBold',
     },
 
     healthBadgeOutOf: {
-      color: '#98A2B3',
+      color: theme.colors.textMuted,
       fontSize: 14,
       fontFamily: 'Inter_600SemiBold',
     },
@@ -2167,13 +2184,13 @@ const styles =
       paddingHorizontal: 11,
       paddingVertical: 6,
       borderRadius: 99,
-      backgroundColor: '#F2F5FF',
+      backgroundColor: theme.colors.primarySoft,
       borderWidth: 1,
-      borderColor: '#DCE5FF',
+      borderColor: theme.colors.border,
     },
 
     percentPillText: {
-      color: '#3156D3',
+      color: theme.colors.text,
       fontSize: 12,
       fontFamily: 'Inter_800ExtraBold',
     },
@@ -2187,7 +2204,7 @@ const styles =
     },
 
     progressRemaining: {
-      color: '#667085',
+      color: theme.colors.textSecondary,
       fontSize: 12,
       fontFamily: 'Inter_600SemiBold',
     },
@@ -2195,7 +2212,7 @@ const styles =
     progressTrackLarge: {
       height: 13,
       marginTop: 16,
-      backgroundColor: '#EDF1F7',
+      backgroundColor: 'rgba(23,26,36,0.12)',
       borderRadius: 99,
       overflow: 'hidden',
     },
@@ -2211,13 +2228,13 @@ const styles =
 
     healthRowLabel: {
       flex: 1,
-      color: '#667085',
+      color: theme.colors.textSecondary,
       fontSize: 12,
       fontFamily: 'Inter_500Medium',
     },
 
     healthRowValue: {
-      color: '#344054',
+      color: theme.colors.text,
       fontSize: 12,
       fontFamily: 'Inter_800ExtraBold',
     },
@@ -2226,14 +2243,14 @@ const styles =
       height: 6,
       marginTop: 7,
       borderRadius: 99,
-      backgroundColor: '#EDF1F7',
+      backgroundColor: 'rgba(23,26,36,0.12)',
       overflow: 'hidden',
     },
 
     healthBarFill: {
       height: '100%',
       borderRadius: 99,
-      backgroundColor: '#356DFF',
+      backgroundColor: theme.colors.success,
     },
 
     healthMiniGrid: {
@@ -2246,29 +2263,31 @@ const styles =
       flex: 1,
       padding: 10,
       borderRadius: 12,
-      backgroundColor: '#F8FAFC',
+      backgroundColor: '#FFF0A8',
       borderWidth: 1,
-      borderColor: '#E7EBF3',
+      borderColor: theme.colors.border,
     },
 
     healthMiniLabel: {
-      color: '#98A2B3',
+      color: theme.colors.textMuted,
       fontSize: 9,
       fontFamily: 'Inter_600SemiBold',
     },
 
     healthMiniValue: {
       marginTop: 4,
-      color: '#172033',
+      color: theme.colors.text,
       fontSize: 13,
       fontFamily: 'Inter_800ExtraBold',
     },
 
     priorityCard: {
       marginTop: 18,
+      width: '100%',
+      alignSelf: 'stretch',
       padding: 20,
       borderRadius: 20,
-      backgroundColor: '#172033',
+      backgroundColor: theme.colors.primaryDark,
       flexDirection: 'row',
       gap: 16,
       alignItems: 'flex-start',
@@ -2279,17 +2298,42 @@ const styles =
       elevation: 3,
     },
 
+    priorityCardDanger: {
+      backgroundColor: theme.colors.danger,
+      borderWidth: 1,
+      borderColor: '#B92525',
+      shadowColor: '#B92525',
+      shadowOpacity: 0.22,
+    },
+
+    priorityCardWarning: {
+      backgroundColor: theme.colors.warning,
+      borderWidth: 1,
+      borderColor: '#D87900',
+    },
+
+    priorityCardPositive: {
+      backgroundColor: theme.colors.success,
+      borderWidth: 1,
+      borderColor: '#087A55',
+      shadowColor: '#087A55',
+    },
+
     priorityIcon: {
       width: 42,
       height: 42,
       borderRadius: 14,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: theme.colors.primarySoft,
       alignItems: 'center',
       justifyContent: 'center',
     },
 
+    priorityIconDanger: {
+      backgroundColor: theme.colors.dangerSoft,
+    },
+
     priorityIconText: {
-      color: '#3156D3',
+      color: theme.colors.danger,
       fontSize: 21,
       fontFamily: 'Inter_800ExtraBold',
     },
@@ -2297,7 +2341,7 @@ const styles =
     priorityContent: { flex: 1 },
 
     priorityEyebrow: {
-      color: '#9FB6FF',
+      color: theme.colors.primary,
       fontSize: 9,
       letterSpacing: 1,
       fontFamily: 'Inter_800ExtraBold',
@@ -2312,7 +2356,7 @@ const styles =
 
     priorityMessage: {
       marginTop: 5,
-      color: 'rgba(255,255,255,0.78)',
+      color: 'rgba(255,255,255,0.88)',
       fontSize: 12,
       lineHeight: 16,
       fontFamily: 'Inter_400Regular',
@@ -2339,9 +2383,9 @@ const styles =
       minHeight: 165,
       padding: 18,
       borderRadius: 18,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#FFE08A',
       borderWidth: 1,
-      borderColor: '#E7EBF3',
+      borderColor: '#D9AD19',
       shadowColor: '#172033',
       shadowOpacity: 0.025,
       shadowRadius: 12,
@@ -2350,7 +2394,7 @@ const styles =
     },
 
     strategyEyebrow: {
-      color: '#98A2B3',
+      color: theme.colors.textMuted,
       fontSize: 9,
       letterSpacing: 0.8,
       fontFamily: 'Inter_800ExtraBold',
@@ -2358,24 +2402,56 @@ const styles =
 
     strategyTitle: {
       marginTop: 9,
-      color: '#172033',
+      color: theme.colors.text,
       fontSize: 15,
       fontFamily: 'Inter_700Bold',
     },
 
     strategyValue: {
       marginTop: 7,
-      color: '#3156D3',
+      color: theme.colors.text,
       fontSize: 25,
       fontFamily: 'Inter_800ExtraBold',
     },
 
     strategyHint: {
       marginTop: 7,
-      color: '#7B8496',
+      color: theme.colors.textSecondary,
       fontSize: 11,
       lineHeight: 14,
       fontFamily: 'Inter_400Regular',
+    },
+
+    decorBlobOne: {
+      position: 'absolute',
+      width: 260,
+      height: 260,
+      borderRadius: 130,
+      backgroundColor: 'rgba(255,255,255,0.18)',
+      top: 80,
+      right: -90,
+      transform: [{ rotate: '18deg' }],
+    },
+
+    decorBlobTwo: {
+      position: 'absolute',
+      width: 180,
+      height: 180,
+      borderRadius: 36,
+      backgroundColor: 'rgba(255,122,0,0.12)',
+      top: 520,
+      left: -80,
+      transform: [{ rotate: '-16deg' }],
+    },
+
+    decorCircle: {
+      position: 'absolute',
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      backgroundColor: 'rgba(23,26,36,0.05)',
+      top: 980,
+      right: 40,
     },
 
     bottomSpace: { height: 20 },

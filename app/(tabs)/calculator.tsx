@@ -560,11 +560,15 @@ export default function CalculatorRoute() {
 
               <ScrollView
                 horizontal
+                style={styles.scheduleScroll}
+                contentContainerStyle={
+                  styles.scheduleScrollContent
+                }
                 showsHorizontalScrollIndicator={
                   false
                 }
               >
-                <View>
+                <View style={styles.scheduleTable}>
                   {/* Table Header */}
 
                   <View
@@ -825,11 +829,11 @@ const styles =
   StyleSheet.create({
     screen: {
       flex: 1,
-      backgroundColor: '#F5F7FB',
+      backgroundColor: '#FFD83D',
     },
 
     content: {
-      paddingHorizontal: 28,
+      paddingHorizontal: 16,
       paddingTop: 28,
       paddingBottom: 56,
       width: '100%',
@@ -843,7 +847,7 @@ const styles =
     title: {
       fontFamily: 'Inter_800ExtraBold',
       fontSize: 35,
-      color: '#111827',
+      color: '#171A24',
       letterSpacing: -0.7,
     },
 
@@ -851,20 +855,20 @@ const styles =
       marginTop: 7,
       fontFamily: 'Inter_400Regular',
       fontSize: 17,
-      color: '#667085',
+      color: '#4D5566',
       lineHeight: 21,
       maxWidth: 720,
     },
 
     card: {
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#FFF0A8',
       borderRadius: 20,
       borderWidth: 1,
-      borderColor: '#E7EBF3',
+      borderColor: '#E7C33A',
       padding: 22,
       marginBottom: 18,
-      shadowColor: '#101828',
-      shadowOpacity: 0.055,
+      shadowColor: '#171A24',
+      shadowOpacity: 0.12,
       shadowRadius: 18,
       shadowOffset: { width: 0, height: 7 },
       elevation: 2,
@@ -873,7 +877,7 @@ const styles =
     sectionTitle: {
       fontFamily: 'Inter_700Bold',
       fontSize: 20,
-      color: '#182230',
+      color: '#171A24',
       letterSpacing: -0.2,
       marginBottom: 18,
     },
@@ -885,7 +889,7 @@ const styles =
     label: {
       fontFamily: 'Inter_600SemiBold',
       fontSize: 14,
-      color: '#344054',
+      color: '#3E3210',
       marginBottom: 8,
       letterSpacing: 0.1,
     },
@@ -893,23 +897,23 @@ const styles =
     input: {
       height: 50,
       borderWidth: 1,
-      borderColor: '#D9E0EA',
+      borderColor: '#D5AA00',
       borderRadius: 13,
       paddingHorizontal: 15,
       fontFamily: 'Inter_500Medium',
       fontSize: 18,
-      color: '#101828',
-      backgroundColor: '#FBFCFE',
+      color: '#171A24',
+      backgroundColor: '#FFF9D6',
     },
 
     inputWithSuffix: {
       height: 50,
       borderWidth: 1,
-      borderColor: '#D9E0EA',
+      borderColor: '#D5AA00',
       borderRadius: 13,
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: '#FBFCFE',
+      backgroundColor: '#FFF9D6',
     },
 
     inputFlex: {
@@ -918,13 +922,13 @@ const styles =
       paddingHorizontal: 15,
       fontFamily: 'Inter_500Medium',
       fontSize: 18,
-      color: '#101828',
+      color: '#171A24',
     },
 
     inputSuffix: {
-      fontFamily: 'Inter_600SemiBold',
+      fontFamily: 'Inter_700Bold',
       fontSize: 17,
-      color: '#667085',
+      color: '#7A5B00',
       paddingRight: 15,
     },
 
@@ -938,62 +942,62 @@ const styles =
       flex: 1,
       height: 50,
       borderWidth: 1,
-      borderColor: '#D9E0EA',
+      borderColor: '#D5AA00',
       borderRadius: 13,
       paddingHorizontal: 15,
       fontFamily: 'Inter_500Medium',
       fontSize: 18,
-      color: '#101828',
-      backgroundColor: '#FBFCFE',
+      color: '#171A24',
+      backgroundColor: '#FFF9D6',
     },
 
     toggleContainer: {
       flexDirection: 'row',
       borderWidth: 1,
-      borderColor: '#D9E0EA',
+      borderColor: '#D5AA00',
       borderRadius: 13,
       overflow: 'hidden',
-      backgroundColor: '#F8FAFC',
+      backgroundColor: '#FFE8A0',
     },
 
     toggleButton: {
       paddingHorizontal: 15,
       height: 48,
       justifyContent: 'center',
-      backgroundColor: '#F8FAFC',
+      backgroundColor: '#FFE8A0',
     },
 
     toggleButtonActive: {
-      backgroundColor: '#356DFF',
+      backgroundColor: '#171A24',
     },
 
     toggleText: {
       fontFamily: 'Inter_600SemiBold',
       fontSize: 14,
-      color: '#667085',
+      color: '#6B5A1A',
     },
 
     toggleTextActive: {
-      color: '#FFFFFF',
+      color: '#FFD83D',
     },
 
     helperText: {
       marginTop: 7,
       fontFamily: 'Inter_400Regular',
       fontSize: 13,
-      color: '#98A2B3',
+      color: '#6B5A1A',
     },
 
     resultCard: {
-      backgroundColor: '#356DFF',
+      backgroundColor: '#F4C400',
       borderWidth: 1,
-      borderColor: '#356DFF',
+      borderColor: '#D5AA00',
       borderRadius: 20,
       paddingHorizontal: 28,
       paddingVertical: 28,
       marginBottom: 18,
       alignItems: 'center',
-      shadowColor: '#356DFF',
+      shadowColor: '#171A24',
       shadowOpacity: 0.18,
       shadowRadius: 22,
       shadowOffset: { width: 0, height: 10 },
@@ -1003,7 +1007,7 @@ const styles =
     resultLabel: {
       fontFamily: 'Inter_600SemiBold',
       fontSize: 14,
-      color: '#DCE7FF',
+      color: '#4D3B00',
       letterSpacing: 0.5,
       textTransform: 'uppercase',
     },
@@ -1012,7 +1016,7 @@ const styles =
       marginTop: 8,
       fontFamily: 'Inter_800ExtraBold',
       fontSize: 45,
-      color: '#FFFFFF',
+      color: '#171A24',
       letterSpacing: -1,
     },
 
@@ -1020,7 +1024,7 @@ const styles =
       marginTop: 5,
       fontFamily: 'Inter_400Regular',
       fontSize: 14,
-      color: '#DCE7FF',
+      color: '#4D3B00',
     },
 
     summaryGrid: {
@@ -1042,51 +1046,51 @@ const styles =
     summaryLabel: {
       fontFamily: 'Inter_500Medium',
       fontSize: 13,
-      color: '#667085',
+      color: '#5A4918',
       marginBottom: 7,
     },
 
     summaryValue: {
       fontFamily: 'Inter_700Bold',
       fontSize: 20,
-      color: '#182230',
+      color: '#171A24',
       letterSpacing: -0.2,
     },
 
     summaryBlue: {
-      backgroundColor: '#F2F5FF',
-      borderColor: '#DCE5FF',
+      backgroundColor: '#FFE27A',
+      borderColor: '#E4B800',
     },
 
     summaryPurple: {
-      backgroundColor: '#F6F2FF',
-      borderColor: '#E7DDFF',
+      backgroundColor: '#FFC83D',
+      borderColor: '#D9A600',
     },
 
     summaryGreen: {
-      backgroundColor: '#EFFAF5',
-      borderColor: '#D4F0E3',
+      backgroundColor: '#E7F2A8',
+      borderColor: '#BFD66A',
     },
 
     summaryOrange: {
-      backgroundColor: '#FFF8EC',
-      borderColor: '#F5E2BE',
+      backgroundColor: '#FFB84A',
+      borderColor: '#E39424',
     },
 
     summaryBlueValue: {
-      color: '#3156D3',
+      color: '#17324D',
     },
 
     summaryPurpleValue: {
-      color: '#6941C6',
+      color: '#4A2F00',
     },
 
     summaryGreenValue: {
-      color: '#168A61',
+      color: '#176B4A',
     },
 
     summaryOrangeValue: {
-      color: '#C47718',
+      color: '#713900',
     },
 
     scheduleHeader: {
@@ -1100,16 +1104,29 @@ const styles =
       marginBottom: 14,
       fontFamily: 'Inter_400Regular',
       fontSize: 13,
-      color: '#98A2B3',
+      color: '#6B5A1A',
+    },
+
+    scheduleScroll: {
+      width: '100%',
+    },
+
+    scheduleScrollContent: {
+      minWidth: '100%',
+    },
+
+    scheduleTable: {
+      width: '100%',
+      minWidth: 760,
     },
 
     tableHeader: {
       height: 42,
       flexDirection: 'row',
-      backgroundColor: '#F8FAFC',
+      backgroundColor: '#FFC928',
       borderTopWidth: 1,
       borderBottomWidth: 1,
-      borderColor: '#E7EBF3',
+      borderColor: '#D5AA00',
       borderTopLeftRadius: 10,
       borderTopRightRadius: 10,
     },
@@ -1122,16 +1139,16 @@ const styles =
     tableHeaderText: {
       fontFamily: 'Inter_600SemiBold',
       fontSize: 13,
-      color: '#475467',
+      color: '#171A24',
     },
 
     tableRow: {
       minHeight: 50,
       flexDirection: 'row',
       borderBottomWidth: 1,
-      borderColor: '#EEF1F5',
+      borderColor: '#E7C33A',
       alignItems: 'center',
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#FFF9D6',
     },
 
     tableCell: {
@@ -1142,19 +1159,19 @@ const styles =
     tableCellText: {
       fontFamily: 'Inter_400Regular',
       fontSize: 13,
-      color: '#475467',
+      color: '#4D5566',
     },
 
     emptyCard: {
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#FFF0A8',
       borderWidth: 1,
-      borderColor: '#E7EBF3',
+      borderColor: '#E7C33A',
       borderRadius: 20,
       padding: 34,
       alignItems: 'center',
       marginTop: 3,
-      shadowColor: '#101828',
-      shadowOpacity: 0.04,
+      shadowColor: '#171A24',
+      shadowOpacity: 0.10,
       shadowRadius: 16,
       shadowOffset: { width: 0, height: 6 },
       elevation: 1,
@@ -1163,7 +1180,7 @@ const styles =
     emptyTitle: {
       fontFamily: 'Inter_700Bold',
       fontSize: 19,
-      color: '#182230',
+      color: '#171A24',
     },
 
     emptyText: {
@@ -1172,8 +1189,7 @@ const styles =
       fontSize: 15,
       lineHeight: 20,
       textAlign: 'center',
-      color: '#667085',
+      color: '#4D5566',
       maxWidth: 500,
     },
   });
-
